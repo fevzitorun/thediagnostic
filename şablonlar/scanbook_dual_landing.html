@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#00c896;--teal-dark:#009e78;--teal-light:#e6faf5;
+  --navy:#0d1f35;--navy-mid:#1a3550;--navy-light:#243d55;
+  --gold:#c9a84c;--gold-light:#fdf3dc;
+  --white:#ffffff;--off:#f7f9f8;--border:#e8eef0;
+  --text:#0d1f35;--muted:#6b8094;--subtle:#a8bcc8;
+}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);overflow-x:hidden}
+
+/* MODE TOGGLE */
+.mode-bar{position:sticky;top:0;z-index:200;display:flex;background:#fff;border-bottom:1.5px solid var(--border);height:52px;align-items:center;justify-content:center;gap:4px;padding:0 24px}
+.mode-btn{padding:8px 22px;border-radius:50px;border:1.5px solid transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.mode-btn.patient.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.mode-btn.clinic.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.mode-btn:not(.active){background:#fff;color:var(--muted);border-color:var(--border)}
+.mode-btn:not(.active):hover{border-color:var(--subtle);color:var(--text)}
+
+/* PAGES */
+.page{display:none;animation:fadeIn .35s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ============ PATIENT PAGE ============ */
+.p-nav{padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.p-logo{font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-.5px}
+.p-logo span{color:var(--teal)}
+.p-navlinks{display:flex;gap:28px;font-size:13px;color:var(--muted)}
+.p-navlinks span{cursor:pointer;transition:color .15s}.p-navlinks span:hover{color:var(--teal)}
+.p-navright{display:flex;gap:10px}
+.btn-ghost{padding:8px 18px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-teal{padding:8px 20px;border:none;border-radius:8px;background:var(--teal);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-teal:hover{background:var(--teal-dark);transform:translateY(-1px)}
+.btn-teal-lg{padding:14px 32px;border:none;border-radius:10px;background:var(--teal);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-teal-lg:hover{background:var(--teal-dark);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,200,150,.3)}
+.btn-outline-lg{padding:14px 28px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text);font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* HERO */
+.p-hero{padding:72px 48px 80px;background:linear-gradient(175deg,#f0fdf9 0%,#fff 55%);position:relative;overflow:hidden}
+.p-hero-badge{display:inline-flex;align-items:center;gap:8px;background:#e6faf5;border:1px solid #b2edd8;border-radius:20px;padding:6px 16px;font-size:12px;color:#00a878;margin-bottom:28px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.p-hero h1{font-family:'Instrument Serif',serif;font-size:54px;line-height:1.12;letter-spacing:-1.5px;margin-bottom:18px;color:var(--navy)}
+.p-hero h1 em{color:var(--teal);font-style:italic}
+.p-hero p{font-size:17px;color:var(--muted);line-height:1.75;max-width:540px;margin:0 auto 44px}
+.search-widget{background:#fff;border-radius:18px;padding:22px;box-shadow:0 4px 6px rgba(0,0,0,.03),0 20px 60px rgba(0,0,0,.07);border:1px solid rgba(0,0,0,.05);max-width:780px;margin:0 auto;text-align:left}
+.scan-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.scan-pill{padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.scan-pill:hover,.scan-pill.active{border-color:var(--teal);background:#e6faf5;color:var(--teal-dark)}
+.scan-pill .ptag{font-size:10px;background:#e6faf5;color:var(--teal);padding:1px 5px;border-radius:4px}
+.search-row{display:flex;gap:8px}
+.search-input{flex:2;padding:13px 13px 13px 38px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b8094' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center}
+.search-input:focus{border-color:var(--teal)}
+.search-select{flex:1;padding:13px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:#fff;outline:none;cursor:pointer}
+.search-hint{margin-top:11px;font-size:12px;color:var(--subtle)}
+.search-hint span{color:var(--teal);cursor:pointer}
+
+/* TRUST BAR */
+.trust-bar{background:var(--navy);padding:16px 48px;display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.7)}
+.trust-item strong{color:var(--teal)}
+
+/* STATS */
+.p-stats{padding:52px 48px;background:var(--off);display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:900px;margin:0 auto}
+.stat-card{text-align:center}
+.stat-val{font-family:'Instrument Serif',serif;font-size:42px;color:var(--teal);letter-spacing:-1px;line-height:1}
+.stat-label{font-size:14px;font-weight:600;color:var(--navy);margin-top:8px}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* SCAN TYPES */
+.section{padding:64px 48px}
+.section-label{font-size:11px;color:var(--subtle);letter-spacing:3px;margin-bottom:10px;text-align:center}
+.section-title{font-family:'Instrument Serif',serif;font-size:36px;text-align:center;margin-bottom:8px;letter-spacing:-.5px}
+.section-title em{color:var(--teal);font-style:italic}
+.section-sub{font-size:15px;color:var(--muted);text-align:center;margin-bottom:44px}
+.scan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:960px;margin:0 auto}
+.scan-card{padding:26px;border-radius:14px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .2s}
+.scan-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,200,150,.1);border-color:var(--teal)}
+.scan-icon{font-size:32px;margin-bottom:14px}
+.scan-name{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.scan-name h3{font-size:18px;font-weight:600}
+.scan-tag{font-size:10px;background:#e6faf5;color:var(--teal);padding:2px 7px;border-radius:4px;font-weight:600}
+.scan-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px}
+.scan-footer{display:flex;justify-content:space-between;align-items:center}
+.scan-price{font-size:22px;font-weight:700;color:var(--navy)}
+.scan-price span{font-size:12px;color:var(--muted);font-weight:400}
+.btn-sm{padding:7px 16px;border:1.5px solid var(--teal);border-radius:8px;background:#fff;color:var(--teal);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* BABY SECTION */
+.baby-section{padding:72px 48px;background:#fff8fc}
+.baby-inner{max-width:880px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.baby-badge{display:inline-block;font-size:11px;background:#ffe0f0;color:#e84393;padding:4px 12px;border-radius:20px;font-weight:600;margin-bottom:16px}
+.baby-inner h2{font-family:'Instrument Serif',serif;font-size:38px;line-height:1.2;letter-spacing:-.5px;margin-bottom:14px}
+.baby-inner h2 em{color:#e84393;font-style:italic}
+.baby-list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.baby-item{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text)}
+.baby-item::before{content:'♥';color:#e84393;font-size:12px}
+.btn-pink{padding:14px 28px;border:none;border-radius:10px;background:#e84393;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.baby-visual{background:linear-gradient(135deg,#ffe0f0,#fff8fc);border-radius:24px;height:320px;display:flex;align-items:center;justify-content:center;font-size:80px}
+
+/* HOW IT WORKS */
+.how-section{padding:72px 48px;background:linear-gradient(170deg,var(--navy) 0%,#162d47 100%)}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;max-width:900px;margin:0 auto}
+.how-step{text-align:center}
+.how-num{font-family:'DM Mono',monospace;font-size:40px;font-weight:700;color:rgba(0,200,150,.12);margin-bottom:10px}
+.how-icon{font-size:26px;margin-bottom:10px}
+.how-title{font-size:15px;color:#fff;font-weight:600;margin-bottom:8px}
+.how-desc{font-size:12px;color:rgba(255,255,255,.45);line-height:1.7}
+
+/* REVIEWS */
+.review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:960px;margin:0 auto}
+.review-card{background:#fff;border-radius:14px;padding:22px;border:1px solid var(--border);transition:all .2s}
+.review-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.stars{color:#f59e0b;font-size:13px;margin-bottom:14px}
+.review-text{font-size:13px;color:#444;line-height:1.7;margin-bottom:18px;font-style:italic}
+.reviewer{display:flex;justify-content:space-between;align-items:flex-end}
+.reviewer-name{font-size:13px;font-weight:600}
+.reviewer-sub{font-size:11px;color:var(--muted)}
+.review-time{font-size:11px;color:#ccc}
+
+/* CITIES */
+.cities-section{padding:56px 48px;text-align:center}
+.city-pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:28px}
+.city-pill{padding:10px 22px;border:1.5px solid var(--border);border-radius:50px;font-size:14px;color:var(--muted);cursor:pointer;transition:all .15s}
+.city-pill:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+/* CTA SECTION */
+.cta-section{padding:80px 48px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));text-align:center}
+.cta-section h2{font-family:'Instrument Serif',serif;font-size:40px;color:#fff;margin-bottom:14px;letter-spacing:-.5px}
+.cta-section p{font-size:16px;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:36px}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-white{padding:15px 32px;border:none;border-radius:10px;background:#fff;color:var(--teal-dark);font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-outline-white{padding:15px 28px;border:2px solid rgba(255,255,255,.5);border-radius:10px;background:transparent;color:#fff;font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* FOOTER */
+.p-footer{background:var(--navy);padding:48px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px}
+.footer-brand{font-family:'Instrument Serif',serif;font-size:20px;color:#fff;margin-bottom:12px}
+.footer-brand span{color:var(--teal)}
+.footer-desc{font-size:13px;color:rgba(255,255,255,.35);line-height:1.8;max-width:240px}
+.footer-col h4{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:1.5px;margin-bottom:14px}
+.footer-link{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:9px;cursor:pointer;display:block}
+.footer-bottom{background:#060e18;padding:20px 48px;display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.25)}
+
+/* ============ CLINIC PAGE ============ */
+.c-page{background:var(--navy)}
+.c-nav{padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06);background:var(--navy)}
+.c-logo-wrap{display:flex;align-items:center;gap:10px}
+.c-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#1a3550,#0d2035);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--teal)}
+.c-logo-text{font-size:14px;font-weight:600;color:#fff}
+.c-logo-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+.c-nav-links{display:flex;gap:28px;font-size:13px;color:rgba(255,255,255,.5)}
+.c-nav-links span{cursor:pointer;transition:color .15s}.c-nav-links span:hover{color:#fff}
+.c-tab-bar{display:flex;border-bottom:1px solid rgba(255,255,255,.06);padding:0 48px;background:var(--navy)}
+.c-tab{padding:14px 24px;font-size:14px;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;color:rgba(255,255,255,.4)}
+.c-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+
+/* CLINIC HERO */
+.c-hero{padding:80px 48px 96px;background:var(--navy);position:relative;overflow:hidden}
+.c-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.c-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.2);border-radius:4px;padding:6px 14px;font-size:11px;color:var(--teal);margin-bottom:28px;letter-spacing:1.5px;font-weight:600;font-family:'DM Mono',monospace}
+.c-hero h1{font-family:'Instrument Serif',serif;font-size:52px;line-height:1.1;color:#fff;margin-bottom:18px;letter-spacing:-1px;max-width:660px}
+.c-hero h1 em{color:var(--teal);font-style:italic}
+.c-hero p{font-size:16px;color:rgba(255,255,255,.55);line-height:1.8;max-width:560px;margin-bottom:40px}
+.c-hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-teal-c{padding:14px 30px;border:none;border-radius:10px;background:var(--teal);color:#0a1f14;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-teal-c:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,200,150,.3)}
+.btn-ghost-c{padding:14px 24px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:transparent;color:rgba(255,255,255,.7);font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.c-trust-row{display:flex;gap:28px;flex-wrap:wrap;margin-top:44px}
+.c-trust-item{font-size:12px;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:6px}
+.c-trust-item::before{content:'✓';color:var(--teal);font-weight:700}
+
+/* CLINIC STATS */
+.c-stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
+.c-stat{padding:32px 24px;text-align:center;border-right:1px solid rgba(255,255,255,.06)}
+.c-stat:last-child{border-right:none}
+.c-stat-val{font-family:'Instrument Serif',serif;font-size:36px;color:#fff;letter-spacing:-1px}
+.c-stat-label{font-size:12px;color:rgba(255,255,255,.4);margin-top:4px}
+
+/* BENEFITS */
+.c-benefits{padding:64px 48px;background:var(--navy)}
+.c-benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:900px;margin:0 auto}
+.benefit-card{padding:26px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;display:flex;gap:18px;cursor:pointer;transition:all .2s}
+.benefit-card:hover{border-color:rgba(0,200,150,.25);background:rgba(0,200,150,.04)}
+.benefit-icon{width:48px;height:48px;border-radius:12px;background:rgba(0,200,150,.08);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.benefit-title{font-size:16px;font-weight:600;color:#fff;margin-bottom:7px}
+.benefit-desc{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7}
+
+/* HOW CLINIC */
+.c-how{padding:64px 48px;background:rgba(0,0,0,.2)}
+.c-how-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;max-width:900px;margin:0 auto;position:relative}
+.c-step{position:relative}
+.c-step-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--teal);letter-spacing:1px;margin-bottom:14px}
+.c-step-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:8px}
+.c-step-desc{font-size:12px;color:rgba(255,255,255,.4);line-height:1.7}
+
+/* TIERS */
+.c-tiers{padding:64px 48px;background:var(--navy)}
+.c-tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:900px;margin:0 auto}
+.tier-card{padding:26px;border-radius:14px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);cursor:pointer;transition:all .2s}
+.tier-card.featured{background:linear-gradient(160deg,#0d2d48,#162d47);border-color:var(--teal)}
+.tier-card:hover:not(.featured){border-color:rgba(255,255,255,.15)}
+.tier-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.tier-name{font-size:15px;font-weight:700;color:#fff}
+.tier-badge{font-size:10px;padding:3px 8px;border-radius:4px;font-weight:600;font-family:'DM Mono',monospace}
+.tier-badge.green{background:rgba(0,200,150,.15);color:var(--teal)}
+.tier-badge.gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
+.tier-commission{font-family:'Instrument Serif',serif;font-size:32px;color:var(--teal);margin-bottom:4px}
+.tier-commission-sub{font-size:12px;color:rgba(255,255,255,.35);margin-bottom:18px}
+.tier-features{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.tier-feature{font-size:12px;color:rgba(255,255,255,.55);display:flex;gap:8px}
+.tier-feature::before{content:'✓';color:var(--teal);flex-shrink:0}
+.tier-btn{width:100%;padding:11px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.tier-btn.green{border:none;background:var(--teal);color:#0a1f14}
+.tier-btn.outline{border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6)}
+
+/* FAQ */
+.c-faq{padding:60px 48px;background:rgba(0,0,0,.15)}
+.c-faq-inner{max-width:680px;margin:0 auto}
+.faq-item{padding:18px 0;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer}
+.faq-q{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;color:#fff}
+.faq-toggle{color:var(--teal);font-size:20px;flex-shrink:0}
+.faq-a{font-size:13px;color:rgba(255,255,255,.5);line-height:1.8;margin-top:12px;display:none}
+.faq-a.open{display:block}
+
+/* GP TAB */
+.gp-section{padding:64px 48px;background:var(--navy)}
+.gp-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px;margin:0 auto 40px}
+.gp-calc{background:linear-gradient(135deg,#180f2e,#2d1e5f);border-radius:16px;padding:32px;max-width:900px;margin:0 auto}
+.gp-calc h3{font-family:'Instrument Serif',serif;font-size:22px;color:#fff;margin-bottom:24px}
+.calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.calc-box{text-align:center;padding:18px;background:rgba(255,255,255,.06);border-radius:10px}
+.calc-patients{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:6px}
+.calc-earn{font-family:'Instrument Serif',serif;font-size:28px;color:#a78bfa}
+.calc-note{font-size:11px;color:rgba(255,255,255,.3);margin-top:4px}
+
+/* CLINIC CTA */
+.c-cta{padding:72px 48px;background:linear-gradient(135deg,#0d2035,#162d47);text-align:center}
+.c-cta h2{font-family:'Instrument Serif',serif;font-size:38px;color:#fff;margin-bottom:14px;letter-spacing:-.5px}
+.c-cta h2 em{color:var(--teal)}
+.c-cta p{font-size:15px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:32px}
+.c-footer{background:#040c14;padding:24px 48px;text-align:center;font-size:12px;color:rgba(255,255,255,.2)}
+
+.section-label-light{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:3px;margin-bottom:10px;text-align:center}
+.section-title-light{font-family:'Instrument Serif',serif;font-size:34px;color:#fff;text-align:center;margin-bottom:8px;letter-spacing:-.5px}
+.section-title-light em{color:var(--teal)}
+.section-sub-light{font-size:14px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:40px}
+</style>
+</head>
+<body>
+
+<!-- MODE TOGGLE -->
+<div class="mode-bar">
+  <button class="mode-btn patient active" onclick="setMode('patient')">🧑‍⚕️ Hasta Sayfası — scanbook.uk</button>
+  <button class="mode-btn clinic" onclick="setMode('clinic')">🏥 Klinik Sayfası — scanbook.co.uk/partners</button>
+</div>
+
+<!-- ==================== PATIENT PAGE ==================== -->
+<div class="page active" id="patient-page">
+
+  <nav class="p-nav">
+    <div class="p-logo">Scan<span>Book</span><span style="font-family:'DM Sans',sans-serif;font-size:11px;color:#aaa;margin-left:4px">.uk</span></div>
+    <div class="p-navlinks">
+      <span>Scan Types</span><span>Find a Centre</span><span>Baby Scans</span><span>How It Works</span>
+    </div>
+    <div class="p-navright">
+      <button class="btn-ghost">Sign In</button>
+      <button class="btn-teal">Book a Scan</button>
+    </div>
+  </nav>
+
+  <div class="p-hero" style="text-align:center">
+    <div class="p-hero-badge"><span class="pulse"></span> NHS wait: 6–18 weeks · ScanBook: <strong style="margin-left:3px">Available Today</strong></div>
+    <h1>Private Diagnostic Scans,<br><em>Booked in Minutes.</em></h1>
+    <p style="margin:0 auto 40px">Connect instantly with 600+ accredited imaging centres across the UK. MRI, CT, Ultrasound, X-Ray — no referral, no waiting list.</p>
+
+    <div class="search-widget">
+      <div class="scan-pills">
+        <div class="scan-pill active">🧲 MRI</div>
+        <div class="scan-pill">🔬 CT Scan</div>
+        <div class="scan-pill">〰 Ultrasound</div>
+        <div class="scan-pill">⚡ X-Ray</div>
+        <div class="scan-pill">👶 Baby Scan <span class="ptag">Popular</span></div>
+        <div class="scan-pill">🏆 Executive</div>
+      </div>
+      <div class="search-row">
+        <input class="search-input" placeholder="City, postcode or centre name...">
+        <select class="search-select">
+          <option>Any body part</option>
+          <option>Head & Brain</option>
+          <option>Knee & Joints</option>
+          <option>Spine & Back</option>
+          <option>Abdomen</option>
+          <option>Chest & Lungs</option>
+        </select>
+        <button class="btn-teal" style="padding:13px 24px;font-size:14px;border-radius:10px">Find Centres →</button>
+      </div>
+      <div class="search-hint">Popular: <span>MRI Knee London</span> · <span>Baby 4D Birmingham</span> · <span>CT Chest Manchester</span></div>
+    </div>
+  </div>
+
+  <div class="trust-bar">
+    <div class="trust-item"><strong>✓</strong> CQC Verified Only</div>
+    <div class="trust-item"><strong>🔒</strong> Secure Stripe Payment</div>
+    <div class="trust-item"><strong>📋</strong> Radiologist Report Included</div>
+    <div class="trust-item"><strong>↩</strong> Free Cancellation 24h</div>
+  </div>
+
+  <div style="background:var(--off);padding:52px 48px">
+    <div class="p-stats">
+      <div class="stat-card"><div class="stat-val">600+</div><div class="stat-label">Partner Centres</div><div class="stat-sub">across the UK</div></div>
+      <div class="stat-card"><div class="stat-val">48h</div><div class="stat-label">Average Wait</div><div class="stat-sub">vs 14 weeks NHS</div></div>
+      <div class="stat-card"><div class="stat-val">£75</div><div class="stat-label">Starting From</div><div class="stat-sub">transparent pricing</div></div>
+      <div class="stat-card"><div class="stat-val">4.9★</div><div class="stat-label">Patient Rating</div><div class="stat-sub">verified reviews</div></div>
+    </div>
+  </div>
+
+  <div class="section" style="background:#fff">
+    <div class="section-label">WHAT WE OFFER</div>
+    <h2 class="section-title">Every scan, <em>every city.</em></h2>
+    <p class="section-sub">No referral needed. Book any scan, anywhere in the UK.</p>
+    <div class="scan-grid">
+      <div class="scan-card"><div class="scan-icon">🧲</div><div class="scan-name"><h3>MRI</h3><span class="scan-tag">Most Popular</span></div><p class="scan-desc">Brain, spine, joints, abdomen and more. 1.5T and 3T available.</p><div class="scan-footer"><div class="scan-price">£199 <span>from</span></div><button class="btn-sm">Book →</button></div></div>
+      <div class="scan-card"><div class="scan-icon">🔬</div><div class="scan-name"><h3>CT Scan</h3></div><p class="scan-desc">Chest, abdomen, cardiac and full body CT imaging.</p><div class="scan-footer"><div class="scan-price">£249 <span>from</span></div><button class="btn-sm">Book →</button></div></div>
+      <div class="scan-card"><div class="scan-icon">〰</div><div class="scan-name"><h3>Ultrasound</h3><span class="scan-tag">Baby Scans</span></div><p class="scan-desc">Organ scans, pregnancy and 4D baby ultrasound packages.</p><div class="scan-footer"><div class="scan-price">£99 <span>from</span></div><button class="btn-sm">Book →</button></div></div>
+      <div class="scan-card"><div class="scan-icon">⚡</div><div class="scan-name"><h3>X-Ray</h3><span class="scan-tag">Same Day</span></div><p class="scan-desc">Chest, bone and joint X-rays. Results same day.</p><div class="scan-footer"><div class="scan-price">£75 <span>from</span></div><button class="btn-sm">Book →</button></div></div>
+      <div class="scan-card"><div class="scan-icon">🎯</div><div class="scan-name"><h3>PET-CT</h3></div><p class="scan-desc">Cancer detection, staging and treatment monitoring.</p><div class="scan-footer"><div class="scan-price">£850 <span>from</span></div><button class="btn-sm">Book →</button></div></div>
+      <div class="scan-card"><div class="scan-icon">🏆</div><div class="scan-name"><h3>Executive</h3><span class="scan-tag">New</span></div><p class="scan-desc">Full body health checks and executive screening packages.</p><div class="scan-footer"><div class="scan-price">£299 <span>from</span></div><button class="btn-sm">Book →</button></div></div>
+    </div>
+  </div>
+
+  <div class="baby-section">
+    <div class="baby-inner">
+      <div>
+        <span class="baby-badge">♥ BABY SCANS</span>
+        <h2>See your baby's<br><em>first smile.</em></h2>
+        <p style="font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:20px">Warm, welcoming clinics offering 4D baby scans, gender reveal and pregnancy packages across the UK.</p>
+        <div class="baby-list">
+          <div class="baby-item">4D/3D Baby Scan — from £99</div>
+          <div class="baby-item">Gender Reveal Scan — from £79</div>
+          <div class="baby-item">Pregnancy Well-being Check</div>
+          <div class="baby-item">Anomaly & Growth Scan</div>
+        </div>
+        <button class="btn-pink">Book Baby Scan →</button>
+      </div>
+      <div class="baby-visual">👶</div>
+    </div>
+  </div>
+
+  <div class="how-section">
+    <div class="section-label" style="color:rgba(0,200,150,.6)">THE PROCESS</div>
+    <h2 class="section-title" style="color:#fff;margin-bottom:48px">From search to scan <em>in minutes.</em></h2>
+    <div class="how-grid">
+      <div class="how-step"><div class="how-num">01</div><div class="how-icon">🔍</div><div class="how-title">Choose your scan</div><div class="how-desc">Select scan type, body part and your preferred city</div></div>
+      <div class="how-step"><div class="how-num">02</div><div class="how-icon">🏥</div><div class="how-title">Pick a centre</div><div class="how-desc">Compare prices, ratings and real-time availability</div></div>
+      <div class="how-step"><div class="how-num">03</div><div class="how-icon">💳</div><div class="how-title">Book & pay</div><div class="how-desc">Instant confirmation. No referral letter needed.</div></div>
+      <div class="how-step"><div class="how-num">04</div><div class="how-icon">📋</div><div class="how-title">Get your results</div><div class="how-desc">Radiologist report delivered within 24–48 hours</div></div>
+    </div>
+  </div>
+
+  <div class="section" style="background:var(--off)">
+    <div class="section-label">PATIENT STORIES</div>
+    <h2 class="section-title">Real people, <em>real results.</em></h2>
+    <div class="review-grid">
+      <div class="review-card"><div class="stars">★★★★★</div><p class="review-text">"Booked my MRI within 2 hours. Was seen the next morning. After 14 weeks on the NHS list, this was life-changing."</p><div class="reviewer"><div><div class="reviewer-name">Sarah M.</div><div class="reviewer-sub">MRI Knee · London</div></div><div class="review-time">2 days ago</div></div></div>
+      <div class="review-card"><div class="stars">★★★★★</div><p class="review-text">"Incredibly smooth process. Got my results in 36 hours. The radiologist report was detailed and my GP was impressed."</p><div class="reviewer"><div><div class="reviewer-name">James O.</div><div class="reviewer-sub">CT Chest · Manchester</div></div><div class="review-time">1 week ago</div></div></div>
+      <div class="review-card"><div class="stars">★★★★★</div><p class="review-text">"We saw our baby's face for the first time. The clinic was warm and professional. Already recommended to 3 friends."</p><div class="reviewer"><div><div class="reviewer-name">Priya K.</div><div class="reviewer-sub">4D Baby Scan · Birmingham</div></div><div class="review-time">3 days ago</div></div></div>
+    </div>
+  </div>
+
+  <div class="cities-section">
+    <div class="section-label">LOCATIONS</div>
+    <h2 class="section-title">Available in <em>10 cities</em></h2>
+    <div class="city-pills">
+      <div class="city-pill">London</div><div class="city-pill">Manchester</div><div class="city-pill">Birmingham</div><div class="city-pill">Leeds</div><div class="city-pill">Bristol</div><div class="city-pill">Edinburgh</div><div class="city-pill">Glasgow</div><div class="city-pill">Liverpool</div>
+      <div class="city-pill" style="border-style:dashed;color:#ccc">+ More coming</div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <h2>Stop waiting.<br>Start scanning.</h2>
+    <p>Over 6 million people are waiting for NHS care.<br>You don't have to be one of them.</p>
+    <div class="cta-btns">
+      <button class="btn-white">Book a Scan Today →</button>
+      <button class="btn-outline-white">View All Centres</button>
+    </div>
+  </div>
+
+  <div class="p-footer">
+    <div><div class="footer-brand">Scan<span>Book</span></div><p class="footer-desc">UK's private diagnostic imaging marketplace. CQC verified centres. No referral needed.</p></div>
+    <div><h4>SCANS</h4><a class="footer-link">MRI Scans</a><a class="footer-link">CT Scans</a><a class="footer-link">Ultrasound</a><a class="footer-link">Baby Scans</a><a class="footer-link">X-Ray</a></div>
+    <div><h4>CITIES</h4><a class="footer-link">London</a><a class="footer-link">Manchester</a><a class="footer-link">Birmingham</a><a class="footer-link">Leeds</a><a class="footer-link">Bristol</a></div>
+    <div><h4>COMPANY</h4><a class="footer-link">About</a><a class="footer-link">For Clinics</a><a class="footer-link">For GPs</a><a class="footer-link">Contact</a><a class="footer-link">Privacy</a></div>
+  </div>
+  <div class="footer-bottom">© 2025 ScanBook Ltd (The Connective UK Ltd) · All rights reserved · 🔒 SSL · ✓ CQC Partner Network</div>
+</div>
+
+<!-- ==================== CLINIC PAGE ==================== -->
+<div class="page" id="clinic-page">
+  <div class="c-page">
+
+    <nav class="c-nav">
+      <div class="c-logo-wrap">
+        <div class="c-logo-icon">S</div>
+        <div><div class="c-logo-text">ScanBook Partner Programme</div><div class="c-logo-sub">Powered by The Connective UK Ltd</div></div>
+      </div>
+      <div class="c-nav-links">
+        <span>For Imaging Centres</span><span>For GP Practices</span><span>Partner Portal</span><span>Contact</span>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost-c" style="font-size:13px;padding:8px 18px">Partner Login</button>
+        <button class="btn-teal-c" style="font-size:13px;padding:8px 20px">Apply Now →</button>
+      </div>
+    </nav>
+
+    <div class="c-tab-bar">
+      <div class="c-tab active" onclick="setClinicTab('imaging',this)">🏥 Imaging Centres</div>
+      <div class="c-tab" onclick="setClinicTab('gp',this)">🩺 GP Practices</div>
+    </div>
+
+    <div id="imaging-tab">
+      <div class="c-hero">
+        <div class="c-badge">SCANBOOK PARTNER PROGRAMME · IMAGING CENTRES</div>
+        <h1>Your scanner runs 8 hours.<br><em>Fill every hour.</em></h1>
+        <p>Join 600+ UK imaging centres using ScanBook to fill empty slots and generate new self-pay revenue — zero upfront cost, zero commitment required.</p>
+        <div class="c-hero-btns">
+          <button class="btn-teal-c">Apply as Partner Centre →</button>
+          <button class="btn-ghost-c">See How It Works</button>
+        </div>
+        <div class="c-trust-row">
+          <div class="c-trust-item">CQC Verified Partners Only</div>
+          <div class="c-trust-item">No Exclusivity Required</div>
+          <div class="c-trust-item">GDPR Compliant</div>
+          <div class="c-trust-item">Stripe Payments</div>
+          <div class="c-trust-item">30-Day Exit Notice</div>
+        </div>
+      </div>
+
+      <div class="c-stats">
+        <div class="c-stat"><div class="c-stat-val">600+</div><div class="c-stat-label">Partner Centres</div></div>
+        <div class="c-stat"><div class="c-stat-val">£0</div><div class="c-stat-label">Upfront Cost</div></div>
+        <div class="c-stat"><div class="c-stat-val">24h</div><div class="c-stat-label">Go-Live Time</div></div>
+        <div class="c-stat"><div class="c-stat-val">14 day</div><div class="c-stat-label">Payment Terms</div></div>
+      </div>
+
+      <div class="c-benefits">
+        <div class="section-label-light">WHY PARTNER WITH SCANBOOK</div>
+        <h2 class="section-title-light">Empty slots cost you money. <em>We fill them.</em></h2>
+        <p class="section-sub-light">No upfront cost. Commission only on completed bookings.</p>
+        <div class="c-benefits-grid">
+          <div class="benefit-card"><div class="benefit-icon">📈</div><div><div class="benefit-title">Fill Empty Slots</div><div class="benefit-desc">Your unused scanner time is revenue walking out the door. ScanBook connects you with self-pay patients ready to book today.</div></div></div>
+          <div class="benefit-card"><div class="benefit-icon">£</div><div><div class="benefit-title">Zero Upfront Cost</div><div class="benefit-desc">No software fees, no setup charges. We only earn when you earn — 12–15% commission on completed bookings only.</div></div></div>
+          <div class="benefit-card"><div class="benefit-icon">⚡</div><div><div class="benefit-title">Live in 24 Hours</div><div class="benefit-desc">Our partner portal takes under a day to set up. Manual slot management or full API integration — you choose.</div></div></div>
+          <div class="benefit-card"><div class="benefit-icon">🤝</div><div><div class="benefit-title">We Handle the Admin</div><div class="benefit-desc">Patient communications, payment processing, reminders and cancellations — all managed by ScanBook.</div></div></div>
+        </div>
+      </div>
+
+      <div class="c-how">
+        <div class="section-label-light">THE PROCESS</div>
+        <h2 class="section-title-light">Live in <em>24 hours.</em></h2>
+        <p class="section-sub-light" style="margin-bottom:40px">From application to first booking in one business day.</p>
+        <div class="c-how-steps">
+          <div class="c-step"><div class="c-step-num">01</div><div class="c-step-title">Apply & Onboard</div><div class="c-step-desc">Submit centre details. CQC verification check. Partner agreement signed digitally.</div></div>
+          <div class="c-step"><div class="c-step-num">02</div><div class="c-step-title">Add Availability</div><div class="c-step-desc">Use our Partner Portal to add slots, or connect via API for real-time sync.</div></div>
+          <div class="c-step"><div class="c-step-num">03</div><div class="c-step-title">Patients Book & Pay</div><div class="c-step-desc">ScanBook handles marketing, booking and payment collection.</div></div>
+          <div class="c-step"><div class="c-step-num">04</div><div class="c-step-title">Get Paid</div><div class="c-step-desc">Funds reach your account within 14 days. Weekly for API partners.</div></div>
+        </div>
+      </div>
+
+      <div class="c-tiers">
+        <div class="section-label-light">PARTNERSHIP OPTIONS</div>
+        <h2 class="section-title-light">Choose your <em>integration level.</em></h2>
+        <p class="section-sub-light">All tiers are free to start. Upgrade as you grow.</p>
+        <div class="c-tier-grid">
+          <div class="tier-card">
+            <div class="tier-top"><div class="tier-name">Standard</div><div class="tier-badge gray">Most Common</div></div>
+            <div class="tier-commission">15%</div>
+            <div class="tier-commission-sub">commission · setup free</div>
+            <div class="tier-features">
+              <div class="tier-feature">Manual slot management portal</div>
+              <div class="tier-feature">Listing on ScanBook.uk</div>
+              <div class="tier-feature">Patient messaging</div>
+              <div class="tier-feature">Monthly payouts</div>
+            </div>
+            <button class="tier-btn outline">Apply for Standard</button>
+          </div>
+          <div class="tier-card featured">
+            <div class="tier-top"><div class="tier-name">API Partner</div><div class="tier-badge green">Recommended</div></div>
+            <div class="tier-commission">12%</div>
+            <div class="tier-commission-sub">commission · setup free</div>
+            <div class="tier-features">
+              <div class="tier-feature">Real-time slot sync via API</div>
+              <div class="tier-feature">Priority listing placement</div>
+              <div class="tier-feature">Dedicated partner manager</div>
+              <div class="tier-feature">Weekly payouts</div>
+              <div class="tier-feature">Analytics dashboard</div>
+            </div>
+            <button class="tier-btn green">Apply for API Tier →</button>
+          </div>
+          <div class="tier-card">
+            <div class="tier-top"><div class="tier-name">Enterprise</div><div class="tier-badge gray">Groups & Chains</div></div>
+            <div class="tier-commission">Custom</div>
+            <div class="tier-commission-sub">bespoke terms</div>
+            <div class="tier-features">
+              <div class="tier-feature">Multi-site management</div>
+              <div class="tier-feature">Custom integrations</div>
+              <div class="tier-feature">Executive reporting</div>
+              <div class="tier-feature">SLA guarantee</div>
+            </div>
+            <button class="tier-btn outline">Contact Us</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="c-faq">
+        <div class="section-label-light" style="text-align:left;margin-bottom:24px">COMMON QUESTIONS</div>
+        <h2 style="font-family:'Instrument Serif',serif;font-size:30px;color:#fff;margin-bottom:32px">Questions <em style="color:var(--teal)">answered.</em></h2>
+        <div class="c-faq-inner" style="max-width:100%">
+          <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Do we need CQC registration? <span class="faq-toggle">+</span></div><div class="faq-a">Yes — all ScanBook partner centres must hold current CQC registration. This protects both patients and your centre's reputation.</div></div>
+          <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">What happens if a patient doesn't show? <span class="faq-toggle">+</span></div><div class="faq-a">Payment is collected upfront. Cancellations within 24 hours receive a full refund. Late cancellations — the centre retains 50% of the booking fee.</div></div>
+          <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Can we control which slots are available? <span class="faq-toggle">+</span></div><div class="faq-a">Completely. You decide exactly which slots appear on ScanBook. Your existing patients and direct bookings always take priority.</div></div>
+          <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How quickly do we receive payment? <span class="faq-toggle">+</span></div><div class="faq-a">Standard partners: 14-day net. API partners: weekly payouts. Enterprise: bespoke payment schedule agreed at contract stage.</div></div>
+          <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Can we set our own prices? <span class="faq-toggle">+</span></div><div class="faq-a">Yes. You control your pricing completely. ScanBook displays your prices transparently — this builds patient trust and increases conversion rates.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="gp-tab" style="display:none">
+      <div class="c-hero" style="background:linear-gradient(160deg,#1a0f2e,#2d1e5f,#1a0f4a)">
+        <div class="c-badge" style="background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.2);color:#a78bfa">GP REFERRAL NETWORK · PRIVATE PRACTICES</div>
+        <h1 style="max-width:600px">Your patients can't wait<br><em style="color:#a78bfa">14 weeks for a scan.</em></h1>
+        <p>Join the ScanBook GP Referral Network. Give patients fast access to private imaging. Earn per completed referral. See results faster.</p>
+        <div class="c-hero-btns">
+          <button class="btn-teal-c" style="background:#a78bfa;color:#fff">Join GP Network →</button>
+          <button class="btn-ghost-c">Learn More</button>
+        </div>
+        <div class="c-trust-row">
+          <div class="c-trust-item" style="color:rgba(167,139,250,.7)">Private GPs only</div>
+          <div class="c-trust-item" style="color:rgba(167,139,250,.7)">£15–25 per referral</div>
+          <div class="c-trust-item" style="color:rgba(167,139,250,.7)">Patient result visibility</div>
+          <div class="c-trust-item" style="color:rgba(167,139,250,.7)">Monthly auto-payment</div>
+        </div>
+      </div>
+
+      <div class="gp-section">
+        <div class="section-label-light">GP REFERRAL BENEFITS</div>
+        <h2 class="section-title-light" style="margin-bottom:40px">Better outcomes. <em style="color:#a78bfa">Extra revenue.</em></h2>
+        <div class="gp-grid">
+          <div class="benefit-card"><div class="benefit-icon" style="background:rgba(167,139,250,.1)">💷</div><div><div class="benefit-title">Earn Per Referral</div><div class="benefit-desc">Receive £15–25 for every patient scan completed through your unique referral link. Paid monthly, automatically.</div></div></div>
+          <div class="benefit-card"><div class="benefit-icon" style="background:rgba(167,139,250,.1)">⏱</div><div><div class="benefit-title">Cut Your Admin</div><div class="benefit-desc">No more chasing imaging referrals. Send patients directly to verified private centres. Same-day appointments available.</div></div></div>
+          <div class="benefit-card"><div class="benefit-icon" style="background:rgba(167,139,250,.1)">📋</div><div><div class="benefit-title">Results Visibility</div><div class="benefit-desc">With patient consent, access scan reports directly through your GP dashboard for faster clinical decisions.</div></div></div>
+          <div class="benefit-card"><div class="benefit-icon" style="background:rgba(167,139,250,.1)">🏆</div><div><div class="benefit-title">Reward Your Patients</div><div class="benefit-desc">Give patients on NHS waiting lists a fast, affordable alternative. 600+ CQC centres, from £75.</div></div></div>
+        </div>
+
+        <div class="gp-calc">
+          <h3>Your potential <em style="color:#a78bfa">monthly earnings</em></h3>
+          <div class="calc-grid">
+            <div class="calc-box"><div class="calc-patients">10 referrals / month</div><div class="calc-earn">£150–250</div><div class="calc-note">Small practice</div></div>
+            <div class="calc-box"><div class="calc-patients">25 referrals / month</div><div class="calc-earn">£375–625</div><div class="calc-note">Medium practice</div></div>
+            <div class="calc-box"><div class="calc-patients">50 referrals / month</div><div class="calc-earn">£750–1,250</div><div class="calc-note">Busy practice</div></div>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,.25);text-align:center;margin-top:16px">Based on £15–25 per completed referral. Private GP practices only.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="c-cta">
+      <h2>Ready to fill your<br><em>empty slots?</em></h2>
+      <p>Apply today. Our team reviews within 24 hours.<br>Go live in as little as one business day.</p>
+      <div class="cta-btns">
+        <button class="btn-teal-c" style="font-size:15px;padding:15px 36px">Apply as Partner →</button>
+        <button class="btn-ghost-c" style="font-size:15px;padding:15px 24px">Book a Demo Call</button>
+      </div>
+    </div>
+
+    <div class="c-footer">ScanBook Partner Programme · The Connective UK Ltd · Registered in England & Wales · CQC Partner Network</div>
+  </div>
+</div>
+
+<script>
+function setMode(mode){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(mode+'-page').classList.add('active');
+  document.querySelector('.mode-btn.'+mode).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function setClinicTab(tab, el){
+  document.querySelectorAll('.c-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('imaging-tab').style.display = tab==='imaging'?'block':'none';
+  document.getElementById('gp-tab').style.display = tab==='gp'?'block':'none';
+}
+function toggleFaq(item){
+  const a = item.querySelector('.faq-a');
+  const t = item.querySelector('.faq-toggle');
+  const isOpen = a.classList.contains('open');
+  document.querySelectorAll('.faq-a').forEach(x=>x.classList.remove('open'));
+  document.querySelectorAll('.faq-toggle').forEach(x=>x.textContent='+');
+  if(!isOpen){a.classList.add('open');t.textContent='−'}
+}
+document.querySelectorAll('.scan-pill').forEach(p=>{
+  p.addEventListener('click',function(){
+    document.querySelectorAll('.scan-pill').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

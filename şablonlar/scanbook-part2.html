@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanBook — Prototype Part 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#00C9A7;--td:#00a888;--tl:#e6faf7;
+  --k:#111;--t:#222;--m:#666;--s:#999;
+  --b:#ebebeb;--bg:#f8f8f8;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--t);background:#fff;-webkit-font-smoothing:antialiased;font-size:14px}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--sans);cursor:pointer;border:none;background:none}
+.page{display:none;min-height:100vh}
+.page.on{display:block;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+nav{height:60px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--b);position:sticky;top:0;background:#fff;z-index:200}
+.logo{display:flex;cursor:pointer}.logo b{font-size:20px;font-weight:700;letter-spacing:-.5px}
+.logo b:first-child{color:var(--k)}.logo b:last-child{color:var(--teal)}
+.nav-links{display:flex;gap:4px}
+.nav-links a{padding:7px 12px;font-size:13px;color:var(--m);border-radius:7px;transition:all .15s}
+.nav-links a:hover{color:var(--k);background:var(--bg)}
+.nav-acts{display:flex;gap:8px}
+.btn-si{padding:7px 16px;border:1.5px solid var(--b);border-radius:7px;font-size:13px;color:var(--t);background:#fff}
+.btn-p{padding:8px 18px;border-radius:7px;background:var(--teal);color:#fff;font-size:13px;font-weight:600}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 48px}
+.bc{padding:10px 48px;font-size:12px;color:#bbb;border-bottom:1px solid #f5f5f5}
+.bc a{color:#999}.bc a:hover{color:var(--k)}
+.eyebrow{font-size:10px;letter-spacing:3px;color:#bbb;font-weight:500;text-transform:uppercase;margin-bottom:12px}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:.4px;text-transform:uppercase}
+.b-teal{background:var(--tl);color:var(--td);border:1px solid #b2edd8}
+.b-pur{background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe}
+.b-sl{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+.b-grn{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+.b-amb{background:#fffbeb;color:#b07800;border:1px solid #fde68a}
+.star{color:#f59e0b;font-size:12px;letter-spacing:1px}
+.tag{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--bg);color:var(--m);border:1px solid var(--b)}
+.dot{width:3px;height:3px;border-radius:50%;background:#ccc;display:inline-block;margin:0 7px}
+.btn{display:inline-block;padding:12px 22px;border-radius:9px;font-size:14px;font-weight:600;transition:all .15s;cursor:pointer}
+.btn-k{background:var(--k);color:#fff}.btn-k:hover{background:var(--teal)}
+.btn-t{background:var(--teal);color:#fff}.btn-t:hover{opacity:.88}
+.btn-o{background:#fff;color:var(--k);border:1.5px solid var(--b)}.btn-o:hover{border-color:#bbb}
+
+/* CLINIC PAGE */
+.clinic-main{max-width:1180px;margin:0 auto;padding:22px 48px 56px;display:grid;grid-template-columns:1fr 340px;gap:26px;align-items:start}
+.gallery{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:190px 190px;gap:8px;border-radius:16px;overflow:hidden}
+.gal-cell{display:grid;place-items:center;font-size:32px;color:#ddd;border:1px solid var(--b);cursor:pointer}
+.gal-cell.big{grid-row:span 2;font-size:52px}
+.pkg-g{display:flex;flex-direction:column;gap:8px}
+.pkg-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#fff;border-radius:11px;border:1px solid var(--b);cursor:pointer;transition:all .15s}
+.pkg-row:hover{border-color:var(--teal);box-shadow:0 3px 14px rgba(0,201,167,.07)}
+.pkg-n{font-size:14px;font-weight:500;color:var(--k);margin-bottom:3px}
+.pkg-m{font-size:12px;color:#bbb}
+.pkg-p{font-family:var(--serif);font-size:21px;color:var(--k);letter-spacing:-.5px}
+.pkg-bk{padding:7px 15px;border:1.5px solid var(--teal);border-radius:8px;background:#fff;color:var(--td);font-size:12px;font-weight:600;transition:all .15s}
+.pkg-bk:hover{background:var(--teal);color:#fff}
+.bp-g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:16px}
+.bp-chip{padding:8px 10px;border:1px solid var(--b);border-radius:8px;font-size:12px;color:var(--t);cursor:pointer;transition:all .15s;background:#fff}
+.bp-chip:hover{border-color:var(--teal);background:var(--tl);color:var(--td)}
+.rev-g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rev-c{background:var(--bg);border:1px solid var(--b);border-radius:11px;padding:16px}
+
+/* BOOKING SIDEBAR */
+.sb-card{background:#fff;border:1px solid var(--b);border-radius:16px;padding:20px 18px}
+.sb-card + .sb-card{margin-top:13px}
+.sb-title{font-size:11px;font-weight:600;color:#bbb;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:13px}
+.sb-price{font-family:var(--serif);font-size:38px;color:var(--k);margin-bottom:18px}
+.sb-label{font-size:10px;font-weight:700;color:#bbb;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:5px}
+.sb-sel{width:100%;padding:10px 12px;border:1.5px solid var(--b);border-radius:9px;font-size:13px;font-family:var(--sans);color:var(--k);background:#fff;outline:none;margin-bottom:12px}
+.sb-sel:focus{border-color:var(--teal)}
+.date-g{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:16px}
+.date-btn{padding:8px 4px;border:1.5px solid var(--b);border-radius:9px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .15s}
+.date-btn.on{border-color:var(--teal);background:var(--tl)}
+.date-day{font-size:10px;color:#999;font-weight:600}
+.date-num{font-size:11px;color:#444;font-weight:400}
+.date-btn.on .date-day{color:var(--td)}
+.date-btn.on .date-num{color:var(--td);font-weight:600}
+.btn-cta{width:100%;padding:13px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:opacity .15s;margin-bottom:11px}
+.btn-cta:hover{opacity:.88}
+.trust-row{display:flex;flex-direction:column;gap:6px;padding-top:11px;border-top:1px solid #f5f5f5}
+.trust-item{font-size:11px;color:#aaa;display:flex;gap:6px}
+.trust-item .ck{color:var(--teal);font-weight:700}
+.cost-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f5f5;font-size:13px}
+.cost-row:last-child{border-bottom:none;padding-top:10px;font-size:14px;font-weight:600}
+.incl{color:var(--td);font-weight:500}
+.hrs-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:12px}
+.hrs-row:last-child{border-bottom:none}
+
+/* BOOKING FLOW */
+.bk-page{background:var(--bg);min-height:100vh}
+.bk-nav{height:56px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid var(--b);position:sticky;top:0;z-index:100}
+.bk-wrap{max-width:1060px;margin:0 auto;padding:28px 24px 60px;display:grid;grid-template-columns:1fr 370px;gap:28px;align-items:start}
+.bk-form{background:#fff;border:1px solid var(--b);border-radius:18px;padding:32px 34px}
+.prog{display:flex;align-items:center;gap:0;margin-bottom:30px}
+.pc{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600;transition:all .2s;flex-shrink:0}
+.pc.done{background:var(--teal);color:#fff;border:2px solid var(--teal)}
+.pc.act{background:var(--k);color:#fff;border:2px solid var(--k)}
+.pc.todo{background:#f0f0f0;color:#bbb;border:2px solid #e8e8e8}
+.pl{font-size:10px;white-space:nowrap;color:#bbb;margin-top:4px}
+.pl.act{color:var(--k);font-weight:600}
+.pl.done{color:var(--td)}
+.pline{flex:1;height:2px;background:#f0f0f0;margin:0 3px;margin-bottom:18px;transition:background .3s}
+.pline.done{background:var(--teal)}
+.bk-step{display:none}.bk-step.on{display:block}
+.form-h{font-family:var(--serif);font-size:26px;letter-spacing:-.6px;color:var(--k);margin-bottom:5px}
+.form-sub{font-size:14px;color:#888;margin-bottom:24px;line-height:1.6}
+.frow{display:grid;gap:13px;margin-bottom:13px}
+.frow.two{grid-template-columns:1fr 1fr}
+.frow.three{grid-template-columns:1fr 1fr 1.5fr}
+.fg label{display:block;font-size:10px;font-weight:700;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.fg label span{color:#ef4444}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;border-radius:9px;font-size:14px;font-family:var(--sans);color:var(--k);outline:none;transition:border-color .15s;background:#fff}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--teal)}
+.fg textarea{resize:vertical}
+.radio-g{display:flex;gap:9px}
+.rb{flex:1;padding:10px;border:1.5px solid #e8e8e8;border-radius:9px;background:#fff;font-size:13px;color:#444;transition:all .15s;text-align:center;cursor:pointer}
+.rb.on{border-color:var(--k);background:var(--k);color:#fff}
+.safety-list{border:1px solid var(--b);border-radius:13px;overflow:hidden}
+.sq{padding:13px 17px;border-bottom:1px solid #f5f5f5;display:flex;justify-content:space-between;align-items:flex-start;gap:13px;background:#fff}
+.sq.yes{background:#fffbeb}
+.sq.danger{background:#fff5f5}
+.sq-txt{font-size:13px;color:#333;line-height:1.55;flex:1}
+.yn{display:flex;gap:5px;flex-shrink:0}
+.yb{width:46px;padding:5px 0;border-radius:7px;border:1.5px solid #e8e8e8;background:#fff;font-size:12px;font-weight:600;color:#666;transition:all .15s}
+.yb.y.on{background:var(--k);border-color:var(--k);color:#fff}
+.yb.n.on{background:var(--k);border-color:var(--k);color:#fff}
+.yb.dy.on{background:#ef4444;border-color:#ef4444;color:#fff}
+.sq-detail{padding:7px 17px 11px;background:#fffbeb;border-bottom:1px solid #f5f5f5}
+.sq-detail textarea{width:100%;padding:7px 10px;border:1.5px solid #fde68a;border-radius:8px;font-size:12px;font-family:var(--sans);outline:none;resize:none;background:#fff}
+.dq-warn{background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:13px 16px;margin-bottom:18px}
+.gdpr-note{padding:12px 14px;background:var(--bg);border:1px solid var(--b);border-radius:10px;font-size:12px;color:#888;line-height:1.65;margin-bottom:18px}
+.gdpr-note a{color:var(--td)}
+.pay-opts{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:20px}
+.pay-opt{padding:17px 15px;border:1.5px solid #e8e8e8;border-radius:13px;cursor:pointer;transition:all .15s;background:#fff}
+.pay-opt.on{border-color:var(--k);background:#fafafa}
+.form-nav{display:grid;gap:9px;margin-top:22px}
+.form-nav.back{grid-template-columns:1fr 2fr}
+.btn-cont{width:100%;padding:13px;background:var(--k);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:background .15s}
+.btn-cont:hover{background:var(--teal)}
+.btn-back{padding:13px;border:1.5px solid #e8e8e8;border-radius:10px;background:#fff;color:#444;font-size:14px;font-weight:500;cursor:pointer}
+.info-box{background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:11px 14px;font-size:12px;color:#0369a1;line-height:1.6;margin-bottom:20px}
+.note-box{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:11px 14px;font-size:12px;color:#92400e;line-height:1.6;margin-top:9px}
+
+/* BOOKING SUMMARY SIDEBAR */
+.sum-side{display:flex;flex-direction:column;gap:13px}
+.sum-card{background:#fff;border:1px solid var(--b);border-radius:16px;padding:18px}
+.sum-title{font-size:11px;font-weight:600;color:#bbb;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:13px}
+.sum-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px}
+.sum-row:last-child{margin-bottom:0}
+.sum-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.upsell-c{background:var(--bg);border:1px solid var(--b);border-radius:14px;padding:14px 16px}
+.upsell-btn{width:100%;padding:10px;border:1.5px solid var(--teal);border-radius:9px;background:#fff;color:var(--td);font-size:13px;font-weight:600;transition:all .15s;cursor:pointer}
+.upsell-btn:hover{background:var(--teal);color:#fff}
+.trust-sm{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:13px}
+.trust-sm span{font-size:11px;color:#bbb}
+
+/* LEGAL */
+.legal{max-width:780px;margin:0 auto;padding:52px 48px 80px}
+.legal-hero{margin-bottom:36px;padding-bottom:26px;border-bottom:1px solid var(--b)}
+.legal-hero h1{font-family:var(--serif);font-size:40px;letter-spacing:-.8px;color:var(--k);margin-bottom:8px}
+.legal-meta{display:flex;gap:12px;font-size:13px;color:#888;flex-wrap:wrap}
+.ls{margin-bottom:28px}
+.ls h2{font-size:17px;font-weight:600;color:var(--k);margin-bottom:9px;padding-top:4px}
+.ls h3{font-size:15px;font-weight:600;color:var(--k);margin-bottom:7px;margin-top:14px}
+.ls p{font-size:14px;color:#555;line-height:1.8;margin-bottom:9px}
+.ls ul{font-size:14px;color:#555;line-height:1.8;padding-left:20px;margin-bottom:9px}
+.ls ul li{margin-bottom:4px}
+.ls table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:11px}
+.ls th{background:var(--bg);padding:9px 11px;text-align:left;font-weight:600;color:var(--k);border:1px solid var(--b);font-size:12px}
+.ls td{padding:9px 11px;border:1px solid var(--b);color:#555;vertical-align:top}
+.contact-box{background:var(--bg);border:1px solid var(--b);border-radius:13px;padding:18px 20px;margin-top:11px}
+.contact-box p{font-size:14px;color:#555;margin-bottom:5px}
+.contact-box a{color:var(--td)}
+
+/* FOOTER */
+footer{background:#111;color:#fff}
+.ft-bot{border-top:1px solid rgba(255,255,255,.06);padding:16px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ft-cp{font-size:11px;color:rgba(255,255,255,.2)}
+.ft-links{display:flex;gap:22px}
+.ft-links a{font-size:11px;color:rgba(255,255,255,.22);transition:color .15s}
+.ft-links a:hover{color:rgba(255,255,255,.6)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="go('home-redirect')"><b>Scan</b><b>Book</b></div>
+  <div class="nav-links">
+    <a href="scanbook-part1.html">Services</a>
+    <a href="scanbook-part1.html">How it works</a>
+    <a href="scanbook-part1.html">Find a Centre</a>
+    <a href="#">For Clinics</a>
+  </div>
+  <div class="nav-acts">
+    <button class="btn-si">Sign In</button>
+    <button class="btn-p" onclick="go('booking')">Book a Scan</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════ CLINIC — MEDICANA -->
+<div class="page on" id="p-medicana">
+  <div class="bc"><a href="scanbook-part1.html">Home</a> / <a href="scanbook-part1.html#centres">Imaging Centres</a> / <a href="#">Winchester</a> / <span style="color:#444">Medicana Winchester</span></div>
+
+  <!-- Gallery -->
+  <div class="wrap" style="padding-top:24px">
+    <div class="gallery">
+      <div class="gal-cell big" style="background:#eef5f2">🏥</div>
+      <div class="gal-cell" style="background:#eeeff5">🧲</div>
+      <div class="gal-cell" style="background:#f5f2ee">🛋️</div>
+      <div class="gal-cell" style="background:#f0f5ee">🅿️</div>
+      <div class="gal-cell" style="background:#f5eeee">⚕️</div>
+    </div>
+    <div style="text-align:right;margin-top:9px"><button style="font-size:12px;color:#666;border:1.5px solid var(--b);border-radius:7px;padding:6px 13px;background:#fff;cursor:pointer">Show all photos</button></div>
+  </div>
+
+  <div class="clinic-main">
+    <!-- LEFT -->
+    <div>
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:11px">
+        <div>
+          <h1 style="font-family:var(--serif);font-size:34px;letter-spacing:-.8px;color:var(--k);line-height:1.15;margin-bottom:4px">Medicana Winchester</h1>
+          <div style="font-size:14px;color:var(--m)">Private Diagnostic Imaging Centre</div>
+        </div>
+        <div style="display:flex;gap:7px;margin-top:6px">
+          <button style="padding:7px 13px;border:1.5px solid var(--b);border-radius:8px;font-size:13px;color:var(--m);background:#fff;cursor:pointer">♡ Save</button>
+          <button style="padding:7px 13px;border:1.5px solid var(--b);border-radius:8px;font-size:13px;color:var(--m);background:#fff;cursor:pointer">↑ Share</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap;font-size:13px;color:var(--m);margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:5px;font-weight:600;color:var(--k)"><span class="star">★★★★★</span><span>4.9</span><span style="font-size:13px;color:var(--s);font-weight:400">(312 reviews)</span></div>
+        <span>·</span><span>Winchester, Hampshire</span><span>·</span><span style="color:var(--td);font-weight:500">● Open now</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+        <span class="badge b-teal">CQC Outstanding</span>
+        <span class="badge b-pur">3T MRI Scanner</span>
+        <span class="badge b-grn">24h report</span>
+        <span class="badge" style="background:var(--bg);color:var(--m);border:1px solid var(--b)">Free cancellation</span>
+      </div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">
+        <div style="padding:8px 13px;border:1.5px solid var(--b);border-radius:9px;font-size:13px;color:var(--t);background:#fff;display:flex;align-items:center;gap:5px"><span style="color:var(--teal)">✓</span>3T MRI Scanner</div>
+        <div style="padding:8px 13px;border:1.5px solid var(--b);border-radius:9px;font-size:13px;color:var(--t);background:#fff;display:flex;align-items:center;gap:5px"><span style="color:var(--teal)">✓</span>From £275</div>
+        <div style="padding:8px 13px;border:1.5px solid var(--b);border-radius:9px;font-size:13px;color:var(--t);background:#fff;display:flex;align-items:center;gap:5px"><span style="color:var(--teal)">✓</span>24h report</div>
+        <div style="padding:8px 13px;border:1.5px solid var(--b);border-radius:9px;font-size:13px;color:var(--t);background:#fff;display:flex;align-items:center;gap:5px"><span style="color:var(--teal)">✓</span>Free parking</div>
+        <div style="padding:8px 13px;border:1.5px solid var(--b);border-radius:9px;font-size:13px;color:var(--t);background:#fff;display:flex;align-items:center;gap:5px"><span style="color:var(--teal)">✓</span>Baby scan suite</div>
+      </div>
+
+      <div style="height:1px;background:var(--b);margin:18px 0"></div>
+
+      <!-- Scan tabs + packages -->
+      <div class="eyebrow" style="margin-bottom:11px">Available scans</div>
+      <h2 style="font-family:var(--serif);font-size:24px;letter-spacing:-.4px;color:var(--k);margin-bottom:14px">Book a scan at Medicana Winchester</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+        <button class="tag" style="padding:7px 13px;border-radius:8px;font-size:13px;border-color:#111;background:#111;color:#fff">MRI</button>
+        <button class="tag" style="padding:7px 13px;border-radius:8px;font-size:13px;cursor:pointer">CT Scan</button>
+        <button class="tag" style="padding:7px 13px;border-radius:8px;font-size:13px;cursor:pointer">Ultrasound</button>
+        <button class="tag" style="padding:7px 13px;border-radius:8px;font-size:13px;cursor:pointer">X-Ray</button>
+        <button class="tag" style="padding:7px 13px;border-radius:8px;font-size:13px;cursor:pointer">Baby Scan</button>
+      </div>
+      <div class="pkg-g">
+        <div class="pkg-row"><div><div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><span class="pkg-n">MRI — 1 Body Part</span><span class="badge b-amb" style="font-size:9px">Most popular</span></div><div class="pkg-m">45 min · Report in 24h</div></div><div style="display:flex;align-items:center;gap:12px"><span class="pkg-p">£275</span><button class="pkg-bk" onclick="go('booking')">Book →</button></div></div>
+        <div class="pkg-row"><div><div class="pkg-n">MRI — 2 Body Parts</div><div class="pkg-m">75 min · Report in 24h</div></div><div style="display:flex;align-items:center;gap:12px"><span class="pkg-p">£445</span><button class="pkg-bk" onclick="go('booking')">Book →</button></div></div>
+        <div class="pkg-row"><div><div class="pkg-n">MRI — 3 Body Parts</div><div class="pkg-m">90 min · Report in 48h</div></div><div style="display:flex;align-items:center;gap:12px"><span class="pkg-p">£575</span><button class="pkg-bk" onclick="go('booking')">Book →</button></div></div>
+        <div class="pkg-row"><div><div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><span class="pkg-n">Full Body MRI</span><span class="badge b-pur" style="font-size:9px">3T scanner</span></div><div class="pkg-m">3 hrs · Report in 48h</div></div><div style="display:flex;align-items:center;gap:12px"><span class="pkg-p">£1,450</span><button class="pkg-bk" onclick="go('booking')">Book →</button></div></div>
+      </div>
+      <!-- Body parts -->
+      <div style="margin-top:16px">
+        <div style="font-size:13px;font-weight:500;color:var(--m);margin-bottom:9px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:13px;background:var(--teal);border-radius:2px;display:block"></span>Available body parts</div>
+        <div class="bp-g4">
+          <div class="bp-chip">Brain &amp; Head</div><div class="bp-chip">Lumbar Spine</div><div class="bp-chip">Cervical Spine</div><div class="bp-chip">Knee</div>
+          <div class="bp-chip">Shoulder</div><div class="bp-chip">Hip</div><div class="bp-chip">Abdomen</div><div class="bp-chip">Pelvis</div>
+          <div class="bp-chip">Wrist</div><div class="bp-chip">Ankle</div><div class="bp-chip">Prostate (mpMRI)</div>
+          <div style="padding:8px 10px;border:1px dashed var(--b);border-radius:8px;font-size:12px;color:#bbb;background:var(--bg)">+4 more</div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--b);margin:26px 0"></div>
+
+      <!-- Reviews -->
+      <div class="eyebrow" style="margin-bottom:11px">Patient reviews</div>
+      <h2 style="font-family:var(--serif);font-size:24px;letter-spacing:-.4px;color:var(--k);margin-bottom:16px">What patients say</h2>
+      <div style="display:flex;gap:12px;margin-bottom:16px">
+        <div style="border:1px solid var(--b);border-radius:12px;padding:13px 17px;background:#fff;display:flex;align-items:center;gap:13px;flex:1"><div style="font-size:11px;font-weight:700;color:#4285f4">Google</div><div><div style="font-family:var(--serif);font-size:26px;color:var(--k);line-height:1">4.8</div><span class="star">★★★★★</span><div style="font-size:11px;color:#bbb;margin-top:1px">214 reviews</div></div></div>
+        <div style="border:1px solid var(--b);border-radius:12px;padding:13px 17px;background:#fff;display:flex;align-items:center;gap:13px;flex:1"><div style="font-size:11px;font-weight:700;color:#00c896">Doctify</div><div><div style="font-family:var(--serif);font-size:26px;color:var(--k);line-height:1">4.9</div><span class="star">★★★★★</span><div style="font-size:11px;color:#bbb;margin-top:1px">98 reviews</div></div></div>
+      </div>
+      <div class="rev-g2">
+        <div class="rev-c"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><div><div style="font-size:13px;font-weight:600;color:var(--k);margin-bottom:2px">Sarah M.</div><div style="font-size:11px;color:var(--td)">MRI Knee</div></div><div style="text-align:right"><span class="star" style="font-size:11px">★★★★★</span><div style="font-size:11px;color:#bbb;margin-top:1px">2 weeks ago</div></div></div><p style="font-size:13px;color:#555;line-height:1.6">Incredibly professional from start to finish. The radiographer explained everything clearly and I had my report within 24 hours.</p></div>
+        <div class="rev-c"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><div><div style="font-size:13px;font-weight:600;color:var(--k);margin-bottom:2px">James P.</div><div style="font-size:11px;color:var(--td)">MRI Brain</div></div><div style="text-align:right"><span class="star" style="font-size:11px">★★★★★</span><div style="font-size:11px;color:#bbb;margin-top:1px">1 month ago</div></div></div><p style="font-size:13px;color:#555;line-height:1.6">Booked online in minutes. The 3T scanner produced crystal-clear images. My consultant was very impressed with the report quality.</p></div>
+        <div class="rev-c"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><div><div style="font-size:13px;font-weight:600;color:var(--k);margin-bottom:2px">Emma R.</div><div style="font-size:11px;color:var(--td)">4D Baby Scan</div></div><div style="text-align:right"><span class="star" style="font-size:11px">★★★★★</span><div style="font-size:11px;color:#bbb;margin-top:1px">3 weeks ago</div></div></div><p style="font-size:13px;color:#555;line-height:1.6">The baby scan team were so warm and reassuring. We got beautiful 4D images and they took their time to show us everything.</p></div>
+        <div class="rev-c"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><div><div style="font-size:13px;font-weight:600;color:var(--k);margin-bottom:2px">David K.</div><div style="font-size:11px;color:var(--td)">CT Chest</div></div><div style="text-align:right"><span class="star" style="font-size:11px">★★★★</span><div style="font-size:11px;color:#bbb;margin-top:1px">2 months ago</div></div></div><p style="font-size:13px;color:#555;line-height:1.6">Well-organised clinic with friendly staff. Very good value for the quality of service and the speed of the report.</p></div>
+      </div>
+
+      <div style="height:1px;background:var(--b);margin:26px 0"></div>
+
+      <!-- About -->
+      <div class="eyebrow" style="margin-bottom:11px">About</div>
+      <h2 style="font-family:var(--serif);font-size:24px;letter-spacing:-.4px;color:var(--k);margin-bottom:14px">About Medicana Winchester</h2>
+      <p style="font-size:14px;color:#555;line-height:1.75;margin-bottom:11px">Medicana Winchester is a CQC-registered private diagnostic imaging centre offering a full range of MRI, CT, ultrasound, X-Ray and pregnancy scans. Located in the heart of Winchester with free parking and excellent transport links, the clinic is designed around patient comfort and speed.</p>
+      <p style="font-size:14px;color:#555;line-height:1.75">The centre operates a 3 Tesla MRI scanner — producing exceptional image quality for complex neurological, musculoskeletal, and oncological cases. Radiologist reports are delivered within 24 hours via a secure patient portal.</p>
+      <div style="margin-top:18px"><div style="font-size:13px;font-weight:600;color:var(--k);margin-bottom:9px">Insurance accepted</div><div style="display:flex;gap:7px;flex-wrap:wrap"><span class="tag">Bupa</span><span class="tag">AXA</span><span class="tag">Aviva</span><span class="tag">Vitality</span><span class="tag">WPA</span><span class="tag" style="color:#bbb">Self-pay welcome</span></div></div>
+
+      <div style="height:1px;background:var(--b);margin:26px 0"></div>
+
+      <!-- Location -->
+      <div class="eyebrow" style="margin-bottom:11px">Location</div>
+      <h2 style="font-family:var(--serif);font-size:24px;letter-spacing:-.4px;color:var(--k);margin-bottom:14px">Getting here</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+        <div style="background:#f0f0f0;border-radius:13px;height:190px;display:flex;align-items:center;justify-content:center;font-size:30px;color:#ccc;border:1px solid var(--b)">🗺️<div style="font-size:11px;color:#bbb;margin-left:8px">Enes: Map embed here</div></div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--k);margin-bottom:4px">Medicana Winchester</div>
+          <div style="font-size:13px;color:#666;margin-bottom:16px">Winchester Clinic, Hampshire<br>SO23 9LQ</div>
+          <div style="display:flex;gap:9px;font-size:13px;color:#444;margin-bottom:9px;align-items:flex-start"><span style="width:28px;height:28px;background:var(--bg);border:1px solid var(--b);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🚉</span>5 minute walk from Winchester station</div>
+          <div style="display:flex;gap:9px;font-size:13px;color:#444;margin-bottom:9px;align-items:flex-start"><span style="width:28px;height:28px;background:var(--bg);border:1px solid var(--b);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🚗</span>Free on-site parking</div>
+          <div style="display:flex;gap:9px;font-size:13px;color:#444;align-items:flex-start"><span style="width:28px;height:28px;background:var(--bg);border:1px solid var(--b);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">♿</span>Fully wheelchair accessible</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — BOOKING SIDEBAR -->
+    <div style="position:sticky;top:76px">
+      <div class="sb-card">
+        <div class="sb-title">Scans from</div>
+        <div class="sb-price">£275 <span style="font-size:13px;color:#bbb;font-family:var(--sans);font-weight:400">per scan</span></div>
+        <label class="sb-label">Scan type</label>
+        <select class="sb-sel">
+          <optgroup label="MRI"><option>MRI — 1 Body Part (£275)</option><option>MRI — 2 Body Parts (£445)</option><option>Full Body MRI (£1,450)</option></optgroup>
+          <optgroup label="CT"><option>CT Chest (£199)</option><option>CT Abdomen (£249)</option></optgroup>
+          <optgroup label="Ultrasound"><option>Abdominal Ultrasound (£99)</option></optgroup>
+          <optgroup label="X-Ray"><option>X-Ray — Single view (£75)</option></optgroup>
+          <optgroup label="Baby Scan"><option>4D Baby Scan (£149)</option></optgroup>
+        </select>
+        <label class="sb-label">Body part</label>
+        <select class="sb-sel">
+          <option value="">Choose a body part…</option>
+          <option>Knee</option><option>Brain &amp; Head</option><option>Lumbar Spine</option><option>Shoulder</option><option>Hip</option><option>Abdomen</option>
+        </select>
+        <label class="sb-label">Preferred date</label>
+        <div class="date-g">
+          <button class="date-btn"><span class="date-day">Tue</span><span class="date-num">13</span></button>
+          <button class="date-btn on"><span class="date-day">Wed</span><span class="date-num">14</span></button>
+          <button class="date-btn"><span class="date-day">Thu</span><span class="date-num">15</span></button>
+          <button class="date-btn"><span class="date-day">Fri</span><span class="date-num">16</span></button>
+          <button class="date-btn"><span class="date-day">Sat</span><span class="date-num">17</span></button>
+        </div>
+        <button class="btn-cta" onclick="go('booking')">Check Availability →</button>
+        <div class="trust-row">
+          <div class="trust-item"><span class="ck">✓</span>Free cancellation up to 48 hours before</div>
+          <div class="trust-item"><span class="ck">✓</span>CQC registered centre</div>
+          <div class="trust-item"><span class="ck">✓</span>Secure payment via Stripe</div>
+        </div>
+      </div>
+      <div class="sb-card" style="margin-top:13px">
+        <div class="sb-title">Price summary</div>
+        <div class="cost-row"><span style="color:#666">MRI — 1 Body Part</span><span>£275</span></div>
+        <div class="cost-row"><span style="color:#666">Radiologist's report</span><span class="incl">Included</span></div>
+        <div class="cost-row"><span style="color:#666">Digital images</span><span class="incl">Included</span></div>
+        <div class="cost-row"><span style="color:#666">ScanBook fee</span><span>£0</span></div>
+        <div class="cost-row"><span>Total</span><span>£275</span></div>
+      </div>
+      <div class="sb-card" style="margin-top:13px">
+        <div class="sb-title">Opening hours</div>
+        <div class="hrs-row"><span style="color:#666">Monday – Friday</span><span style="color:var(--k)">8am – 7pm</span></div>
+        <div class="hrs-row"><span style="color:#666">Saturday</span><span>9am – 4pm</span></div>
+        <div class="hrs-row"><span style="color:#666">Sunday</span><span style="color:#f87171">Closed</span></div>
+      </div>
+      <div class="sb-card" style="margin-top:13px">
+        <div class="sb-title">Facilities</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#444"><span style="color:var(--teal);font-weight:700">✓</span>3T MRI Scanner</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#444"><span style="color:var(--teal);font-weight:700">✓</span>CT and Ultrasound Suite</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#444"><span style="color:var(--teal);font-weight:700">✓</span>Private Baby Scan Room</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#444"><span style="color:var(--teal);font-weight:700">✓</span>Wheelchair accessible</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#444"><span style="color:var(--teal);font-weight:700">✓</span>Free parking on-site</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer><div class="ft-bot" style="justify-content:center"><div class="ft-links"><a href="#" onclick="go('privacy')">Privacy Policy</a><a href="#" onclick="go('terms')">Terms &amp; Conditions</a><a href="#" onclick="go('cookies')">Cookie Policy</a></div></div></footer>
+</div>
+
+<!-- ══════════════════════════════ CLINIC — UNIRAD -->
+<div class="page" id="p-unirad">
+  <div class="bc"><a href="scanbook-part1.html">Home</a> / <a href="scanbook-part1.html#centres">Imaging Centres</a> / <a href="#">London</a> / <span style="color:#444">Unirad Imaging</span></div>
+  <div class="wrap" style="padding-top:24px">
+    <div class="gallery">
+      <div class="gal-cell big" style="background:#eef5f2">🏥</div>
+      <div class="gal-cell" style="background:#eeeff5">🧲</div>
+      <div class="gal-cell" style="background:#f5f2ee">🛋️</div>
+      <div class="gal-cell" style="background:#eef5f0">📋</div>
+      <div class="gal-cell" style="background:#f0f5ee">🔬</div>
+    </div>
+  </div>
+  <div class="clinic-main">
+    <div>
+      <div style="margin-bottom:11px">
+        <h1 style="font-family:var(--serif);font-size:34px;letter-spacing:-.8px;color:var(--k);margin-bottom:4px">Unirad Imaging</h1>
+        <div style="font-size:14px;color:var(--m)">Specialist MRI Centre · Wimpole Street, London</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap;font-size:13px;color:var(--m);margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:5px;font-weight:600;color:var(--k)"><span class="star">★★★★★</span><span>4.7</span><span style="font-size:13px;color:var(--s);font-weight:400">(189 reviews)</span></div>
+        <span>·</span><span>London W1G</span><span>·</span><span style="color:var(--td);font-weight:500">● Open now</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+        <span class="badge b-teal">CQC Good</span>
+        <span class="badge b-sl">1.5T MRI Scanner</span>
+        <span class="badge" style="background:var(--bg);color:var(--m);border:1px solid var(--b)">MRI specialist</span>
+        <span class="badge" style="background:var(--bg);color:var(--m);border:1px solid var(--b)">Report in 48h</span>
+      </div>
+
+      <!-- 1.5T Explainer -->
+      <div style="background:var(--bg);border:1px solid var(--b);border-radius:12px;padding:15px 17px;margin-bottom:18px">
+        <div style="font-size:13px;font-weight:600;color:var(--k);margin-bottom:7px;display:flex;align-items:center;gap:7px"><span class="badge b-sl" style="font-size:9px">1.5T scanner</span>Is this the right scanner for me?</div>
+        <p style="font-size:13px;color:#555;line-height:1.7">Unirad operates a 1.5 Tesla MRI scanner — the UK standard for the vast majority of diagnostic imaging. For routine musculoskeletal scans (knee, shoulder, spine, hip) and most abdominal and pelvic studies, a 1.5T scanner produces excellent diagnostic quality images at a lower cost than 3T centres. If your consultant has specifically requested a 3T scan, we can refer you to a partner 3T centre.</p>
+      </div>
+
+      <div style="height:1px;background:var(--b);margin:18px 0"></div>
+      <div class="eyebrow" style="margin-bottom:11px">MRI Scans</div>
+      <h2 style="font-family:var(--serif);font-size:24px;letter-spacing:-.4px;color:var(--k);margin-bottom:14px">Book an MRI at Unirad</h2>
+      <div class="pkg-g">
+        <div class="pkg-row"><div><div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><span class="pkg-n">MRI — 1 Body Part</span><span class="badge b-amb" style="font-size:9px">Most popular</span></div><div class="pkg-m">45 min · Report in 48h</div></div><div style="display:flex;align-items:center;gap:12px"><span class="pkg-p">£195</span><button class="pkg-bk" onclick="go('booking')">Book →</button></div></div>
+        <div class="pkg-row"><div><div class="pkg-n">MRI — 2 Body Parts</div><div class="pkg-m">75 min · Report in 48h</div></div><div style="display:flex;align-items:center;gap:12px"><span class="pkg-p">£340</span><button class="pkg-bk" onclick="go('booking')">Book →</button></div></div>
+        <div class="pkg-row"><div><div class="pkg-n">MRI — 3 Body Parts</div><div class="pkg-m">90 min · Report in 72h</div></div><div style="display:flex;align-items:center;gap:12px"><span class="pkg-p">£450</span><button class="pkg-bk" onclick="go('booking')">Book →</button></div></div>
+        <div class="pkg-row"><div><div class="pkg-n">Full Body MRI</div><div class="pkg-m">3 hrs · Report in 72h</div></div><div style="display:flex;align-items:center;gap:12px"><span class="pkg-p">£1,200</span><button class="pkg-bk" onclick="go('booking')">Book →</button></div></div>
+      </div>
+      <div style="margin-top:16px">
+        <div style="font-size:13px;font-weight:500;color:var(--m);margin-bottom:9px;display:flex;align-items:center;gap:6px"><span style="width:3px;height:13px;background:var(--teal);border-radius:2px;display:block"></span>Available body parts</div>
+        <div class="bp-g4">
+          <div class="bp-chip">Brain &amp; Head</div><div class="bp-chip">Cervical Spine</div><div class="bp-chip">Lumbar Spine</div><div class="bp-chip">Knee</div>
+          <div class="bp-chip">Shoulder</div><div class="bp-chip">Hip</div><div class="bp-chip">Abdomen</div><div class="bp-chip">Prostate (mpMRI)</div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--b);margin:24px 0"></div>
+      <div class="eyebrow" style="margin-bottom:11px">Patient reviews</div>
+      <h2 style="font-family:var(--serif);font-size:24px;letter-spacing:-.4px;color:var(--k);margin-bottom:14px">What patients say</h2>
+      <div class="rev-g2">
+        <div class="rev-c"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><div><div style="font-size:13px;font-weight:600;color:var(--k);margin-bottom:2px">Rachel T.</div><div style="font-size:11px;color:var(--td)">MRI Knee</div></div><div style="text-align:right"><span class="star" style="font-size:11px">★★★★★</span><div style="font-size:11px;color:#bbb">3 weeks ago</div></div></div><p style="font-size:13px;color:#555;line-height:1.6">Very professional team. The 1.5T scanner produced excellent images for my knee — my orthopaedic consultant was very happy with the report quality.</p></div>
+        <div class="rev-c"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><div><div style="font-size:13px;font-weight:600;color:var(--k);margin-bottom:2px">Oliver M.</div><div style="font-size:11px;color:var(--td)">MRI Lumbar Spine</div></div><div style="text-align:right"><span class="star" style="font-size:11px">★★★★★</span><div style="font-size:11px;color:#bbb">1 month ago</div></div></div><p style="font-size:13px;color:#555;line-height:1.6">Convenient Wimpole Street location, easy to book online, and the report arrived within 48 hours as promised. Stress-free experience.</p></div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div style="position:sticky;top:76px">
+      <div class="sb-card">
+        <div class="sb-title">MRI scans from</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:18px"><span class="sb-price" style="font-size:36px">£195</span><span style="font-size:11px;color:#bbb">per scan</span><span style="font-size:11px;padding:2px 7px;border-radius:20px;background:var(--tl);color:var(--td);font-weight:500">Save vs 3T</span></div>
+        <label class="sb-label">Scan package</label>
+        <select class="sb-sel"><option>MRI — 1 Body Part — £195</option><option>MRI — 2 Body Parts — £340</option><option>MRI — 3 Body Parts — £450</option><option>Full Body MRI — £1,200</option></select>
+        <label class="sb-label">Body part</label>
+        <select class="sb-sel"><option value="" style="color:#bbb">Choose a body part…</option><option>Knee</option><option>Shoulder</option><option>Brain &amp; Head</option><option>Lumbar Spine</option><option>Hip</option></select>
+        <label class="sb-label">Preferred date</label>
+        <div class="date-g">
+          <button class="date-btn on"><span class="date-day">Today</span><span class="date-num">12</span></button>
+          <button class="date-btn"><span class="date-day">Tue</span><span class="date-num">13</span></button>
+          <button class="date-btn"><span class="date-day">Wed</span><span class="date-num">14</span></button>
+          <button class="date-btn"><span class="date-day">Thu</span><span class="date-num">15</span></button>
+          <button class="date-btn"><span class="date-day">Fri</span><span class="date-num">16</span></button>
+        </div>
+        <button class="btn-cta" onclick="go('booking')">Check Availability →</button>
+        <div class="trust-row">
+          <div class="trust-item"><span class="ck">✓</span>Free cancellation up to 48 hours before</div>
+          <div class="trust-item"><span class="ck">✓</span>CQC registered — Good rating</div>
+          <div class="trust-item"><span class="ck">✓</span>Secure payment via Stripe</div>
+        </div>
+      </div>
+      <div class="sb-card" style="margin-top:13px">
+        <div class="sb-title">Opening hours</div>
+        <div class="hrs-row"><span style="color:#666">Monday – Friday</span><span style="color:var(--k)">8am – 6pm</span></div>
+        <div class="hrs-row"><span style="color:#666">Saturday</span><span>9am – 1pm</span></div>
+        <div class="hrs-row"><span style="color:#666">Sunday</span><span style="color:#f87171">Closed</span></div>
+      </div>
+    </div>
+  </div>
+  <footer><div class="ft-bot" style="justify-content:center"><div class="ft-links"><a href="#" onclick="go('privacy')">Privacy Policy</a><a href="#" onclick="go('terms')">Terms &amp; Conditions</a><a href="#" onclick="go('cookies')">Cookie Policy</a></div></div></footer>
+</div>
+
+<!-- ══════════════════════════════ BOOKING FLOW -->
+<div class="page" id="p-booking">
+  <div class="bk-nav">
+    <div class="logo" onclick="window.location.href='scanbook-part1.html'"><b>Scan</b><b>Book</b></div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span id="step-lbl" style="font-size:12px;color:#bbb">Step 1 of 5</span>
+      <a href="#" onclick="go('medicana')" style="font-size:13px;color:#888">← Back to clinic</a>
+      <a href="tel:08001234567" style="font-size:13px;color:var(--k);font-weight:500">📞 0800 123 4567</a>
+    </div>
+  </div>
+  <div class="bk-page">
+    <div class="bk-wrap">
+      <!-- FORM -->
+      <div class="bk-form">
+        <!-- Progress -->
+        <div class="prog">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0"><div class="pc act" id="pc1">1</div><div class="pl act" id="pl1">Personal</div></div>
+          <div class="pline" id="pln1"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0"><div class="pc todo" id="pc2">2</div><div class="pl" id="pl2">Contact</div></div>
+          <div class="pline" id="pln2"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0"><div class="pc todo" id="pc3">3</div><div class="pl" id="pl3">Scan details</div></div>
+          <div class="pline" id="pln3"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0"><div class="pc todo" id="pc4">4</div><div class="pl" id="pl4">Safety</div></div>
+          <div class="pline" id="pln4"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0"><div class="pc todo" id="pc5">5</div><div class="pl" id="pl5">Review</div></div>
+        </div>
+
+        <!-- Step 1 — Personal -->
+        <div class="bk-step on" id="bs1">
+          <div class="form-h">About you</div>
+          <div class="form-sub">We need these details to confirm your identity and prepare your scan.</div>
+          <div class="frow" style="grid-template-columns:120px 1fr;margin-bottom:13px">
+            <div class="fg"><label>Title</label><select><option>Select</option><option>Mr</option><option>Miss</option><option>Mrs</option><option>Ms</option><option>Dr</option><option>Mx</option></select></div>
+            <div></div>
+          </div>
+          <div class="frow two">
+            <div class="fg"><label>First name <span>*</span></label><input placeholder="First name"></div>
+            <div class="fg"><label>Last name <span>*</span></label><input placeholder="Last name"></div>
+          </div>
+          <div class="fg" style="margin-bottom:13px">
+            <label>Sex assigned at birth <span>*</span></label>
+            <div class="radio-g"><button class="rb" onclick="setRb(this)">Male</button><button class="rb" onclick="setRb(this)">Female</button><button class="rb" onclick="setRb(this)">Other</button></div>
+            <p style="font-size:11px;color:#bbb;margin-top:5px">Required for clinical safety screening purposes.</p>
+          </div>
+          <div class="fg" style="margin-bottom:26px">
+            <label>Date of birth <span>*</span></label>
+            <div class="frow three" style="margin-bottom:0"><select><option>Day</option></select><select><option>Month</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option></select><select><option>Year</option><option>1990</option><option>1985</option><option>1975</option></select></div>
+          </div>
+          <div class="form-nav"><button class="btn-cont" onclick="goStep(2)">Continue →</button></div>
+        </div>
+
+        <!-- Step 2 — Contact -->
+        <div class="bk-step" id="bs2">
+          <div class="form-h">Contact &amp; address</div>
+          <div class="form-sub">We use this to confirm your appointment and send your report. Please double-check your email address.</div>
+          <div class="fg" style="margin-bottom:13px"><label>Email address <span>*</span></label><input type="email" placeholder="your@email.com"></div>
+          <div class="frow two">
+            <div class="fg"><label>Phone number <span>*</span></label><input type="tel" placeholder="07700 900000"></div>
+            <div class="fg"><label>Alternate phone (optional)</label><input type="tel" placeholder="Alternate number"></div>
+          </div>
+          <div style="height:1px;background:#f0f0f0;margin:18px 0"></div>
+          <div style="font-size:12px;font-weight:600;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:13px">Your address</div>
+          <div class="fg" style="margin-bottom:13px"><label>Address line 1 <span>*</span></label><input placeholder="House number and street"></div>
+          <div class="fg" style="margin-bottom:13px"><label>Address line 2 (optional)</label><input placeholder="Apartment, suite, etc."></div>
+          <div class="frow two">
+            <div class="fg"><label>City <span>*</span></label><input placeholder="City"></div>
+            <div class="fg"><label>Postcode <span>*</span></label><input placeholder="SW1A 2AA"></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:9px;margin:13px 0 24px">
+            <input type="checkbox" id="mkt" style="margin-top:2px;accent-color:var(--teal);width:15px;height:15px;flex-shrink:0">
+            <label for="mkt" style="font-size:13px;color:#888;line-height:1.6;cursor:pointer">I'd like to occasionally receive offers and health tips from ScanBook. You can opt out at any time.</label>
+          </div>
+          <div class="form-nav back"><button class="btn-back" onclick="goStep(1)">← Back</button><button class="btn-cont" onclick="goStep(3)">Continue →</button></div>
+        </div>
+
+        <!-- Step 3 — Scan details -->
+        <div class="bk-step" id="bs3">
+          <div class="form-h">About your scan</div>
+          <div class="form-sub">These details help our clinical team and the radiologist understand your needs.</div>
+          <div class="fg" style="margin-bottom:17px">
+            <label>Reason for your scan <span>*</span></label>
+            <textarea rows="3" placeholder="e.g. Pain in right knee after sports injury. Suspected ligament damage. Referred by physio."></textarea>
+            <p style="font-size:11px;color:#bbb;margin-top:5px">Any detail helps the radiologist interpret your images more accurately.</p>
+          </div>
+          <div class="fg" style="margin-bottom:17px">
+            <label>Previous imaging for this area?</label>
+            <div class="radio-g"><button class="rb" onclick="setRb(this)">Yes</button><button class="rb" onclick="setRb(this)">No</button></div>
+          </div>
+          <div class="frow two" style="margin-bottom:17px">
+            <div class="fg">
+              <label>GP referral letter?</label>
+              <div class="radio-g"><button class="rb" onclick="setRb(this)">Yes</button><button class="rb" onclick="setRb(this)">No</button></div>
+              <p style="font-size:11px;color:#bbb;margin-top:5px">Not required — you can self-refer.</p>
+            </div>
+            <div class="fg">
+              <label>Private health insurance?</label>
+              <div class="radio-g"><button class="rb" onclick="setRb(this)">Yes</button><button class="rb" onclick="setRb(this)">No</button></div>
+            </div>
+          </div>
+          <div class="fg" style="margin-bottom:17px">
+            <label>Do you need contrast dye?</label>
+            <div class="radio-g"><button class="rb" onclick="setRb(this)">Not sure</button><button class="rb" onclick="setRb(this)">Yes</button><button class="rb" onclick="setRb(this)">No</button></div>
+          </div>
+          <div class="fg" style="margin-bottom:24px">
+            <label>GP surgery name (optional)</label>
+            <input placeholder="e.g. The Limes Medical Centre">
+            <p style="font-size:11px;color:#bbb;margin-top:5px">We only use this in an emergency to contact your GP.</p>
+          </div>
+          <div class="form-nav back"><button class="btn-back" onclick="goStep(2)">← Back</button><button class="btn-cont" onclick="goStep(4)">Continue →</button></div>
+        </div>
+
+        <!-- Step 4 — Safety -->
+        <div class="bk-step" id="bs4">
+          <div class="form-h">MRI safety questions</div>
+          <div class="form-sub">Required for your safety. Our clinical team reviews all answers before confirming your appointment.</div>
+          <div class="info-box">Please answer all questions accurately. If unsure about any answer, choose <b>Yes</b> and provide details — our team will follow up.</div>
+          <div id="dq-warn" class="dq-warn" style="display:none">
+            <div style="font-size:14px;font-weight:600;color:#dc2626;margin-bottom:5px">⚠ We may not be able to proceed</div>
+            <p id="dq-text" style="font-size:13px;color:#7f1d1d;line-height:1.65"></p>
+          </div>
+          <div class="safety-list">
+            <div class="sq"><span class="sq-txt">Have you had any previous surgery?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Have you had any operations in the last 6 weeks?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Do you have any metal in your body — implants, non-removable piercings, or fragments?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Do you suffer from claustrophobia?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Do you suffer from epilepsy or regular fits/blackouts?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Do you have any allergies?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Do you wear a medicine patch (nicotine, angina, or contraceptive)?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq" id="sq-pacemaker"><span class="sq-txt"><b>Do you have a cardiac pacemaker or any other cardiac device?</b></span><div class="yn"><button class="yb dy" onclick="setSq(this,'dy','pacemaker')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Do you have an aneurysm clip in your brain?</span><div class="yn"><button class="yb dy" onclick="setSq(this,'dy','aneurysm')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Do you have a cochlear implant or programmable hydrocephalus shunt?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Do you require any accessibility adjustments or accommodations?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq"><span class="sq-txt">Do you weigh over 18 stone (114 kg) or are you over 6 foot 4 inches tall?</span><div class="yn"><button class="yb y" onclick="setSq(this,'y')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+            <div class="sq" style="border-bottom:none"><span class="sq-txt"><b>Are you pregnant or could you be pregnant?</b></span><div class="yn"><button class="yb dy" onclick="setSq(this,'dy','pregnant')">Yes</button><button class="yb n" onclick="setSq(this,'n')">No</button></div></div>
+          </div>
+          <div style="margin:18px 0;padding:11px 14px;background:var(--bg);border:1px solid var(--b);border-radius:10px;font-size:12px;color:#888;line-height:1.65">By continuing, you confirm your answers are accurate. You consent to this information being shared with the imaging centre for clinical safety review.</div>
+          <div class="form-nav back"><button class="btn-back" onclick="goStep(3)">← Back</button><button class="btn-cont" id="btn-to-review" onclick="goStep(5)">Continue to payment →</button></div>
+        </div>
+
+        <!-- Step 5 — Review & Pay -->
+        <div class="bk-step" id="bs5">
+          <div class="form-h">Review &amp; pay</div>
+          <div class="form-sub">Double-check your details before confirming your booking.</div>
+          <!-- Summary box -->
+          <div style="background:var(--bg);border:1px solid var(--b);border-radius:13px;padding:17px;margin-bottom:20px">
+            <div style="font-size:12px;font-weight:600;color:#bbb;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:13px">Booking summary</div>
+            <div style="display:flex;gap:14px;padding:6px 0;border-bottom:1px solid var(--b);font-size:13px"><span style="color:#888;width:80px;flex-shrink:0">Scan</span><span style="color:var(--k);font-weight:500">MRI — Knee (Right)</span></div>
+            <div style="display:flex;gap:14px;padding:6px 0;border-bottom:1px solid var(--b);font-size:13px"><span style="color:#888;width:80px;flex-shrink:0">Centre</span><span style="color:var(--k);font-weight:500">Medicana Winchester</span></div>
+            <div style="display:flex;gap:14px;padding:6px 0;border-bottom:1px solid var(--b);font-size:13px"><span style="color:#888;width:80px;flex-shrink:0">Date</span><span style="color:var(--k);font-weight:500">Wednesday 14th May 2026</span></div>
+            <div style="display:flex;gap:14px;padding:6px 0;border-bottom:1px solid var(--b);font-size:13px"><span style="color:#888;width:80px;flex-shrink:0">Time</span><span style="color:var(--k);font-weight:500">10:30 AM</span></div>
+            <div style="display:flex;gap:14px;padding:6px 0;font-size:13px"><span style="color:#888;width:80px;flex-shrink:0">Total</span><span style="color:var(--k);font-weight:600">£275</span></div>
+          </div>
+          <!-- Payment options -->
+          <div style="font-size:12px;font-weight:600;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:13px">How would you like to proceed?</div>
+          <div class="pay-opts">
+            <div class="pay-opt on" onclick="selPay(this)">
+              <div style="font-size:22px;margin-bottom:9px">💳</div>
+              <div style="font-size:14px;font-weight:600;color:var(--k);margin-bottom:4px">Pay now</div>
+              <div style="font-size:12px;color:#888;line-height:1.5">Secure card payment via Stripe. Free cancellation up to 48 hours before.</div>
+              <div style="font-size:15px;font-weight:700;color:var(--k);margin-top:9px">£275</div>
+            </div>
+            <div class="pay-opt" onclick="selPay(this)">
+              <div style="font-size:22px;margin-bottom:9px">📞</div>
+              <div style="font-size:14px;font-weight:600;color:var(--k);margin-bottom:4px">Request a callback</div>
+              <div style="font-size:12px;color:#888;line-height:1.5">Our team calls you within 1 hour (Mon–Fri, 9–5) to complete your booking and answer questions.</div>
+              <div style="font-size:12px;color:#bbb;margin-top:9px">No payment now</div>
+            </div>
+          </div>
+          <!-- GDPR -->
+          <div class="gdpr-note">By confirming this booking, you agree to ScanBook's <a href="#" onclick="go('terms')">Terms &amp; Conditions</a> and <a href="#" onclick="go('privacy')">Privacy Policy</a>. Your personal and health data will be shared with Medicana Winchester for the purposes of your scan. We process your data in accordance with UK GDPR. Questions? <a href="mailto:hello@scanbook.uk">hello@scanbook.uk</a></div>
+          <div class="form-nav back">
+            <button class="btn-back" onclick="goStep(4)">← Back</button>
+            <button class="btn-cont" style="background:var(--teal)" onclick="alert('Booking confirmed! Redirecting to Stripe...\n\nEnes: POST /api/stripe/checkout here')">Pay £275 securely →</button>
+          </div>
+          <div class="trust-sm"><span>🔒 Stripe secure</span><span>✓ Free cancellation (48h)</span><span>✓ Instant confirmation</span></div>
+        </div>
+      </div>
+
+      <!-- BOOKING SUMMARY SIDEBAR -->
+      <div>
+        <div class="sum-side">
+          <div class="sum-card">
+            <div class="sum-title">Your appointment</div>
+            <div class="sum-row"><span class="sum-icon">🏥</span><div><div style="font-size:13px;font-weight:600;color:var(--k)">Medicana Winchester</div><div style="font-size:11px;color:#888;margin-top:1px">Winchester, Hampshire</div></div></div>
+            <div class="sum-row"><span class="sum-icon">🧲</span><div><div style="font-size:13px;font-weight:500;color:var(--k)">MRI Scan</div><div style="font-size:11px;color:#888">Knee — Right</div></div></div>
+            <div class="sum-row"><span class="sum-icon">📅</span><div><div style="font-size:13px;font-weight:500;color:var(--k)">Wednesday 14th May 2026</div><div style="font-size:11px;color:#888">10:30 AM</div></div></div>
+            <div class="note-box">Appointment requests are subject to clinical safety checks. Please don't make travel plans until the centre confirms your slot by phone.</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-title">Cost</div>
+            <div class="cost-row"><span style="color:#666">MRI — Knee (Right)</span><span>£275</span></div>
+            <div class="cost-row"><span style="color:#666">Pre-scan clinical check</span><span style="color:var(--td);font-weight:500">Included</span></div>
+            <div class="cost-row"><span style="color:#666">Radiologist report (24h)</span><span style="color:var(--td);font-weight:500">Included</span></div>
+            <div class="cost-row"><span style="color:#666">Digital images (DICOM)</span><span style="color:var(--td);font-weight:500">Included</span></div>
+            <div class="cost-row"><span style="color:#666">ScanBook fee</span><span>£0</span></div>
+            <div class="cost-row"><span>Total</span><span>£275</span></div>
+          </div>
+          <div class="upsell-c">
+            <div style="font-size:13px;font-weight:600;color:var(--k);margin-bottom:5px">Add a post-scan consultation</div>
+            <p style="font-size:12px;color:#888;line-height:1.6;margin-bottom:9px">Speak to a clinician about your results. Know what's next — without paying hundreds for a private GP appointment.</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px"><span style="font-size:13px;color:#bbb;text-decoration:line-through">£50</span><span style="font-size:16px;font-weight:600;color:var(--k)">£40</span><span style="font-size:10px;padding:2px 7px;border-radius:20px;background:var(--tl);color:var(--td);font-weight:600">when you book now</span></div>
+            <button class="upsell-btn">Add consultation — £40</button>
+          </div>
+          <div class="sum-card">
+            <div class="sum-title">What happens after booking</div>
+            <div class="sum-row"><div style="width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--b);display:grid;place-items:center;font-size:11px;font-weight:600;color:#888;flex-shrink:0">1</div><div><div style="font-size:13px;font-weight:500;color:var(--k);margin-bottom:2px">Clinical safety check</div><div style="font-size:12px;color:#888">Our team reviews your safety answers within 1 working day.</div></div></div>
+            <div class="sum-row"><div style="width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--b);display:grid;place-items:center;font-size:11px;font-weight:600;color:#888;flex-shrink:0">2</div><div><div style="font-size:13px;font-weight:500;color:var(--k);margin-bottom:2px">Centre confirmation</div><div style="font-size:12px;color:#888">The scanning centre calls to confirm your exact time.</div></div></div>
+            <div class="sum-row"><div style="width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--b);display:grid;place-items:center;font-size:11px;font-weight:600;color:#888;flex-shrink:0">3</div><div><div style="font-size:13px;font-weight:500;color:var(--k);margin-bottom:2px">Your scan</div><div style="font-size:12px;color:#888">Attend your appointment. Bring your booking confirmation.</div></div></div>
+            <div class="sum-row"><div style="width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--b);display:grid;place-items:center;font-size:11px;font-weight:600;color:#888;flex-shrink:0">4</div><div><div style="font-size:13px;font-weight:500;color:var(--k);margin-bottom:2px">Your report</div><div style="font-size:12px;color:#888">Radiologist report delivered within 24 hours to your secure portal.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ PRIVACY POLICY -->
+<div class="page" id="p-privacy">
+  <div class="bc"><a href="scanbook-part1.html">Home</a> / <span style="color:#444">Privacy Policy</span></div>
+  <div class="legal">
+    <div class="legal-hero">
+      <h1>Privacy Policy</h1>
+      <div class="legal-meta"><span>Last updated: 28 April 2026</span><span>·</span><span>Connective Ltd (trading as ScanBook)</span><span>·</span><span>Company No. 11148446</span></div>
+    </div>
+    <div class="ls"><h2>1. Who We Are</h2><p>This Privacy Policy explains how Connective Ltd, trading as ScanBook ("ScanBook", "we", "us", "our"), collects, uses, stores, and shares your personal information when you use the ScanBook platform at www.scanbook.uk (the "Platform").</p><p>Connective Ltd is the data controller under UK GDPR and the Data Protection Act 2018. Our registered address is Unit Da2 Sutherland House, 43 Sutherland Road, London, E17 6BU.</p><div class="contact-box"><p><strong>Data protection queries:</strong> <a href="mailto:hello@scanbook.uk">hello@scanbook.uk</a></p></div></div>
+    <div class="ls"><h2>2. Personal Information We Collect</h2><h3>2.1 Information You Provide</h3><ul><li>Identity data: full name, date of birth, gender</li><li>Contact data: email address, phone number, home address</li><li>Booking data: scan type, preferred clinic, appointment preferences</li><li>Health data: relevant medical history and contraindications (required for safety)</li><li>Payment data: billing address and payment method (processed by Stripe — we do not store card details)</li></ul><h3>2.2 Information Collected Automatically</h3><ul><li>Technical data: IP address, browser type, operating system</li><li>Usage data: pages viewed, time on Platform, referral sources</li><li>Location data: approximate location based on IP address or postcode entered during booking</li></ul></div>
+    <div class="ls"><h2>3. Special Category Data — Health Information</h2><p>Health information you provide constitutes special category data under UK GDPR. We process this data only where strictly necessary to facilitate your booking and to ensure your safety at the Clinic.</p><p>Legal basis: Article 9(2)(h) UK GDPR — processing for health care purposes — and your explicit consent collected during the booking process. We restrict access to health data on a strict need-to-know basis and share it only with the Clinic you have booked with.</p></div>
+    <div class="ls"><h2>4. Legal Bases for Processing</h2><ul><li><strong>Performance of a contract:</strong> to process your booking, confirm appointments, and manage payments</li><li><strong>Legal obligation:</strong> to comply with applicable laws and regulations</li><li><strong>Legitimate interests:</strong> to operate, improve, and secure the Platform; to prevent fraud</li><li><strong>Consent:</strong> for marketing communications and certain cookie-based tracking technologies</li></ul></div>
+    <div class="ls"><h2>6. Who We Share Your Information With</h2><h3>6.1 Clinics</h3><p>When you book a scan, we share the minimum necessary personal information with the Clinic to facilitate your appointment. Clinics are independent data controllers subject to their own data protection obligations.</p><h3>6.2 Sub-processors</h3><table><tr><th>Sub-processor</th><th>Service</th><th>Location</th></tr><tr><td>Stripe Payments Europe Ltd</td><td>Payment processing</td><td>UK / EU</td></tr><tr><td>Google LLC (Workspace)</td><td>Email, storage, analytics</td><td>USA (SCCs)</td></tr><tr><td>Vercel Inc.</td><td>Web hosting</td><td>USA (SCCs)</td></tr><tr><td>Resend Inc.</td><td>Transactional email</td><td>USA (SCCs)</td></tr><tr><td>Postcodes.io</td><td>Postcode lookup</td><td>UK</td></tr></table></div>
+    <div class="ls"><h2>8. Retention Periods</h2><ul><li>Booking and transaction records: 7 years (tax and legal compliance)</li><li>Health-related booking information: 7 years from date of appointment</li><li>Marketing preferences: until you withdraw consent</li><li>Technical/usage data: up to 26 months</li></ul></div>
+    <div class="ls"><h2>11. Your Rights</h2><p>Under UK GDPR you have the right to: access your data, rectify inaccuracies, request erasure, restrict processing, object to processing, data portability, and withdraw consent. Contact <a href="mailto:hello@scanbook.uk">hello@scanbook.uk</a> to exercise any right. We will respond within one calendar month.</p><p>You may also complain to the ICO: <a href="https://ico.org.uk" target="_blank">www.ico.org.uk</a> · 0303 123 1113.</p></div>
+    <div class="ls"><h2>15. Contact</h2><div class="contact-box"><p><strong>Connective Ltd (trading as ScanBook)</strong></p><p>Unit Da2 Sutherland House, 43 Sutherland Road, London, E17 6BU</p><p>Email: <a href="mailto:hello@scanbook.uk">hello@scanbook.uk</a></p><p>Website: <a href="https://www.scanbook.uk">www.scanbook.uk</a></p></div></div>
+  </div>
+  <footer><div class="ft-bot" style="justify-content:center;background:#111;border-top:1px solid rgba(255,255,255,.06)"><div class="ft-links"><a href="#" onclick="go('terms')">Terms &amp; Conditions</a><a href="#" onclick="go('cookies')">Cookie Policy</a><a href="scanbook-part1.html">Home</a></div></div></footer>
+</div>
+
+<!-- ══════════════════════════════ TERMS & CONDITIONS -->
+<div class="page" id="p-terms">
+  <div class="bc"><a href="scanbook-part1.html">Home</a> / <span style="color:#444">Terms &amp; Conditions</span></div>
+  <div class="legal">
+    <div class="legal-hero">
+      <h1>Terms and Conditions</h1>
+      <div class="legal-meta"><span>Last updated: 28 April 2026</span><span>·</span><span>Connective Ltd (trading as ScanBook)</span><span>·</span><span>Company No. 11148446</span></div>
+    </div>
+    <div class="ls"><h2>1. Introduction and Agreement</h2><p>Welcome to ScanBook, a service operated by Connective Ltd ("ScanBook", "we", "us"), registered in England and Wales (Company No. 11148446). Registered office: Unit Da2 Sutherland House, 43 Sutherland Road, London, E17 6BU.</p><p>ScanBook is an online marketplace enabling patients to search, compare, and book private diagnostic imaging appointments at regulated, independent healthcare providers across the UK. ScanBook does not provide medical services directly; we act as a technology intermediary connecting patients with CQC-registered imaging providers ("Clinics").</p></div>
+    <div class="ls"><h2>2. Eligibility</h2><p>The Platform is available to persons aged 18 and over who are UK residents. You may book on behalf of another person provided you have their authority and accept responsibility for the accuracy of their information.</p></div>
+    <div class="ls"><h2>3. Important Disclaimer — ScanBook is Not a Medical Provider</h2><p>ScanBook is a booking facilitator only. All medical services are provided solely by the independent Clinic you book with. ScanBook has no influence over clinical decisions, scan protocols, or radiological reports.</p><p>Nothing on the Platform constitutes medical advice, diagnosis, or clinical recommendation. You should always consult a qualified medical professional regarding your health and any scan results.</p></div>
+    <div class="ls"><h2>4. Bookings and Appointments</h2><h3>4.1 How to Book</h3><p>To make a booking, you must provide accurate personal details, select your scan type and preferred Clinic, and complete payment via Stripe. A booking is confirmed only once you receive written confirmation from ScanBook.</p><h3>4.2 Self-Referral</h3><p>Many scans can be booked without a GP referral. Where a referral is required, ScanBook may introduce you to a partner GP for a remote consultation. Such GPs are independent practitioners and may charge a separate fee.</p></div>
+    <div class="ls"><h2>5. Payments and Pricing</h2><p>All payments are processed securely via Stripe. Prices are displayed in GBP and are inclusive of applicable taxes. The price displayed at the time of booking is the price you pay. We accept Visa, Mastercard, American Express, Apple Pay, and Google Pay.</p></div>
+    <div class="ls"><h2>6. Cancellation and Refund Policy</h2><h3>6.1 Cancellation by You</h3><ul><li><strong>More than 48 hours before your appointment:</strong> full refund</li><li><strong>Within 48 hours of your appointment:</strong> no refund</li><li><strong>Did Not Attend (DNA):</strong> no refund. A second DNA may incur an additional £50 administration fee</li></ul><h3>6.2 Cancellation by the Clinic</h3><p>If a Clinic cancels, ScanBook will make reasonable efforts to offer an alternative Clinic or a full refund.</p><h3>6.3 Refund Processing</h3><p>Approved refunds will be processed within 5–10 working days to your original payment method.</p></div>
+    <div class="ls"><h2>9. Limitation of Liability</h2><p>To the fullest extent permitted by English law, Connective Ltd's aggregate liability shall not exceed the total amount paid by you for the relevant booking. Nothing in these Terms limits our liability for death or personal injury caused by negligence, fraud, or any liability that cannot be excluded by law.</p></div>
+    <div class="ls"><h2>12. Governing Law and Disputes</h2><p>These Terms are governed by the laws of England and Wales. Disputes are subject to the exclusive jurisdiction of the courts of England and Wales.</p><p>Complaints: <a href="mailto:hello@scanbook.uk">hello@scanbook.uk</a>. We aim to resolve complaints within 14 working days.</p></div>
+    <div class="ls"><h2>15. Contact</h2><div class="contact-box"><p><strong>Connective Ltd (trading as ScanBook)</strong></p><p>Unit Da2 Sutherland House, 43 Sutherland Road, London, E17 6BU</p><p>Email: <a href="mailto:hello@scanbook.uk">hello@scanbook.uk</a></p><p>Website: <a href="https://www.scanbook.uk">www.scanbook.uk</a></p></div></div>
+  </div>
+  <footer><div class="ft-bot" style="justify-content:center;background:#111;border-top:1px solid rgba(255,255,255,.06)"><div class="ft-links"><a href="#" onclick="go('privacy')">Privacy Policy</a><a href="#" onclick="go('cookies')">Cookie Policy</a><a href="scanbook-part1.html">Home</a></div></div></footer>
+</div>
+
+<!-- ══════════════════════════════ COOKIE POLICY -->
+<div class="page" id="p-cookies">
+  <div class="bc"><a href="scanbook-part1.html">Home</a> / <span style="color:#444">Cookie Policy</span></div>
+  <div class="legal">
+    <div class="legal-hero">
+      <h1>Cookie Policy</h1>
+      <div class="legal-meta"><span>Last updated: 28 April 2026</span><span>·</span><span>Connective Ltd (trading as ScanBook)</span><span>·</span><span>Company No. 11148446</span></div>
+    </div>
+    <div class="ls"><h2>1. What Are Cookies?</h2><p>Cookies are small text files placed on your device when you visit a website. This Cookie Policy explains what cookies we use on www.scanbook.uk, why we use them, and how you can manage your preferences. It should be read alongside our <a href="#" onclick="go('privacy')">Privacy Policy</a>.</p></div>
+    <div class="ls"><h2>3. Types of Cookies We Use</h2><h3>3.1 Strictly Necessary Cookies</h3><p>Essential for the Platform to function. Set in response to actions such as logging in or processing a payment. No consent required under UK PECR.</p><h3>3.2 Performance and Analytics Cookies</h3><p>Allow us to count visits and understand how users interact with the Platform. All information is aggregated and anonymous. We use Google Analytics. Opt out at: <a href="https://tools.google.com/dlpage/gaoptout" target="_blank">https://tools.google.com/dlpage/gaoptout</a></p><h3>3.3 Functional Cookies</h3><p>Enable enhanced functionality and personalisation, such as remembering your preferences or region.</p><h3>3.4 Marketing and Advertising Cookies</h3><p>Set by advertising partners to build a profile of your interests. Only placed with your explicit consent. Withdraw consent at any time using our cookie consent tool or browser settings.</p></div>
+    <div class="ls"><h2>4. Cookies We Use</h2><table><tr><th>Cookie</th><th>Purpose</th><th>Provider</th><th>Duration</th><th>Category</th></tr><tr><td>_ga, _gid</td><td>Analytics</td><td>Google Analytics</td><td>Session / 2 years</td><td>Performance</td></tr><tr><td>_stripe_mid, _stripe_sid</td><td>Payment security</td><td>Stripe</td><td>1 year / session</td><td>Strictly necessary</td></tr><tr><td>sb_session</td><td>User session</td><td>ScanBook</td><td>Session</td><td>Strictly necessary</td></tr><tr><td>sb_consent</td><td>Cookie consent</td><td>ScanBook</td><td>1 year</td><td>Strictly necessary</td></tr><tr><td>_fbp</td><td>Advertising (if enabled)</td><td>Meta / Facebook</td><td>3 months</td><td>Marketing</td></tr></table></div>
+    <div class="ls"><h2>6. Legal Basis</h2><p>Under UK PECR and UK GDPR:</p><ul><li><strong>Strictly necessary cookies:</strong> no consent required — essential for the service</li><li><strong>Analytics, functional, and marketing cookies:</strong> we rely on your consent, collected via our cookie consent banner on first visit</li></ul></div>
+    <div class="ls"><h2>7. How to Manage Your Cookie Preferences</h2><p>When you first visit the Platform, you will see a cookie consent banner. You can accept all cookies, reject non-essential cookies, or customise preferences by category. Revisit preferences at any time via the "Cookie Settings" link in the footer.</p><p>You can also manage cookies through your browser settings. Note that disabling cookies may affect Platform functionality.</p></div>
+    <div class="ls"><h2>10. Contact</h2><div class="contact-box"><p><strong>Connective Ltd (trading as ScanBook)</strong></p><p>Unit Da2 Sutherland House, 43 Sutherland Road, London, E17 6BU</p><p>Email: <a href="mailto:hello@scanbook.uk">hello@scanbook.uk</a></p><p>Website: <a href="https://www.scanbook.uk/cookie-policy">www.scanbook.uk/cookie-policy</a></p></div></div>
+  </div>
+  <footer><div class="ft-bot" style="justify-content:center;background:#111;border-top:1px solid rgba(255,255,255,.06)"><div class="ft-links"><a href="#" onclick="go('privacy')">Privacy Policy</a><a href="#" onclick="go('terms')">Terms &amp; Conditions</a><a href="scanbook-part1.html">Home</a></div></div></footer>
+</div>
+
+<script>
+// Page routing
+function go(id){
+  if(id==='home-redirect'){window.location.href='scanbook-part1.html';return}
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  const el=document.getElementById('p-'+id);
+  if(el){el.classList.add('on');window.scrollTo(0,0)}
+}
+
+// Handle URL hash on load (#medicana, #unirad, #booking, etc.)
+window.addEventListener('load',function(){
+  const hash=window.location.hash.replace('#','');
+  if(hash){
+    const el=document.getElementById('p-'+hash);
+    if(el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));el.classList.add('on')}
+  }
+});
+
+// Booking flow
+const STEP_LABELS=['Personal','Contact','Scan details','Safety','Review'];
+function goStep(n){
+  for(let i=1;i<=5;i++){
+    const step=document.getElementById('bs'+i);
+    if(step){step.classList.toggle('on',i===n)}
+    const pc=document.getElementById('pc'+i);
+    const pl=document.getElementById('pl'+i);
+    if(pc){
+      pc.className='pc '+(i<n?'done':i===n?'act':'todo');
+      if(pl){pl.className='pl '+(i<n?'done':i===n?'act':'')}
+    }
+    if(i<5){
+      const line=document.getElementById('pln'+i);
+      if(line){line.classList.toggle('done',i<n)}
+    }
+  }
+  const lbl=document.getElementById('step-lbl');
+  if(lbl)lbl.textContent='Step '+n+' of 5';
+  window.scrollTo(0,0);
+}
+
+// Radio buttons
+function setRb(el){
+  el.closest('.radio-g').querySelectorAll('.rb').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// Safety questions
+const DQ_MSGS={
+  pacemaker:'We are unable to perform MRI scans on patients with a cardiac pacemaker or any other cardiac device. Please speak to your GP or cardiologist about alternative imaging options.',
+  aneurysm:'We are unable to perform MRI scans on patients with an aneurysm clip. Please contact your neurosurgeon for guidance.',
+  pregnant:'We are unable to perform MRI scans on pregnant patients. Please speak to your midwife or GP about safe imaging alternatives.'
+};
+let activeDisqualifier=null;
+function setSq(el,type,dq){
+  const row=el.closest('.sq');
+  const yBtn=row.querySelector('.yb.y, .yb.dy');
+  const nBtn=row.querySelector('.yb.n');
+  // clear
+  [yBtn,nBtn].forEach(b=>{if(b)b.classList.remove('on')});
+  el.classList.add('on');
+  // show detail textarea for yes
+  let detail=row.nextElementSibling;
+  if(detail&&detail.classList.contains('sq-detail'))detail.remove();
+  if(type==='y'){
+    row.classList.add('yes');
+    row.classList.remove('danger');
+    const d=document.createElement('div');
+    d.className='sq-detail';
+    d.innerHTML='<textarea rows="2" placeholder="Please provide details…"></textarea>';
+    row.after(d);
+  } else if(type==='dy'){
+    row.classList.add('danger');
+    row.classList.remove('yes');
+    // show disqualifier warning
+    activeDisqualifier=dq;
+    const warn=document.getElementById('dq-warn');
+    const txt=document.getElementById('dq-text');
+    if(warn&&txt){warn.style.display='block';txt.textContent=DQ_MSGS[dq]||''}
+    const cont=document.getElementById('btn-to-review');
+    if(cont){cont.style.background='#e8e8e8';cont.style.color='#bbb';cont.disabled=true}
+  } else {
+    row.classList.remove('yes','danger');
+    if(dq&&activeDisqualifier===dq){
+      activeDisqualifier=null;
+      const warn=document.getElementById('dq-warn');
+      if(warn)warn.style.display='none';
+      const cont=document.getElementById('btn-to-review');
+      if(cont){cont.style.background='';cont.style.color='';cont.disabled=false}
+    }
+  }
+}
+
+// Pay option selection
+function selPay(el){
+  el.closest('.pay-opts').querySelectorAll('.pay-opt').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  const btn=document.querySelector('.btn-cont[onclick*="Pay"]');
+  if(btn){
+    if(el.querySelector('.pay-opt-title').textContent.includes('callback')){
+      btn.textContent='Request callback →';btn.style.background='var(--k)';
+    } else {
+      btn.textContent='Pay £275 securely →';btn.style.background='var(--teal)';
+    }
+  }
+}
+
+// Date picker
+document.addEventListener('click',function(e){
+  if(e.target.closest('.date-btn')){
+    const g=e.target.closest('.date-g');
+    if(g){g.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('on'));e.target.closest('.date-btn').classList.add('on')}
+  }
+});
+</script>
+</body>
+</html>

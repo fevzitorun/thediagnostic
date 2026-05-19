@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanBook — Book Private Medical Scans Across the UK</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0A0E1A;
+  --blue: #1A56FF;
+  --blue-mid: #2563EB;
+  --electric: #00D4FF;
+  --surface: #F4F6FF;
+  --white: #FFFFFF;
+  --muted: #6B7280;
+  --border: #E5E9F5;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --card: #FFFFFF;
+  --navy-glass: rgba(10,14,26,0.92);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: var(--white);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 48px;
+  height: 64px;
+  background: var(--navy-glass);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+}
+.logo span { color: var(--electric); }
+.logo sub { font-size:0.55rem; color:rgba(255,255,255,0.4); vertical-align:middle; margin-left:2px; font-weight:400; font-family:'Instrument Sans',sans-serif; letter-spacing:1px; text-transform:uppercase; }
+.nav-center { display:flex; gap:32px; list-style:none; }
+.nav-center a { color:rgba(255,255,255,0.65); text-decoration:none; font-size:0.875rem; font-weight:500; transition:color 0.2s; }
+.nav-center a:hover { color:white; }
+.nav-right { display:flex; gap:12px; align-items:center; }
+.nav-login { color:rgba(255,255,255,0.7); text-decoration:none; font-size:0.875rem; padding:8px 16px; border-radius:6px; transition:all 0.2s; }
+.nav-login:hover { color:white; background:rgba(255,255,255,0.08); }
+.nav-book {
+  background: var(--blue);
+  color:white; text-decoration:none;
+  font-size:0.875rem; font-weight:600;
+  padding:9px 20px; border-radius:7px;
+  transition: all 0.2s;
+}
+.nav-book:hover { background: var(--blue-mid); transform:translateY(-1px); box-shadow:0 4px 16px rgba(26,86,255,0.4); }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: center;
+  padding: 80px 0 0;
+}
+.hero-grid-bg {
+  position: absolute; inset: 0;
+  background-image: 
+    linear-gradient(rgba(26,86,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,86,255,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.hero-glow-1 {
+  position:absolute; top:-200px; right:-100px;
+  width:700px; height:700px;
+  background: radial-gradient(circle, rgba(26,86,255,0.18) 0%, transparent 65%);
+  border-radius:50%;
+}
+.hero-glow-2 {
+  position:absolute; bottom:-200px; left:-100px;
+  width:500px; height:500px;
+  background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 65%);
+  border-radius:50%;
+}
+
+.hero-inner {
+  max-width:1280px; margin:0 auto; width:100%;
+  padding: 80px 48px 120px;
+  display:grid; grid-template-columns:1fr 480px; gap:80px; align-items:center;
+  position:relative; z-index:2;
+}
+
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:10px;
+  background: rgba(26,86,255,0.12);
+  border: 1px solid rgba(26,86,255,0.25);
+  color: var(--electric);
+  padding: 6px 14px; border-radius:20px;
+  font-size:0.75rem; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+  margin-bottom:28px;
+}
+.pulse-dot {
+  width:7px; height:7px; background:var(--electric); border-radius:50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 4rem; font-weight:800;
+  color: white; line-height:1.1; letter-spacing:-1.5px;
+  margin-bottom:24px;
+}
+h1 .accent { color: var(--electric); }
+h1 .dim { color:rgba(255,255,255,0.45); }
+
+.hero-desc {
+  color:rgba(255,255,255,0.55);
+  font-size:1.05rem; line-height:1.75;
+  max-width:500px; margin-bottom:40px; font-weight:300;
+}
+
+.hero-actions { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:56px; }
+.btn-hero-primary {
+  background: var(--blue);
+  color:white; text-decoration:none;
+  font-size:0.95rem; font-weight:600;
+  padding:14px 28px; border-radius:8px;
+  display:inline-flex; align-items:center; gap:8px;
+  transition:all 0.25s; border:none; cursor:pointer; font-family:'Instrument Sans',sans-serif;
+}
+.btn-hero-primary:hover { background:var(--blue-mid); transform:translateY(-2px); box-shadow:0 8px 30px rgba(26,86,255,0.45); }
+.btn-hero-ghost {
+  color:rgba(255,255,255,0.7); text-decoration:none;
+  font-size:0.95rem; font-weight:500;
+  padding:14px 28px; border-radius:8px;
+  border:1px solid rgba(255,255,255,0.15);
+  display:inline-flex; align-items:center; gap:8px;
+  transition:all 0.25s; cursor:pointer; font-family:'Instrument Sans',sans-serif; background:none;
+}
+.btn-hero-ghost:hover { border-color:rgba(255,255,255,0.4); color:white; }
+
+.hero-proof {
+  display:flex; gap:32px;
+}
+.proof-item { }
+.proof-num {
+  font-family:'Syne',sans-serif;
+  font-size:2rem; font-weight:800; color:white; letter-spacing:-1px;
+}
+.proof-num span { color:var(--electric); }
+.proof-label { font-size:0.78rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+
+/* ─── SEARCH BOX ─── */
+.search-box {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 28px;
+  backdrop-filter: blur(20px);
+}
+.search-box-title {
+  font-family:'Syne',sans-serif;
+  font-size:1.1rem; font-weight:700; color:white;
+  margin-bottom:4px;
+}
+.search-box-sub { font-size:0.82rem; color:rgba(255,255,255,0.4); margin-bottom:22px; }
+
+.scan-types {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px;
+}
+.scan-type-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius:8px; padding:10px 8px;
+  text-align:center; cursor:pointer;
+  transition:all 0.2s; color:rgba(255,255,255,0.6);
+  font-size:0.78rem; font-weight:500;
+  font-family:'Instrument Sans',sans-serif;
+}
+.scan-type-btn:hover, .scan-type-btn.active {
+  border-color: var(--blue);
+  background: rgba(26,86,255,0.15);
+  color:white;
+}
+.scan-type-btn .icon { font-size:1.3rem; display:block; margin-bottom:4px; }
+
+.search-field {
+  margin-bottom:12px;
+}
+.search-field label {
+  display:block; font-size:0.72rem; font-weight:600;
+  color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;
+}
+.search-field input, .search-field select {
+  width:100%; padding:11px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius:8px; color:white;
+  font-size:0.9rem; font-family:'Instrument Sans',sans-serif;
+  transition:border-color 0.2s;
+  appearance:none;
+}
+.search-field input::placeholder { color:rgba(255,255,255,0.3); }
+.search-field input:focus, .search-field select:focus { outline:none; border-color:var(--blue); }
+.search-field select option { background: #1a1f35; color:white; }
+
+.search-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.search-submit {
+  width:100%; margin-top:4px;
+  background: var(--blue);
+  color:white; border:none; border-radius:8px;
+  padding:13px; font-size:0.95rem; font-weight:700;
+  cursor:pointer; font-family:'Instrument Sans',sans-serif;
+  transition:all 0.25s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.search-submit:hover { background:var(--blue-mid); transform:translateY(-1px); box-shadow:0 6px 20px rgba(26,86,255,0.4); }
+
+.search-trust {
+  display:flex; gap:12px; margin-top:16px; flex-wrap:wrap;
+}
+.stag {
+  display:flex; align-items:center; gap:5px;
+  font-size:0.73rem; color:rgba(255,255,255,0.35);
+}
+.stag .dot { color:var(--success); }
+
+/* ─── CLINIC CARDS (Map Section) ─── */
+.section { padding:96px 48px; }
+.section-inner { max-width:1280px; margin:0 auto; }
+.tag { font-size:0.72rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--blue); margin-bottom:10px; }
+h2 { font-family:'Syne',sans-serif; font-size:2.6rem; font-weight:800; color:var(--ink); letter-spacing:-1px; line-height:1.15; }
+
+.map-section { background: var(--surface); }
+.map-layout { display:grid; grid-template-columns:380px 1fr; gap:24px; margin-top:48px; height:560px; }
+.clinic-list { display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
+.clinic-list::-webkit-scrollbar { width:4px; }
+.clinic-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+.clinic-card {
+  background:white; border-radius:12px; padding:16px;
+  border:1.5px solid var(--border); cursor:pointer;
+  transition:all 0.2s; position:relative;
+}
+.clinic-card:hover, .clinic-card.active {
+  border-color:var(--blue);
+  box-shadow:0 4px 20px rgba(26,86,255,0.1);
+}
+.clinic-card.active::before {
+  content:''; position:absolute; left:0; top:12px; bottom:12px;
+  width:3px; background:var(--blue); border-radius:0 2px 2px 0;
+}
+.clinic-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+.clinic-name { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; color:var(--ink); }
+.clinic-rating { display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:600; color:var(--ink); }
+.stars-small { color:#F59E0B; font-size:0.7rem; }
+.clinic-address { font-size:0.78rem; color:var(--muted); margin-bottom:10px; }
+.clinic-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+.clinic-tag {
+  background: rgba(26,86,255,0.07); color:var(--blue);
+  font-size:0.68rem; font-weight:600; padding:3px 8px; border-radius:4px;
+  letter-spacing:0.3px;
+}
+.clinic-footer { display:flex; justify-content:space-between; align-items:center; }
+.clinic-price { font-size:0.82rem; font-weight:700; color:var(--ink); }
+.clinic-price span { color:var(--muted); font-weight:400; font-size:0.74rem; }
+.clinic-avail { font-size:0.73rem; color:var(--success); font-weight:600; }
+.clinic-avail.busy { color:var(--warning); }
+.book-slot-btn {
+  background:var(--blue); color:white;
+  border:none; border-radius:6px;
+  padding:7px 14px; font-size:0.78rem; font-weight:600;
+  cursor:pointer; font-family:'Instrument Sans',sans-serif;
+  transition:all 0.2s;
+}
+.book-slot-btn:hover { background:var(--blue-mid); }
+
+.map-placeholder {
+  background: #e8ecf5;
+  border-radius:14px; overflow:hidden; position:relative;
+  display:flex; align-items:center; justify-content:center;
+}
+.map-bg {
+  position:absolute; inset:0;
+  background: 
+    linear-gradient(rgba(26,86,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,86,255,0.03) 1px, transparent 1px);
+  background-size:40px 40px;
+  background-color: #dde3f0;
+}
+.map-roads {
+  position:absolute; inset:0;
+  background-image: 
+    linear-gradient(transparent 40%, rgba(255,255,255,0.7) 40%, rgba(255,255,255,0.7) 43%, transparent 43%),
+    linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.6) 25%, rgba(255,255,255,0.6) 27%, transparent 27%),
+    linear-gradient(90deg, transparent 60%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0.6) 62%, transparent 62%),
+    linear-gradient(transparent 70%, rgba(255,255,255,0.5) 70%, rgba(255,255,255,0.5) 72%, transparent 72%);
+}
+.map-pin {
+  position:absolute; text-align:center; cursor:pointer;
+  transition: transform 0.2s;
+}
+.map-pin:hover { transform: scale(1.1) translateY(-3px); z-index:10; }
+.pin-bubble {
+  background:var(--blue); color:white;
+  font-size:0.72rem; font-weight:700;
+  padding:5px 10px; border-radius:20px;
+  white-space:nowrap;
+  box-shadow:0 4px 12px rgba(26,86,255,0.4);
+}
+.pin-bubble.pink { background:#EF4444; }
+.pin-bubble.green { background:var(--success); }
+.pin-tail {
+  width:10px; height:10px; background:inherit;
+  clip-path: polygon(0 0,100% 0,50% 100%);
+  margin:0 auto;
+}
+.pin-1 { top:30%; left:35%; }
+.pin-2 { top:20%; left:58%; }
+.pin-3 { top:50%; left:65%; }
+.pin-4 { top:60%; left:28%; }
+.pin-5 { top:42%; left:48%; }
+.map-label {
+  position:absolute; bottom:20px; right:20px;
+  background:white; padding:10px 14px; border-radius:8px;
+  font-size:0.75rem; font-weight:600; color:var(--ink);
+  box-shadow:0 2px 12px rgba(0,0,0,0.12);
+}
+
+/* ─── HOW IT WORKS ─── */
+.how-it-works { background:white; }
+.steps-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-top:60px; }
+.step-item {
+  padding:32px 24px;
+  border-top:2px solid var(--border);
+  position:relative;
+  transition:border-color 0.3s;
+}
+.step-item:hover { border-top-color:var(--blue); }
+.step-num {
+  font-family:'Syne',sans-serif;
+  font-size:3rem; font-weight:800;
+  color:rgba(26,86,255,0.08); line-height:1;
+  margin-bottom:16px; letter-spacing:-2px;
+}
+.step-icon { font-size:1.6rem; margin-bottom:12px; }
+.step-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--ink); margin-bottom:8px; }
+.step-desc { font-size:0.85rem; color:var(--muted); line-height:1.65; }
+
+/* ─── PANELS SECTION ─── */
+.panels-section { background:var(--ink); color:white; }
+.panels-section h2 { color:white; }
+.panels-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:48px; }
+.panel-card {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius:14px; padding:28px;
+  transition:all 0.3s;
+  position:relative; overflow:hidden;
+}
+.panel-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  transform:scaleX(0); transition:transform 0.3s;
+}
+.panel-card.clinic::before { background: linear-gradient(to right, var(--blue), var(--electric)); }
+.panel-card.gp::before { background: linear-gradient(to right, #10B981, #34D399); }
+.panel-card.patient::before { background: linear-gradient(to right, #8B5CF6, #A78BFA); }
+.panel-card:hover { border-color:rgba(255,255,255,0.2); transform:translateY(-4px); }
+.panel-card:hover::before { transform:scaleX(1); }
+
+.panel-icon {
+  width:48px; height:48px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.4rem; margin-bottom:18px;
+}
+.panel-icon.clinic { background:rgba(26,86,255,0.15); }
+.panel-icon.gp { background:rgba(16,185,129,0.15); }
+.panel-icon.patient { background:rgba(139,92,246,0.15); }
+.panel-title { font-family:'Syne',sans-serif; font-size:1.15rem; font-weight:700; color:white; margin-bottom:6px; }
+.panel-sub { font-size:0.82rem; color:rgba(255,255,255,0.45); margin-bottom:18px; line-height:1.6; }
+.panel-features { list-style:none; display:flex; flex-direction:column; gap:8px; margin-bottom:22px; }
+.panel-features li { font-size:0.82rem; color:rgba(255,255,255,0.65); display:flex; align-items:center; gap:8px; }
+.panel-features li::before { content:'✓'; color:var(--electric); font-weight:700; font-size:0.75rem; }
+.panel-cta {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:0.82rem; font-weight:600; text-decoration:none;
+  transition:gap 0.2s; cursor:pointer; border:none; background:none;
+  font-family:'Instrument Sans',sans-serif;
+}
+.panel-cta.clinic { color:var(--electric); }
+.panel-cta.gp { color:#34D399; }
+.panel-cta.patient { color:#A78BFA; }
+.panel-cta:hover { gap:10px; }
+
+/* ─── SECURITY ─── */
+.security-section { background:var(--surface); }
+.security-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-top:48px; }
+.security-card {
+  background:white; border-radius:12px; padding:24px;
+  border:1px solid var(--border); display:flex; gap:16px; align-items:flex-start;
+}
+.sec-icon {
+  width:44px; height:44px; border-radius:10px;
+  background:rgba(26,86,255,0.08);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.2rem; flex-shrink:0;
+}
+.sec-title { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; color:var(--ink); margin-bottom:4px; }
+.sec-desc { font-size:0.82rem; color:var(--muted); line-height:1.6; }
+
+/* ─── AI MARKETING SECTION ─── */
+.ai-section {
+  background: linear-gradient(135deg, #0A0E1A 0%, #0d1833 100%);
+  color:white; position:relative; overflow:hidden;
+}
+.ai-grid-bg {
+  position:absolute; inset:0;
+  background-image: linear-gradient(rgba(26,86,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(26,86,255,0.05) 1px, transparent 1px);
+  background-size:48px 48px;
+}
+.ai-inner { position:relative; z-index:2; }
+.ai-layout { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; margin-top:48px; }
+.ai-content h2 { color:white; margin-bottom:20px; }
+.ai-content p { color:rgba(255,255,255,0.55); font-size:1rem; line-height:1.75; margin-bottom:28px; font-weight:300; }
+.ai-features { display:flex; flex-direction:column; gap:14px; }
+.ai-feature {
+  display:flex; align-items:center; gap:12px;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px; padding:14px 16px;
+}
+.ai-feature-icon { font-size:1.2rem; width:32px; text-align:center; }
+.ai-feature-text { font-size:0.85rem; color:rgba(255,255,255,0.7); }
+.ai-feature-text strong { color:white; display:block; margin-bottom:2px; font-size:0.88rem; }
+
+.ai-terminal {
+  background: rgba(0,0,0,0.5);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:14px; overflow:hidden;
+}
+.terminal-bar {
+  background:rgba(255,255,255,0.06);
+  padding:12px 16px; display:flex; align-items:center; gap:8px;
+}
+.t-dot { width:12px; height:12px; border-radius:50%; }
+.t-dot.r { background:#FF5F57; }
+.t-dot.y { background:#FEBC2E; }
+.t-dot.g { background:#28C840; }
+.terminal-title { font-size:0.75rem; color:rgba(255,255,255,0.3); margin-left:auto; margin-right:auto; }
+.terminal-body { padding:20px; font-family:monospace; font-size:0.82rem; line-height:1.8; }
+.t-line { margin-bottom:6px; }
+.t-prompt { color:var(--electric); }
+.t-cmd { color:white; }
+.t-output { color:rgba(255,255,255,0.5); }
+.t-success { color:var(--success); }
+.t-highlight { color:var(--electric); }
+.t-cursor { display:inline-block; width:8px; height:14px; background:var(--electric); animation:blink 1s infinite; vertical-align:middle; }
+@keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+/* ─── PAYMENT ─── */
+.payment-section { background:white; }
+.payment-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; margin-top:48px; }
+.payment-methods { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.pay-method {
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:10px; padding:16px;
+  display:flex; align-items:center; gap:12px;
+  transition:border-color 0.2s;
+}
+.pay-method:hover { border-color:var(--blue); }
+.pay-icon { font-size:1.6rem; }
+.pay-name { font-size:0.85rem; font-weight:600; color:var(--ink); }
+.pay-desc { font-size:0.75rem; color:var(--muted); }
+.stripe-badge {
+  display:flex; align-items:center; gap:8px;
+  background: #0A2463; color:white;
+  padding:12px 20px; border-radius:10px;
+  font-size:0.85rem; font-weight:600; margin-top:20px;
+  width:fit-content;
+}
+.insurance-plans { display:flex; flex-direction:column; gap:14px; }
+.insurance-plan {
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:10px; padding:16px 20px;
+  display:flex; align-items:center; justify-content:space-between;
+  transition:all 0.2s;
+}
+.insurance-plan:hover { border-color:var(--blue); }
+.plan-name { font-size:0.9rem; font-weight:600; color:var(--ink); }
+.plan-cover { font-size:0.78rem; color:var(--muted); margin-top:2px; }
+.plan-badge {
+  font-size:0.72rem; font-weight:700; padding:4px 10px; border-radius:4px;
+  background:rgba(16,185,129,0.1); color:var(--success);
+}
+
+/* ─── FOOTER ─── */
+footer { background:var(--ink); color:rgba(255,255,255,0.5); padding:64px 48px 32px; }
+.footer-top { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:2.5fr 1fr 1fr 1fr 1fr; gap:48px; margin-bottom:48px; }
+.footer-brand .logo { color:white; margin-bottom:14px; display:block; }
+.footer-brand p { font-size:0.83rem; line-height:1.7; max-width:240px; }
+.footer-col h5 { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,0.35); margin-bottom:16px; }
+.footer-col ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.footer-col a { color:rgba(255,255,255,0.5); text-decoration:none; font-size:0.84rem; transition:color 0.2s; }
+.footer-col a:hover { color:white; }
+.footer-bottom {
+  max-width:1280px; margin:0 auto;
+  padding-top:24px; border-top:1px solid rgba(255,255,255,0.07);
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:0.78rem;
+}
+.footer-badges { display:flex; gap:10px; }
+.f-badge {
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+  padding:5px 12px; border-radius:6px; font-size:0.72rem; color:rgba(255,255,255,0.45); font-weight:600;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+.hero-eyebrow{animation:fadeUp 0.5s ease both}
+h1{animation:fadeUp 0.5s 0.08s ease both}
+.hero-desc{animation:fadeUp 0.5s 0.15s ease both}
+.hero-actions{animation:fadeUp 0.5s 0.22s ease both}
+.hero-proof{animation:fadeUp 0.5s 0.3s ease both}
+.search-box{animation:fadeUp 0.6s 0.15s ease both}
+
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:40px}
+  .map-layout{grid-template-columns:1fr;height:auto}
+  .map-placeholder{height:300px}
+  .panels-grid{grid-template-columns:1fr}
+  .ai-layout{grid-template-columns:1fr;gap:40px}
+  .payment-grid{grid-template-columns:1fr;gap:40px}
+  .footer-top{grid-template-columns:1fr 1fr;gap:32px}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  nav{padding:0 24px}
+  .section{padding:64px 24px}
+  h1{font-size:2.8rem}
+  .hero-inner{padding:60px 24px 80px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Scan<span>Book</span><sub>.co.uk</sub></div>
+  <ul class="nav-center">
+    <li><a href="#">Find a Scan</a></li>
+    <li><a href="#">Baby Scans</a></li>
+    <li><a href="#">Clinics</a></li>
+    <li><a href="#">For GPs</a></li>
+    <li><a href="#">Pricing</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="scanbook-patient.html" class="nav-login">My Account</a>
+    <a href="#search" class="nav-book">Book a Scan →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">
+        <div class="pulse-dot"></div>
+        UK's Fastest Growing Scan Marketplace
+      </div>
+      <h1>Private Scans.<br><span class="accent">Booked Instantly.</span><br><span class="dim">No Waiting Lists.</span></h1>
+      <p class="hero-desc">ScanBook connects patients with verified private imaging clinics across the UK. MRI, CT, Ultrasound and Baby Scans — available within 48 hours. Results in 3 days.</p>
+      <div class="hero-actions">
+        <button class="btn-hero-primary" onclick="document.getElementById('search').scrollIntoView({behavior:'smooth'})">🔍 Find a Scan Near You</button>
+        <button class="btn-hero-ghost">▶ Watch How It Works</button>
+      </div>
+      <div class="hero-proof">
+        <div class="proof-item">
+          <div class="proof-num">10<span>+</span></div>
+          <div class="proof-label">Partner Clinics</div>
+        </div>
+        <div class="proof-item">
+          <div class="proof-num">48<span>h</span></div>
+          <div class="proof-label">Avg Booking</div>
+        </div>
+        <div class="proof-item">
+          <div class="proof-num">£0</div>
+          <div class="proof-label">Referral Fee</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH WIDGET -->
+    <div class="search-box" id="search">
+      <div class="search-box-title">Find Your Scan</div>
+      <div class="search-box-sub">No GP referral needed — book direct</div>
+      
+      <div class="scan-types">
+        <button class="scan-type-btn active" onclick="setScan(this)"><span class="icon">🧠</span>MRI</button>
+        <button class="scan-type-btn" onclick="setScan(this)"><span class="icon">🔬</span>CT Scan</button>
+        <button class="scan-type-btn" onclick="setScan(this)"><span class="icon">🔊</span>Ultrasound</button>
+        <button class="scan-type-btn" onclick="setScan(this)"><span class="icon">🤰</span>Baby Scan</button>
+        <button class="scan-type-btn" onclick="setScan(this)"><span class="icon">🫁</span>Full Body</button>
+        <button class="scan-type-btn" onclick="setScan(this)"><span class="icon">🦴</span>X-Ray</button>
+      </div>
+
+      <div class="search-field">
+        <label>Body Part / Concern</label>
+        <select>
+          <option>Select area...</option>
+          <option>Head & Brain</option>
+          <option>Spine & Back</option>
+          <option>Knee / Shoulder / Joint</option>
+          <option>Abdomen & Pelvis</option>
+          <option>Chest & Lungs</option>
+          <option>Heart & Vascular</option>
+          <option>Full Body Check</option>
+        </select>
+      </div>
+      <div class="search-field">
+        <label>Location / Postcode</label>
+        <input type="text" placeholder="e.g. London, Manchester, SW1A...">
+      </div>
+      <div class="search-row">
+        <div class="search-field">
+          <label>Date</label>
+          <input type="date">
+        </div>
+        <div class="search-field">
+          <label>Max Distance</label>
+          <select>
+            <option>5 miles</option>
+            <option>10 miles</option>
+            <option selected>20 miles</option>
+            <option>50 miles</option>
+            <option>Any distance</option>
+          </select>
+        </div>
+      </div>
+      <button class="search-submit">🔍 Search Available Slots</button>
+      <div class="search-trust">
+        <div class="stag"><span class="dot">●</span> No hidden fees</div>
+        <div class="stag"><span class="dot">●</span> Instant confirmation</div>
+        <div class="stag"><span class="dot">●</span> ICO registered</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP + CLINIC LIST -->
+<section class="section map-section">
+  <div class="section-inner">
+    <div class="tag">Partner Network</div>
+    <h2>5 Launch Clinics — Growing to 10+</h2>
+    <div class="map-layout">
+      <div class="clinic-list">
+
+        <div class="clinic-card active" onclick="selectClinic(this)">
+          <div class="clinic-header">
+            <div class="clinic-name">Harley Street Imaging</div>
+            <div class="clinic-rating"><span class="stars-small">★★★★★</span> 4.9</div>
+          </div>
+          <div class="clinic-address">📍 22 Harley St, London W1G 9PL</div>
+          <div class="clinic-tags">
+            <span class="clinic-tag">MRI 1.5T</span>
+            <span class="clinic-tag">MRI 3T</span>
+            <span class="clinic-tag">CT</span>
+            <span class="clinic-tag">Ultrasound</span>
+          </div>
+          <div class="clinic-footer">
+            <div>
+              <div class="clinic-price">From £249 <span>· MRI</span></div>
+              <div class="clinic-avail">● 3 slots today</div>
+            </div>
+            <button class="book-slot-btn">Book →</button>
+          </div>
+        </div>
+
+        <div class="clinic-card" onclick="selectClinic(this)">
+          <div class="clinic-header">
+            <div class="clinic-name">NovaScan Manchester</div>
+            <div class="clinic-rating"><span class="stars-small">★★★★★</span> 4.8</div>
+          </div>
+          <div class="clinic-address">📍 15 Deansgate, Manchester M3 4LQ</div>
+          <div class="clinic-tags">
+            <span class="clinic-tag">MRI</span>
+            <span class="clinic-tag">CT</span>
+            <span class="clinic-tag">Baby Scan</span>
+          </div>
+          <div class="clinic-footer">
+            <div>
+              <div class="clinic-price">From £229 <span>· MRI</span></div>
+              <div class="clinic-avail">● 7 slots today</div>
+            </div>
+            <button class="book-slot-btn">Book →</button>
+          </div>
+        </div>
+
+        <div class="clinic-card" onclick="selectClinic(this)">
+          <div class="clinic-header">
+            <div class="clinic-name">Birmingham Diagnostic Centre</div>
+            <div class="clinic-rating"><span class="stars-small">★★★★☆</span> 4.6</div>
+          </div>
+          <div class="clinic-address">📍 8 Colmore Row, Birmingham B3 2QD</div>
+          <div class="clinic-tags">
+            <span class="clinic-tag">CT</span>
+            <span class="clinic-tag">Ultrasound</span>
+            <span class="clinic-tag">X-Ray</span>
+          </div>
+          <div class="clinic-footer">
+            <div>
+              <div class="clinic-price">From £145 <span>· Ultrasound</span></div>
+              <div class="clinic-avail busy">● 1 slot tomorrow</div>
+            </div>
+            <button class="book-slot-btn">Book →</button>
+          </div>
+        </div>
+
+        <div class="clinic-card" onclick="selectClinic(this)">
+          <div class="clinic-header">
+            <div class="clinic-name">Leeds Scan & Imaging</div>
+            <div class="clinic-rating"><span class="stars-small">★★★★★</span> 4.9</div>
+          </div>
+          <div class="clinic-address">📍 3 Park Row, Leeds LS1 5HD</div>
+          <div class="clinic-tags">
+            <span class="clinic-tag">MRI</span>
+            <span class="clinic-tag">Baby Scan 3D/4D</span>
+            <span class="clinic-tag">Ultrasound</span>
+          </div>
+          <div class="clinic-footer">
+            <div>
+              <div class="clinic-price">From £79 <span>· Baby Scan</span></div>
+              <div class="clinic-avail">● 5 slots today</div>
+            </div>
+            <button class="book-slot-btn">Book →</button>
+          </div>
+        </div>
+
+        <div class="clinic-card" onclick="selectClinic(this)">
+          <div class="clinic-header">
+            <div class="clinic-name">Edinburgh Private Imaging</div>
+            <div class="clinic-rating"><span class="stars-small">★★★★★</span> 5.0</div>
+          </div>
+          <div class="clinic-address">📍 11 George St, Edinburgh EH2 2PB</div>
+          <div class="clinic-tags">
+            <span class="clinic-tag">MRI 3T</span>
+            <span class="clinic-tag">CT</span>
+            <span class="clinic-tag">Full Body</span>
+          </div>
+          <div class="clinic-footer">
+            <div>
+              <div class="clinic-price">From £299 <span>· CT Scan</span></div>
+              <div class="clinic-avail">● 4 slots today</div>
+            </div>
+            <button class="book-slot-btn">Book →</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MAP -->
+      <div class="map-placeholder">
+        <div class="map-bg"></div>
+        <div class="map-roads"></div>
+        <!-- Pins -->
+        <div class="map-pin pin-1">
+          <div class="pin-bubble">Harley St, London</div>
+          <div class="pin-tail" style="background:#1A56FF"></div>
+        </div>
+        <div class="map-pin pin-2">
+          <div class="pin-bubble green">Leeds Scan</div>
+          <div class="pin-tail" style="background:#10B981"></div>
+        </div>
+        <div class="map-pin pin-3">
+          <div class="pin-bubble green">Edinburgh</div>
+          <div class="pin-tail" style="background:#10B981"></div>
+        </div>
+        <div class="map-pin pin-4">
+          <div class="pin-bubble">Birmingham DC</div>
+          <div class="pin-tail" style="background:#1A56FF"></div>
+        </div>
+        <div class="map-pin pin-5">
+          <div class="pin-bubble pink">Manchester</div>
+          <div class="pin-tail" style="background:#EF4444"></div>
+        </div>
+        <div class="map-label">🗺️ Interactive map — powered by Google Maps</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-it-works">
+  <div class="section-inner">
+    <div class="tag">How ScanBook Works</div>
+    <h2>From search to scan in minutes</h2>
+    <div class="steps-grid">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-icon">🔍</div>
+        <div class="step-title">Search & Compare</div>
+        <div class="step-desc">Enter your scan type and location. See real-time slot availability, prices and ratings across all partner clinics.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-icon">📅</div>
+        <div class="step-title">Book Your Slot</div>
+        <div class="step-desc">Choose your preferred time. Complete our short health questionnaire and pay securely via Stripe or insurance.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-icon">🏥</div>
+        <div class="step-title">Attend Your Scan</div>
+        <div class="step-desc">Arrive at the clinic. Your booking is confirmed and the team is ready. Most scans complete within 45 minutes.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">04</div>
+        <div class="step-icon">📋</div>
+        <div class="step-title">Receive Results</div>
+        <div class="step-desc">Your radiologist report arrives in your secure patient portal within 3 working days, with GP sharing option.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PANELS -->
+<section class="section panels-section">
+  <div class="section-inner">
+    <div class="tag" style="color:var(--electric)">Three Portals, One Platform</div>
+    <h2>Built for Everyone in the Pathway</h2>
+    <div class="panels-grid">
+
+      <div class="panel-card clinic">
+        <div class="panel-icon clinic">🏥</div>
+        <div class="panel-title">Clinic Dashboard</div>
+        <div class="panel-sub">Full slot management, revenue tracking and patient communication — all in one place.</div>
+        <ul class="panel-features">
+          <li>Real-time slot & calendar management</li>
+          <li>Booking confirmations & reminders</li>
+          <li>Revenue & commission dashboard</li>
+          <li>Last-minute slot promotions</li>
+          <li>Patient communication tools</li>
+          <li>Analytics & occupancy reports</li>
+        </ul>
+        <a href="scanbook-clinic.html" class="panel-cta clinic">Access Clinic Panel →</a>
+      </div>
+
+      <div class="panel-card gp">
+        <div class="panel-icon gp">👨‍⚕️</div>
+        <div class="panel-title">GP Partner Portal</div>
+        <div class="panel-sub">Refer patients, track outcomes and earn commission — seamlessly integrated into your workflow.</div>
+        <ul class="panel-features">
+          <li>One-click patient referrals</li>
+          <li>Secure result sharing</li>
+          <li>Referral commission tracking</li>
+          <li>Preferred clinic network</li>
+          <li>Audit trail & compliance logs</li>
+          <li>Monthly partnership reports</li>
+        </ul>
+        <a href="#" class="panel-cta gp">Access GP Portal →</a>
+      </div>
+
+      <div class="panel-card patient">
+        <div class="panel-icon patient">👤</div>
+        <div class="panel-title">Patient Account</div>
+        <div class="panel-sub">Manage bookings, view results and share reports — securely from any device.</div>
+        <ul class="panel-features">
+          <li>Booking history & upcoming scans</li>
+          <li>Secure results portal</li>
+          <li>Share results with your GP</li>
+          <li>Download DICOM images</li>
+          <li>Rebooking & cancellation</li>
+          <li>Invoice & insurance claims</li>
+        </ul>
+        <a href="scanbook-patient.html" class="panel-cta patient">Access Patient Portal →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section class="section security-section">
+  <div class="section-inner">
+    <div class="tag">Security & Compliance</div>
+    <h2>Your data. Fully protected.</h2>
+    <div class="security-grid">
+      <div class="security-card">
+        <div class="sec-icon">🔒</div>
+        <div>
+          <div class="sec-title">End-to-End Encryption</div>
+          <div class="sec-desc">All patient data, scan results and communications are encrypted using AES-256 at rest and TLS 1.3 in transit. Zero plaintext storage.</div>
+        </div>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">🇬🇧</div>
+        <div>
+          <div class="sec-title">GDPR & UK Data Protection Act</div>
+          <div class="sec-desc">Fully ICO registered. We are a Data Controller and Processor under UK GDPR. Data never leaves UK/EEA servers. Right to erasure supported.</div>
+        </div>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">🏥</div>
+        <div>
+          <div class="sec-title">Verified Clinic Network</div>
+          <div class="sec-desc">Every partner clinic undergoes ID verification, CQC registration check, indemnity insurance validation and quality audit before listing.</div>
+        </div>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">🛡️</div>
+        <div>
+          <div class="sec-title">Multi-Factor Authentication</div>
+          <div class="sec-desc">All clinic and GP accounts require 2FA. Patients can enable biometric login. Session timeouts and device management built-in.</div>
+        </div>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">💳</div>
+        <div>
+          <div class="sec-title">PCI DSS Compliant Payments</div>
+          <div class="sec-desc">Payments processed exclusively via Stripe (Level 1 PCI DSS). We never store card numbers. 3D Secure authentication on all transactions.</div>
+        </div>
+      </div>
+      <div class="security-card">
+        <div class="sec-icon">📋</div>
+        <div>
+          <div class="sec-title">Health Questionnaire Screening</div>
+          <div class="sec-desc">MRI safety screening (metallic implants, claustrophobia, pregnancy) is mandatory for all relevant scan types before booking confirms.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI MARKETING -->
+<section class="section ai-section">
+  <div class="ai-grid-bg"></div>
+  <div class="section-inner ai-inner">
+    <div class="tag" style="color:var(--electric)">AI-Powered Growth</div>
+    <div class="ai-layout">
+      <div class="ai-content">
+        <h2>AI Marketing Engine — Built In</h2>
+        <p>ScanBook doesn't just list clinics — it actively fills empty slots using intelligent marketing automation. From Google Ads to personalised patient re-engagement, our AI works 24/7 to maximise clinic revenue.</p>
+        <div class="ai-features">
+          <div class="ai-feature">
+            <div class="ai-feature-icon">🤖</div>
+            <div class="ai-feature-text">
+              <strong>Smart Slot Filling</strong>
+              AI detects empty slots 48h in advance and triggers targeted paid campaigns automatically
+            </div>
+          </div>
+          <div class="ai-feature">
+            <div class="ai-feature-icon">📧</div>
+            <div class="ai-feature-text">
+              <strong>Patient Re-engagement</strong>
+              Automated personalised emails & SMS when relevant slots open near past patients
+            </div>
+          </div>
+          <div class="ai-feature">
+            <div class="ai-feature-icon">📊</div>
+            <div class="ai-feature-text">
+              <strong>Dynamic Pricing</strong>
+              Last-minute discounts applied automatically to maximise clinic occupancy rates
+            </div>
+          </div>
+          <div class="ai-feature">
+            <div class="ai-feature-icon">🔍</div>
+            <div class="ai-feature-text">
+              <strong>SEO Content Generation</strong>
+              AI generates location-specific landing pages for every scan type in every city
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-terminal">
+        <div class="terminal-bar">
+          <div class="t-dot r"></div>
+          <div class="t-dot y"></div>
+          <div class="t-dot g"></div>
+          <div class="terminal-title">scanbook-ai-engine.js</div>
+        </div>
+        <div class="terminal-body">
+          <div class="t-line"><span class="t-prompt">$ </span><span class="t-cmd">scanbook analyze --clinic harley-st</span></div>
+          <div class="t-line"><span class="t-output">→ Checking slot occupancy...</span></div>
+          <div class="t-line"><span class="t-output">→ Tomorrow MRI slots: </span><span style="color:#EF4444">3 empty (40% fill rate)</span></div>
+          <div class="t-line"><span class="t-output">→ Revenue at risk: </span><span style="color:#EF4444">£747</span></div>
+          <br>
+          <div class="t-line"><span class="t-prompt">$ </span><span class="t-cmd">scanbook fill-slots --auto --budget 45</span></div>
+          <div class="t-line"><span class="t-output">→ Launching Google Ads campaign...</span></div>
+          <div class="t-line"><span class="t-output">→ Sending 847 re-engagement emails...</span></div>
+          <div class="t-line"><span class="t-output">→ Applying 15% last-minute discount...</span></div>
+          <br>
+          <div class="t-line"><span class="t-success">✓ 2 slots filled in 3.4 hours</span></div>
+          <div class="t-line"><span class="t-success">✓ Revenue recovered: £498</span></div>
+          <div class="t-line"><span class="t-success">✓ Ad spend: £38 | ROI: 13.1x</span></div>
+          <br>
+          <div class="t-line"><span class="t-prompt">$ </span><span class="t-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAYMENT & INSURANCE -->
+<section class="section payment-section">
+  <div class="section-inner">
+    <div class="tag">Payments & Insurance</div>
+    <h2>Every way to pay. Every insurer covered.</h2>
+    <div class="payment-grid">
+      <div>
+        <p style="color:var(--muted);font-size:0.95rem;line-height:1.7;margin-bottom:28px;">Pay directly or claim through your private health insurance. ScanBook handles invoicing and insurer communications automatically.</p>
+        <div class="payment-methods">
+          <div class="pay-method">
+            <div class="pay-icon">💳</div>
+            <div><div class="pay-name">Credit / Debit Card</div><div class="pay-desc">Visa, Mastercard, Amex</div></div>
+          </div>
+          <div class="pay-method">
+            <div class="pay-icon">📱</div>
+            <div><div class="pay-name">Apple / Google Pay</div><div class="pay-desc">One-tap checkout</div></div>
+          </div>
+          <div class="pay-method">
+            <div class="pay-icon">🏦</div>
+            <div><div class="pay-name">Open Banking</div><div class="pay-desc">Instant bank transfer</div></div>
+          </div>
+          <div class="pay-method">
+            <div class="pay-icon">🔄</div>
+            <div><div class="pay-name">Buy Now, Pay Later</div><div class="pay-desc">Klarna — 3 months 0%</div></div>
+          </div>
+        </div>
+        <div class="stripe-badge">⚡ Powered by Stripe — PCI DSS Level 1</div>
+      </div>
+      <div>
+        <p style="color:var(--muted);font-size:0.88rem;margin-bottom:16px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Accepted Insurers</p>
+        <div class="insurance-plans">
+          <div class="insurance-plan">
+            <div><div class="plan-name">Bupa</div><div class="plan-cover">Direct claim — no forms needed</div></div>
+            <div class="plan-badge">Active</div>
+          </div>
+          <div class="insurance-plan">
+            <div><div class="plan-name">AXA Health</div><div class="plan-cover">Pre-authorisation supported</div></div>
+            <div class="plan-badge">Active</div>
+          </div>
+          <div class="insurance-plan">
+            <div><div class="plan-name">Aviva</div><div class="plan-cover">Invoice generation automated</div></div>
+            <div class="plan-badge">Active</div>
+          </div>
+          <div class="insurance-plan">
+            <div><div class="plan-name">WPA / Cigna / Vitality</div><div class="plan-cover">All major UK insurers</div></div>
+            <div class="plan-badge">Active</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo">Scan<span>Book</span></div>
+      <p>The UK's medical scan marketplace. Connecting patients with verified private imaging clinics — instantly.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Scans</h5>
+      <ul>
+        <li><a href="#">MRI Scan</a></li>
+        <li><a href="#">CT Scan</a></li>
+        <li><a href="#">Ultrasound</a></li>
+        <li><a href="#">Baby Scan</a></li>
+        <li><a href="#">Full Body</a></li>
+        <li><a href="#">X-Ray</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Portals</h5>
+      <ul>
+        <li><a href="#">Patient Login</a></li>
+        <li><a href="#">Clinic Dashboard</a></li>
+        <li><a href="#">GP Portal</a></li>
+        <li><a href="#">List Your Clinic</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#">About ScanBook</a></li>
+        <li><a href="#">Our Clinics</a></li>
+        <li><a href="#">Press</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Legal</h5>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Cookie Policy</a></li>
+        <li><a href="#">GDPR Rights</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 ScanBook Ltd. Registered in England & Wales. ICO Registered Data Controller.</span>
+    <div class="footer-badges">
+      <div class="f-badge">ICO Registered</div>
+      <div class="f-badge">GDPR Compliant</div>
+      <div class="f-badge">Stripe Verified</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function setScan(btn) {
+  document.querySelectorAll('.scan-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function selectClinic(card) {
+  document.querySelectorAll('.clinic-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+}
+</script>
+</body>
+</html>

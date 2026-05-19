@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00C9A7;
+  --teal-dark:#00a888;
+  --teal-light:#e6faf7;
+  --black:#111;
+  --text:#222;
+  --muted:#666;
+  --subtle:#999;
+  --border:#ebebeb;
+  --bg:#f8f8f8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* ── NAV (ScanBook nav — same as service pages) ── */
+.nav{height:60px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:200}
+.logo{display:flex;align-items:center;gap:1px;text-decoration:none}
+.logo-scan{font-family:'Helvetica Neue','Helvetica',Arial,sans-serif;font-size:20px;font-weight:700;color:var(--black)}
+.logo-book{font-family:'Helvetica Neue','Helvetica',Arial,sans-serif;font-size:20px;font-weight:700;color:var(--teal)}
+.nav-mid{display:flex;align-items:center;gap:4px}
+.nav-link{padding:7px 12px;font-size:13px;color:var(--muted);text-decoration:none;border-radius:7px;transition:all .15s}
+.nav-link:hover{color:var(--black);background:var(--bg)}
+.nav-link.on{color:var(--black);font-weight:500}
+.nav-right{display:flex;align-items:center;gap:8px}
+.btn-sm{padding:7px 16px;border:1.5px solid var(--border);border-radius:7px;background:#fff;font-size:13px;cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif}
+.btn-primary{padding:8px 18px;border:none;border-radius:7px;background:var(--teal);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
+.btn-primary:hover{opacity:.88}
+
+/* ── BREADCRUMB ── */
+.bc{padding:12px 48px;font-size:12px;color:#bbb;border-bottom:1px solid #f5f5f5}
+.bc a{color:#999;text-decoration:none}.bc a:hover{color:var(--black)}
+
+/* ── GALLERY ── */
+.gallery{max-width:1180px;margin:0 auto;padding:28px 48px 0}
+.gallery-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:200px 200px;gap:8px;border-radius:16px;overflow:hidden}
+.g-cell{background:var(--bg);display:grid;place-items:center;font-size:32px;color:#ddd;cursor:pointer;transition:opacity .15s;border:1px solid var(--border)}
+.g-cell:hover{opacity:.9}
+.g-cell.main{grid-row:span 2;font-size:56px}
+.g-cell.c1{background:#eef5f2}
+.g-cell.c2{background:#f0eef5}
+.g-cell.c3{background:#f5f2ee}
+.g-cell.c4{background:#eef0f5}
+.gallery-btn{position:relative;margin-top:10px;text-align:right}
+.btn-photos{font-size:12px;color:var(--muted);border:1.5px solid var(--border);border-radius:7px;padding:6px 14px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* ── MAIN LAYOUT ── */
+.main{max-width:1180px;margin:0 auto;padding:28px 48px 60px;display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start}
+
+/* ── LEFT ── */
+/* Header */
+.clinic-header{margin-bottom:20px}
+.ch-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
+.ch-title{font-family:'Instrument Serif',serif;font-size:34px;letter-spacing:-.8px;color:var(--black);line-height:1.15}
+.ch-actions{display:flex;gap:8px;flex-shrink:0;margin-top:6px}
+.btn-save{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted);background:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-save:hover{border-color:#e84393;color:#e84393}
+.btn-share{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted);background:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif}
+.ch-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:14px}
+.ch-meta-item{display:flex;align-items:center;gap:5px}
+.ch-rating{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--black)}
+.ch-stars{color:#f59e0b;font-size:12px;letter-spacing:1.5px}
+.ch-review-count{font-size:13px;color:var(--muted);font-weight:400}
+
+/* Badges */
+.badges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+.badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:5px;letter-spacing:.5px;border:1px solid transparent}
+.badge-cqc{background:#e6faf7;color:#00a888;border-color:#b2edd8}
+.badge-sb{background:var(--bg);color:var(--muted);border-color:var(--border)}
+.badge-3t{background:#f3e8ff;color:#7c3aed;border-color:#ddd6fe}
+.badge-baby{background:#fff0f6;color:#e84393;border-color:#fce7f3}
+
+/* Divider */
+.divider{height:1px;background:var(--border);margin:20px 0}
+
+/* Overview pills */
+.overview-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.ov-pill{padding:8px 14px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;color:var(--text);background:#fff;display:flex;align-items:center;gap:6px;cursor:default}
+.ov-pill svg{width:14px;height:14px;stroke:var(--teal);fill:none;stroke-width:2;stroke-linecap:round}
+
+/* ── SCANS ── */
+.section-label{font-size:10px;letter-spacing:2.5px;color:#bbb;font-weight:500;margin-bottom:14px}
+.sec-h{font-family:'Instrument Serif',serif;font-size:24px;letter-spacing:-.4px;color:var(--black);margin-bottom:16px}
+
+/* Scan type tabs */
+.stabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.stab{padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;background:#fff;color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif;font-weight:400}
+.stab.on{background:var(--black);color:#fff;border-color:var(--black)}
+.scan-panel{display:none}.scan-panel.on{display:block}
+
+/* Scan rows */
+.scan-row{display:flex;justify-content:space-between;align-items:center;padding:15px 17px;background:#fff;border-radius:11px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer;transition:all .15s}
+.scan-row:hover{border-color:var(--teal);box-shadow:0 3px 14px rgba(0,201,167,.07)}
+.sr-left{}
+.sr-name{font-size:14px;font-weight:500;color:var(--black);margin-bottom:3px;display:flex;align-items:center;gap:7px}
+.tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.3px}
+.tag-now{background:#e6faf7;color:#00a888}
+.tag-pop{background:#fff8e6;color:#b07800}
+.tag-3t{background:#f3e8ff;color:#7c3aed}
+.sr-meta{font-size:12px;color:#bbb;display:flex;gap:10px}
+.sr-right{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.sr-price{font-family:'Instrument Serif',serif;font-size:21px;color:var(--black);white-space:nowrap}
+.btn-sr{padding:8px 16px;border:1.5px solid var(--teal);border-radius:8px;background:#fff;color:var(--teal-dark);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s}
+.btn-sr:hover{background:var(--teal);color:#fff}
+
+/* Body parts */
+.bp-section-title{font-size:13px;font-weight:500;color:var(--muted);margin:18px 0 11px;display:flex;align-items:center;gap:7px}
+.bp-section-title::before{content:'';width:3px;height:13px;background:var(--teal);border-radius:2px;flex-shrink:0}
+.bp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.bp-item{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);cursor:pointer;transition:all .15s;background:#fff;line-height:1.3}
+.bp-item:hover{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark)}
+.bp-item.more{border-style:dashed;color:var(--subtle);background:var(--bg)}
+
+/* Pregnancy */
+.preg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.preg-card{border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .18s;background:#fff}
+.preg-card:hover,.preg-card.feat{border-color:#e84393}
+.preg-card.feat{background:#fff8fb}
+.preg-wk{font-size:10px;color:#e84393;letter-spacing:1.5px;font-weight:600;margin-bottom:6px}
+.preg-name{font-size:14px;font-weight:600;color:var(--black);margin-bottom:4px}
+.preg-desc{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+.preg-price{font-family:'Instrument Serif',serif;font-size:24px;color:var(--black);margin-bottom:10px}
+.btn-preg{width:100%;padding:9px;border:1.5px solid #e84393;border-radius:8px;background:#fff;color:#e84393;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-preg:hover,.preg-card.feat .btn-preg{background:#e84393;color:#fff}
+
+/* ── REVIEWS ── */
+.review-sources{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.rs-box{border:1px solid var(--border);border-radius:12px;padding:16px 20px;background:#fff;display:flex;align-items:center;gap:14px;flex:1;min-width:180px}
+.rs-logo{font-size:11px;font-weight:700;letter-spacing:-.3px}
+.rs-google{color:#4285f4}
+.rs-doctify{color:#00c896}
+.rs-num{font-family:'Instrument Serif',serif;font-size:28px;color:var(--black);line-height:1}
+.rs-stars{color:#f59e0b;font-size:11px;letter-spacing:1.5px}
+.rs-count{font-size:11px;color:#bbb;margin-top:1px}
+.rv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.rv{background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:18px}
+.rv-source{font-size:9px;font-weight:700;letter-spacing:1.5px;color:#bbb;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.rv-source-dot{width:7px;height:7px;border-radius:50%}
+.dot-g{background:#4285f4}
+.dot-d{background:#00c896}
+.rv-stars{color:#f59e0b;font-size:12px;letter-spacing:2px;margin-bottom:8px}
+.rv-text{font-size:13px;color:#444;line-height:1.7;margin-bottom:12px}
+.rv-author{font-size:12px;font-weight:600;color:var(--black)}
+.rv-date{font-size:11px;color:#bbb;margin-top:1px}
+.rv-all{text-align:center;margin-top:14px}
+.btn-rv-all{font-size:13px;color:var(--muted);border:1.5px solid var(--border);border-radius:8px;padding:8px 20px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* ── LOCATION ── */
+.location-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:4px}
+.map-box{background:linear-gradient(135deg,#eef2f8,#e8eef7);border-radius:12px;height:180px;display:grid;place-items:center;border:1px solid #dce4f0;cursor:pointer;font-size:40px}
+.location-info{font-size:13px;color:var(--muted);line-height:1.85}
+.location-info strong{color:var(--black);display:block;margin-bottom:2px}
+.transport-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.transport-icon{width:22px;height:22px;border-radius:6px;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:12px;flex-shrink:0}
+
+/* ── SIDEBAR ── */
+.sidebar-card{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px;box-shadow:0 2px 16px rgba(0,0,0,.04)}
+
+/* BOOK CARD */
+.bc-from{font-size:12px;color:#bbb;margin-bottom:2px}
+.bc-price{font-family:'Instrument Serif',serif;font-size:38px;color:var(--black);letter-spacing:-1px;line-height:1;margin-bottom:18px}
+.bc-price sub{font-size:12px;color:#bbb;font-family:'DM Sans',sans-serif;font-weight:400;vertical-align:baseline;letter-spacing:0}
+.bc-field{margin-bottom:11px}
+.bc-label{display:block;font-size:10px;color:#bbb;letter-spacing:2px;font-weight:500;margin-bottom:5px}
+.bc-select,.bc-input{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--black);background:#fff;outline:none;-webkit-appearance:none;transition:border-color .15s}
+.bc-select:focus,.bc-input:focus{border-color:var(--teal)}
+.bc-input::placeholder{color:#ccc}
+.date-row{display:flex;gap:5px;margin-bottom:11px}
+.date-btn{flex:1;padding:9px 4px;border:1.5px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;transition:all .15s;background:#fff;font-family:'DM Sans',sans-serif}
+.date-btn:hover{border-color:var(--teal)}
+.date-btn.on{border-color:var(--black);background:var(--black);color:#fff}
+.date-day{font-size:11px;font-weight:600;display:block}
+.date-num{font-size:10px;opacity:.6;display:block;margin-top:1px}
+.btn-book-now{width:100%;padding:13px;border:none;border-radius:10px;background:var(--teal);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px;margin-bottom:12px;transition:opacity .15s}
+.btn-book-now:hover{opacity:.88}
+.bc-notes{display:flex;flex-direction:column;gap:5px;padding-top:12px;border-top:1px solid #f5f5f5}
+.bc-note{font-size:11px;color:#bbb;display:flex;align-items:center;gap:6px}
+
+/* SUMMARY CARD */
+.sc-row{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid #f5f5f5}
+.sc-row:last-child{border-bottom:none;font-weight:600;color:var(--black)}
+.sc-label{color:var(--muted)}
+.sc-val{color:var(--text)}
+
+/* HOURS CARD */
+.hr-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid #f8f8f8}
+.hr-row:last-child{border-bottom:none}
+.hr-day{color:var(--muted)}
+.hr-time{font-weight:500}
+.hr-row.today .hr-day{color:var(--teal);font-weight:600}
+.hr-row.today .hr-time{color:var(--teal)}
+
+/* FEATURES */
+.feat-list{display:flex;flex-direction:column;gap:8px}
+.feat-item{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted)}
+.feat-icon{width:26px;height:26px;border-radius:6px;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:13px;flex-shrink:0}
+
+/* FOOT */
+.foot{background:var(--black);padding:20px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.foot-logo{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:700}
+.foot-logo .s{color:#fff}.foot-logo .b{color:var(--teal)}
+.foot-copy{font-size:11px;color:rgba(255,255,255,.2)}
+</style>
+</head>
+<body>
+
+<!-- NAV — ScanBook's own nav, unchanged -->
+<nav class="nav">
+  <a class="logo" href="#"><span class="logo-scan">Scan</span><span class="logo-book">Book</span></a>
+  <div class="nav-mid">
+    <a class="nav-link" href="#">Services</a>
+    <a class="nav-link" href="#">About</a>
+    <a class="nav-link" href="#">How it works</a>
+    <a class="nav-link on" href="#">Find a Centre</a>
+    <a class="nav-link" href="#">For Clinics</a>
+    <a class="nav-link" href="#">Blog</a>
+    <a class="nav-link" href="#">For Business</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn-sm">Sign In</button>
+    <button class="btn-primary">Book a Scan</button>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="bc">
+  <a href="#">Home</a> &nbsp;/&nbsp;
+  <a href="#">Find a Centre</a> &nbsp;/&nbsp;
+  <a href="#">Winchester</a> &nbsp;/&nbsp;
+  Medicana Winchester Clinic
+</div>
+
+<!-- GALLERY -->
+<div class="gallery">
+  <div class="gallery-grid">
+    <div class="g-cell main c1">🏥</div>
+    <div class="g-cell c2">🧲</div>
+    <div class="g-cell c3">🔬</div>
+    <div class="g-cell c4">🛋️</div>
+    <div class="g-cell c1">📋</div>
+  </div>
+  <div class="gallery-btn">
+    <button class="btn-photos">📷 View all photos</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT COLUMN -->
+  <div>
+
+    <!-- CLINIC HEADER -->
+    <div class="clinic-header">
+      <div class="ch-top">
+        <h1 class="ch-title">Medicana Winchester Clinic</h1>
+        <div class="ch-actions">
+          <button class="btn-save">♡ Save</button>
+          <button class="btn-share">↗ Share</button>
+        </div>
+      </div>
+
+      <div class="ch-meta">
+        <div class="ch-meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Winchester, Hampshire
+        </div>
+        <div class="ch-rating">
+          <span class="ch-stars">★★★★★</span>
+          4.9
+          <span class="ch-review-count">(184 reviews)</span>
+        </div>
+        <div class="ch-meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/></svg>
+          CQC Registered
+        </div>
+        <div class="ch-meta-item" style="color:var(--teal)">
+          🟢 Open today until 7pm
+        </div>
+      </div>
+
+      <div class="badges">
+        <span class="badge badge-cqc">✓ CQC Registered</span>
+        <span class="badge badge-sb">✓ ScanBook Verified</span>
+        <span class="badge badge-3t">3T MRI Available</span>
+        <span class="badge badge-baby">♥ Baby Scans</span>
+      </div>
+
+      <div class="overview-pills">
+        <div class="ov-pill">
+          <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/></svg>
+          No GP referral needed
+        </div>
+        <div class="ov-pill">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Report in 24–48 hrs
+        </div>
+        <div class="ov-pill">
+          <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Free cancellation
+        </div>
+        <div class="ov-pill">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+          Family welcome
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SCANS -->
+    <div style="margin-bottom:28px">
+      <div class="section-label">AVAILABLE SCANS</div>
+      <h2 class="sec-h">Scans &amp; Pricing</h2>
+
+      <div class="stabs">
+        <button class="stab on" onclick="showScan('mri',this)">MRI Scan</button>
+        <button class="stab" onclick="showScan('ct',this)">CT Scan</button>
+        <button class="stab" onclick="showScan('us',this)">Ultrasound</button>
+        <button class="stab" onclick="showScan('xray',this)">X-Ray</button>
+        <button class="stab" onclick="showScan('preg',this)" style="border-color:#fce7f3;color:#e84393">♥ Baby &amp; Pregnancy</button>
+      </div>
+
+      <!-- MRI -->
+      <div class="scan-panel on" id="scan-mri">
+        <div class="scan-row">
+          <div class="sr-left">
+            <div class="sr-name">1 Body Part <span class="tag tag-now">Today</span></div>
+            <div class="sr-meta"><span>⚡ Same-day slots</span><span>📋 Report within 24–48 hrs</span></div>
+          </div>
+          <div class="sr-right"><div class="sr-price">£275</div><button class="btn-sr">Book</button></div>
+        </div>
+        <div class="scan-row">
+          <div class="sr-left">
+            <div class="sr-name">2 Body Parts <span class="tag tag-pop">Popular</span></div>
+            <div class="sr-meta"><span>📋 Combined radiologist's report</span></div>
+          </div>
+          <div class="sr-right"><div class="sr-price">£445</div><button class="btn-sr">Book</button></div>
+        </div>
+        <div class="scan-row">
+          <div class="sr-left">
+            <div class="sr-name">3 Body Parts</div>
+            <div class="sr-meta"><span>📋 Combined radiologist's report</span></div>
+          </div>
+          <div class="sr-right"><div class="sr-price">£575</div><button class="btn-sr">Book</button></div>
+        </div>
+        <div class="scan-row">
+          <div class="sr-left">
+            <div class="sr-name">4 Body Parts</div>
+            <div class="sr-meta"><span>📋 Combined radiologist's report</span></div>
+          </div>
+          <div class="sr-right"><div class="sr-price">£725</div><button class="btn-sr">Book</button></div>
+        </div>
+        <div class="scan-row" style="border-color:#111">
+          <div class="sr-left">
+            <div class="sr-name">Full Body MRI <span class="tag tag-3t">3T · Best Value</span></div>
+            <div class="sr-meta"><span>Whole-body screening · Full radiologist's report</span></div>
+          </div>
+          <div class="sr-right"><div class="sr-price">£1,450</div><button class="btn-sr" style="background:var(--black);color:#fff;border-color:var(--black)">Book</button></div>
+        </div>
+
+        <div class="bp-section-title">Select a body part</div>
+        <div class="bp-grid">
+          <div class="bp-item">Brain &amp; Head</div>
+          <div class="bp-item">Lumbar Spine</div>
+          <div class="bp-item">Cervical Spine</div>
+          <div class="bp-item">Thoracic Spine</div>
+          <div class="bp-item">Knee</div>
+          <div class="bp-item">Shoulder</div>
+          <div class="bp-item">Hip</div>
+          <div class="bp-item">Abdomen</div>
+          <div class="bp-item">Pelvis</div>
+          <div class="bp-item">Cardiac</div>
+          <div class="bp-item">Prostate (mpMRI)</div>
+          <div class="bp-item more">+ 21 more</div>
+        </div>
+      </div>
+
+      <!-- CT -->
+      <div class="scan-panel" id="scan-ct">
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">CT Chest <span class="tag tag-now">Same day</span></div><div class="sr-meta"><span>Lungs, airways and surrounding structures</span></div></div><div class="sr-right"><div class="sr-price">£249</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">CT Abdomen and Pelvis</div><div class="sr-meta"><span>Liver, kidneys, bowel and pelvic organs</span></div></div><div class="sr-right"><div class="sr-price">£299</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">CT Calcium Score <span class="tag tag-pop">Popular</span></div><div class="sr-meta"><span>Cardiac risk assessment</span></div></div><div class="sr-right"><div class="sr-price">£199</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">CT Head and Brain</div><div class="sr-meta"><span>Acute presentation, stroke, sinuses</span></div></div><div class="sr-right"><div class="sr-price">£249</div><button class="btn-sr">Book</button></div></div>
+      </div>
+
+      <!-- US -->
+      <div class="scan-panel" id="scan-us">
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">Abdominal Ultrasound <span class="tag tag-now">Same day</span></div><div class="sr-meta"><span>Liver, gallbladder, kidneys, spleen</span></div></div><div class="sr-right"><div class="sr-price">£99</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">Pelvic Ultrasound</div><div class="sr-meta"><span>Uterus, ovaries, bladder</span></div></div><div class="sr-right"><div class="sr-price">£120</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">Thyroid Ultrasound</div><div class="sr-meta"><span>Thyroid gland and lymph nodes</span></div></div><div class="sr-right"><div class="sr-price">£99</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">Breast Ultrasound</div><div class="sr-meta"><span>Lumps, cysts and breast tissue</span></div></div><div class="sr-right"><div class="sr-price">£149</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">Doppler Vascular Scan</div><div class="sr-meta"><span>Blood flow in arteries and veins</span></div></div><div class="sr-right"><div class="sr-price">£149</div><button class="btn-sr">Book</button></div></div>
+      </div>
+
+      <!-- XRAY -->
+      <div class="scan-panel" id="scan-xray">
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">X-Ray — Any area <span class="tag tag-now">Same day</span></div><div class="sr-meta"><span>Digital X-ray · Report within 2 hours</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">Chest X-Ray</div><div class="sr-meta"><span>Lungs, heart and rib cage</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">Knee X-Ray</div><div class="sr-meta"><span>Bones, joint space, arthritis</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">Shoulder X-Ray</div><div class="sr-meta"><span>Shoulder joint and clavicle</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+        <div class="scan-row"><div class="sr-left"><div class="sr-name">Foot and Ankle X-Ray</div><div class="sr-meta"><span>Fractures, deformity, arthritis</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+      </div>
+
+      <!-- PREGNANCY -->
+      <div class="scan-panel" id="scan-preg">
+        <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.7">All pregnancy and baby scans are carried out by specialist sonographers. Partners and family members are welcome to attend.</p>
+        <div class="preg-grid">
+          <div class="preg-card">
+            <div class="preg-wk">6–15 WEEKS</div>
+            <div class="preg-name">Early Pregnancy Scan</div>
+            <div class="preg-desc">Confirms heartbeat and estimated due date.</div>
+            <div class="preg-price">£89</div>
+            <button class="btn-preg">Book</button>
+          </div>
+          <div class="preg-card feat">
+            <div class="preg-wk">24–34 WEEKS</div>
+            <div class="preg-name">4D Baby Scan <span style="font-size:9px;background:#fce7f3;color:#e84393;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px">POPULAR</span></div>
+            <div class="preg-desc">Live HD 4D video. Gender reveal optional.</div>
+            <div class="preg-price">£149</div>
+            <button class="btn-preg">Book</button>
+          </div>
+          <div class="preg-card">
+            <div class="preg-wk">15–40 WEEKS</div>
+            <div class="preg-name">Wellbeing Scan</div>
+            <div class="preg-desc">Growth, position and amniotic fluid check.</div>
+            <div class="preg-price">£99</div>
+            <button class="btn-preg">Book</button>
+          </div>
+          <div class="preg-card">
+            <div class="preg-wk">FROM 10 WEEKS</div>
+            <div class="preg-name">NIPT Blood Test</div>
+            <div class="preg-desc">Screens for Down's, Edwards' and Patau's syndromes. 99%+ accurate.</div>
+            <div class="preg-price">£399</div>
+            <button class="btn-preg">Book</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- REVIEWS -->
+    <div style="margin-bottom:28px">
+      <div class="section-label">REVIEWS</div>
+      <h2 class="sec-h">What patients say</h2>
+
+      <div class="review-sources">
+        <div class="rs-box">
+          <div>
+            <div class="rs-logo rs-google">G Google</div>
+            <div class="rs-num">4.8</div>
+            <div class="rs-stars">★★★★★</div>
+            <div class="rs-count">127 reviews</div>
+          </div>
+        </div>
+        <div class="rs-box">
+          <div>
+            <div class="rs-logo rs-doctify">✦ Doctify</div>
+            <div class="rs-num">4.9</div>
+            <div class="rs-stars">★★★★★</div>
+            <div class="rs-count">57 reviews</div>
+          </div>
+        </div>
+        <div class="rs-box">
+          <div>
+            <div class="rs-logo" style="color:#f59e0b">★ ScanBook</div>
+            <div class="rs-num">5.0</div>
+            <div class="rs-stars">★★★★★</div>
+            <div class="rs-count">18 bookings</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rv-grid">
+        <div class="rv">
+          <div class="rv-source"><div class="rv-source-dot dot-g"></div>GOOGLE REVIEW</div>
+          <div class="rv-stars">★★★★★</div>
+          <p class="rv-text">"The 3T MRI was exceptional quality and the radiologist's report arrived the following morning. Staff were professional and the waiting area was calm and comfortable."</p>
+          <div class="rv-author">Thomas H.</div>
+          <div class="rv-date">2 weeks ago</div>
+        </div>
+        <div class="rv">
+          <div class="rv-source"><div class="rv-source-dot dot-d"></div>DOCTIFY REVIEW</div>
+          <div class="rv-stars">★★★★★</div>
+          <p class="rv-text">"My 4D baby scan was a truly special experience. The sonographer was warm and patient and we were able to bring both sets of grandparents. Would highly recommend."</p>
+          <div class="rv-author">Emma L.</div>
+          <div class="rv-date">1 month ago</div>
+        </div>
+        <div class="rv">
+          <div class="rv-source"><div class="rv-source-dot dot-g"></div>GOOGLE REVIEW</div>
+          <div class="rv-stars">★★★★★</div>
+          <p class="rv-text">"CT scan done on the day I called. Parking was straightforward, the report was with my GP by the following morning. I could not have asked for a faster or smoother experience."</p>
+          <div class="rv-author">Robert B.</div>
+          <div class="rv-date">3 weeks ago</div>
+        </div>
+        <div class="rv">
+          <div class="rv-source"><div class="rv-source-dot dot-d"></div>DOCTIFY REVIEW</div>
+          <div class="rv-stars">★★★★★</div>
+          <p class="rv-text">"After months on the NHS list I finally had my MRI. Booked online through ScanBook in minutes. Seen within 48 hours and my GP had the report before my next appointment."</p>
+          <div class="rv-author">Sarah M.</div>
+          <div class="rv-date">5 days ago</div>
+        </div>
+      </div>
+      <div class="rv-all"><button class="btn-rv-all">View all 184 reviews</button></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- LOCATION -->
+    <div style="margin-bottom:28px">
+      <div class="section-label">LOCATION</div>
+      <h2 class="sec-h">Getting here</h2>
+      <div class="location-grid">
+        <div class="map-box">🗺️</div>
+        <div>
+          <div class="location-info" style="margin-bottom:16px">
+            <strong>Medicana Winchester Clinic</strong>
+            Winchester, Hampshire
+          </div>
+          <div class="transport-item"><div class="transport-icon">🚉</div>5 minute walk from Winchester station</div>
+          <div class="transport-item"><div class="transport-icon">🚗</div>Free on-site parking</div>
+          <div class="transport-item"><div class="transport-icon">🚌</div>Bus routes 1, 2 and X64 stop nearby</div>
+          <div class="transport-item"><div class="transport-icon">♿</div>Fully wheelchair accessible</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- BOOK CARD -->
+    <div class="sidebar-card">
+      <div class="bc-from">Scans from</div>
+      <div class="bc-price">£75 <sub>per scan</sub></div>
+
+      <div class="bc-field">
+        <label class="bc-label">SCAN TYPE</label>
+        <select class="bc-select">
+          <option>MRI — 1 Body Part (£275)</option>
+          <option>MRI — 2 Body Parts (£445)</option>
+          <option>MRI — 3 Body Parts (£575)</option>
+          <option>MRI — Full Body (£1,450)</option>
+          <option>CT Scan — from £199</option>
+          <option>Ultrasound — from £99</option>
+          <option>X-Ray (£75)</option>
+          <option>4D Baby Scan (£149)</option>
+          <option>Early Pregnancy Scan (£89)</option>
+        </select>
+      </div>
+
+      <div class="bc-field">
+        <label class="bc-label">BODY PART</label>
+        <select class="bc-select">
+          <option>Choose a body part...</option>
+          <option>Brain and Head</option>
+          <option>Lumbar Spine</option>
+          <option>Cervical Spine</option>
+          <option>Knee</option>
+          <option>Shoulder</option>
+          <option>Hip</option>
+          <option>Abdomen</option>
+        </select>
+      </div>
+
+      <div class="bc-field">
+        <label class="bc-label">PREFERRED DATE</label>
+        <div class="date-row">
+          <button class="date-btn on"><span class="date-day">Today</span><span class="date-num">30 Apr</span></button>
+          <button class="date-btn"><span class="date-day">Thu</span><span class="date-num">1 May</span></button>
+          <button class="date-btn"><span class="date-day">Fri</span><span class="date-num">2 May</span></button>
+          <button class="date-btn"><span class="date-day">Sat</span><span class="date-num">3 May</span></button>
+        </div>
+      </div>
+
+      <button class="btn-book-now">Check Availability</button>
+
+      <div class="bc-notes">
+        <div class="bc-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/></svg>
+          Free cancellation up to 24 hours before
+        </div>
+        <div class="bc-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          CQC registered centre
+        </div>
+        <div class="bc-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Secure payment via Stripe
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICE SUMMARY -->
+    <div class="sidebar-card">
+      <div style="font-size:13px;font-weight:600;color:var(--black);margin-bottom:14px">Price summary</div>
+      <div class="sc-row"><span class="sc-label">MRI — 1 Body Part</span><span class="sc-val">£275</span></div>
+      <div class="sc-row"><span class="sc-label">Radiologist's report</span><span class="sc-val">Included</span></div>
+      <div class="sc-row"><span class="sc-label">Digital images</span><span class="sc-val">Included</span></div>
+      <div class="sc-row"><span class="sc-label">ScanBook fee</span><span class="sc-val">£0</span></div>
+      <div class="sc-row"><span>Total</span><span>£275</span></div>
+    </div>
+
+    <!-- HOURS -->
+    <div class="sidebar-card">
+      <div style="font-size:13px;font-weight:600;color:var(--black);margin-bottom:14px">Opening hours</div>
+      <div class="hr-row today"><span class="hr-day">Wednesday (today)</span><span class="hr-time">8am – 7pm ●</span></div>
+      <div class="hr-row"><span class="hr-day">Thursday</span><span class="hr-time">8am – 7pm</span></div>
+      <div class="hr-row"><span class="hr-day">Friday</span><span class="hr-time">8am – 6pm</span></div>
+      <div class="hr-row"><span class="hr-day">Saturday</span><span class="hr-time">9am – 4pm</span></div>
+      <div class="hr-row"><span class="hr-day">Sunday</span><span class="hr-time">Closed</span></div>
+      <div class="hr-row"><span class="hr-day">Monday – Tuesday</span><span class="hr-time">8am – 7pm</span></div>
+    </div>
+
+    <!-- FACILITIES -->
+    <div class="sidebar-card">
+      <div style="font-size:13px;font-weight:600;color:var(--black);margin-bottom:14px">Facilities</div>
+      <div class="feat-list">
+        <div class="feat-item"><div class="feat-icon">🧲</div>3T MRI Scanner</div>
+        <div class="feat-item"><div class="feat-icon">🔬</div>CT and Ultrasound Suite</div>
+        <div class="feat-item"><div class="feat-icon">👶</div>Private Baby Scan Room</div>
+        <div class="feat-item"><div class="feat-icon">♿</div>Wheelchair accessible</div>
+        <div class="feat-item"><div class="feat-icon">🅿️</div>Free parking on-site</div>
+        <div class="feat-item"><div class="feat-icon">🚉</div>5 min from Winchester station</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="foot">
+  <span class="foot-logo"><span class="s">Scan</span><span class="b">Book</span></span>
+  <span class="foot-copy">© 2025 The Connective UK Ltd &nbsp;·&nbsp; CQC Partner Network &nbsp;·&nbsp; Registered in England and Wales</span>
+</div>
+
+<script>
+function showScan(id,el){
+  document.querySelectorAll('.scan-panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('scan-'+id).classList.add('on');
+  el.classList.add('on');
+}
+document.querySelectorAll('.date-btn').forEach(b=>{
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.date-btn').forEach(x=>x.classList.remove('on'));
+    this.classList.add('on');
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;padding:24px;font-size:13px}
+h1{font-size:20px;font-weight:700;margin-bottom:4px}
+.meta{font-size:13px;color:#888;margin-bottom:28px;display:flex;gap:20px;flex-wrap:wrap}
+.meta span{background:#fff;border:1px solid #eee;padding:4px 12px;border-radius:20px}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:8px 18px;border-radius:8px;border:1.5px solid #e8e8e8;background:#fff;font-size:13px;font-weight:500;cursor:pointer;color:#666;transition:all .15s;font-family:'DM Sans',sans-serif}
+.tab.on{background:#0a0a0a;color:#fff;border-color:#0a0a0a}
+.panel{display:none}.panel.on{display:block}
+
+/* SECTION */
+.sec{background:#fff;border-radius:14px;border:1.5px solid #eee;margin-bottom:16px;overflow:hidden}
+.sec-head{padding:14px 20px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:10px;background:#fafafa}
+.sec-badge{font-size:10px;padding:3px 9px;border-radius:5px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0}
+.b-green{background:#00c896;color:#fff}
+.b-blue{background:#3b82f6;color:#fff}
+.b-purple{background:#8b5cf6;color:#fff}
+.b-amber{background:#f59e0b;color:#fff}
+.b-pink{background:#ec4899;color:#fff}
+.b-red{background:#ef4444;color:#fff}
+.b-dark{background:#374151;color:#fff}
+.b-teal{background:#0d9488;color:#fff}
+.sec-title{font-size:14px;font-weight:600}
+.sec-count{margin-left:auto;font-family:'DM Mono',monospace;font-size:11px;color:#bbb}
+.sec-body{padding:16px 20px}
+
+/* URL GRID */
+.url-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.url-grid.cols2{grid-template-columns:repeat(2,1fr)}
+.url-grid.cols4{grid-template-columns:repeat(4,1fr)}
+.url-item{padding:7px 11px;border-radius:8px;border:1px solid #f0f0f0;background:#fafafa;font-size:11px;font-family:'DM Mono',monospace;color:#444;cursor:pointer;transition:all .15s;line-height:1.4}
+.url-item:hover{border-color:#00c896;background:#e6faf5;color:#00a878}
+.url-item .note{font-size:10px;color:#bbb;font-family:'DM Sans',sans-serif;margin-top:2px}
+.url-item.done{border-color:#d1fae5;background:#f0fdf9;color:#059669}
+.url-item.done::before{content:'✓ '}
+.url-item.priority{border-color:#fde68a;background:#fffbeb}
+
+/* BODY PARTS TABLE */
+.bp-table{width:100%;border-collapse:collapse}
+.bp-table th{background:#f9fafb;padding:8px 12px;font-size:11px;font-weight:600;color:#666;text-align:left;border-bottom:1.5px solid #f0f0f0}
+.bp-table td{padding:7px 12px;font-size:11px;font-family:'DM Mono',monospace;color:#444;border-bottom:1px solid #f9f9f9;vertical-align:top}
+.bp-table tr:last-child td{border-bottom:none}
+.bp-table tr:hover td{background:#fafafa}
+.tick{color:#00c896;font-weight:700}
+.cross{color:#f87171}
+.dash{color:#ddd}
+
+/* CITY MATRIX */
+.matrix{width:100%;border-collapse:collapse;font-size:11px}
+.matrix th{background:#0a0a0a;color:rgba(255,255,255,.7);padding:8px 10px;text-align:center;font-weight:500;font-size:10px}
+.matrix th:first-child{text-align:left;background:#111;color:#fff}
+.matrix td{padding:7px 10px;text-align:center;border-bottom:1px solid #f5f5f5;border-right:1px solid #f5f5f5;font-size:10px;font-family:'DM Mono',monospace}
+.matrix td:first-child{text-align:left;font-weight:600;font-family:'DM Sans',sans-serif;background:#fafafa;font-size:12px}
+.matrix tr:last-child td{border-bottom:none}
+.cell-yes{color:#00c896;font-weight:700}
+.cell-p1{background:#e6faf5;color:#00a878;font-size:9px;font-weight:600;border-radius:3px;padding:2px 4px}
+.matrix-url{font-size:9px;color:#bbb;display:block;margin-top:1px}
+
+/* STATS */
+.stats-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.stat-box{background:#fff;border-radius:10px;border:1.5px solid #eee;padding:14px 18px;text-align:center;flex:1;min-width:100px}
+.stat-n{font-size:26px;font-weight:700;color:#00c896;font-family:'DM Mono',monospace}
+.stat-l{font-size:11px;color:#aaa;margin-top:2px}
+
+/* PHASE TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:12px}
+.tl-item{display:flex;gap:16px;align-items:flex-start}
+.tl-left{width:100px;flex-shrink:0;text-align:right}
+.tl-date{font-size:11px;font-weight:600;color:#333}
+.tl-sub{font-size:10px;color:#bbb}
+.tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px;border:2px solid #fff;box-shadow:0 0 0 2px #e8e8e8}
+.tl-dot.green{background:#00c896;box-shadow:0 0 0 2px #d1fae5}
+.tl-dot.amber{background:#f59e0b;box-shadow:0 0 0 2px #fde68a}
+.tl-dot.purple{background:#8b5cf6;box-shadow:0 0 0 2px #ede9fe}
+.tl-dot.blue{background:#3b82f6;box-shadow:0 0 0 2px #dbeafe}
+.tl-content{flex:1}
+.tl-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.tl-items{display:flex;flex-direction:column;gap:3px}
+.tl-i{font-size:12px;color:#666;display:flex;gap:6px}
+.tl-i::before{content:'›';color:#ccc}
+.tl-line{width:1px;background:#f0f0f0;margin:0 auto;height:12px}
+</style>
+</head>
+<body>
+
+<h1>ScanBook — Tam Site Haritası & İçerik Planı</h1>
+<div class="meta">
+  <span>scanbook.uk</span>
+  <span>Rakip analizi: scan.com + getscanned.me</span>
+  <span>Hazırlayan: Claude · Nisan 2026</span>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-box"><div class="stat-n">12</div><div class="stat-l">Servis Sayfası</div></div>
+  <div class="stat-box"><div class="stat-n">~120</div><div class="stat-l">Body Part Sayfası</div></div>
+  <div class="stat-box"><div class="stat-n">15</div><div class="stat-l">Şehir</div></div>
+  <div class="stat-box"><div class="stat-n">~105</div><div class="stat-l">Şehir × Scan Sayfası</div></div>
+  <div class="stat-box"><div class="stat-n">~350+</div><div class="stat-l">Toplam SEO Sayfası</div></div>
+  <div class="stat-box"><div class="stat-n">Haziran</div><div class="stat-l">Canlı Hedef</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" onclick="showPanel('services')">📋 Servis Sayfaları</button>
+  <button class="tab" onclick="showPanel('bodyparts')">🫁 Body Parts</button>
+  <button class="tab" onclick="showPanel('cities')">🗺️ Şehirler</button>
+  <button class="tab" onclick="showPanel('company')">🏢 Şirket Sayfaları</button>
+  <button class="tab" onclick="showPanel('business')">🤝 For Business</button>
+  <button class="tab" onclick="showPanel('timeline')">📅 Üretim Takvimi</button>
+</div>
+
+<!-- ═══ SERVICES ═══ -->
+<div class="panel on" id="panel-services">
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-green">TANI</span><span class="sec-title">Diagnostic Scan Sayfaları</span><span class="sec-count">5 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item priority">/services/mri-scan<div class="note">Private MRI Scan — En kritik, en yüksek hacimli keyword</div></div>
+        <div class="url-item priority">/services/open-mri<div class="note">Open & Upright MRI — claustrophobia, bariatric</div></div>
+        <div class="url-item priority">/services/ct-scan<div class="note">Private CT Scan</div></div>
+        <div class="url-item priority">/services/ultrasound<div class="note">Private Ultrasound Scan</div></div>
+        <div class="url-item priority">/services/x-ray<div class="note">Private X-Ray</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-blue">TARAMA</span><span class="sec-title">Screening & Preventative Sayfaları</span><span class="sec-count">8 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item priority">/services/baby-scan<div class="note">Private Baby & Pregnancy Scan — ayrı landing, pembe tasarım</div></div>
+        <div class="url-item">/services/mammogram<div class="note">Private Mammogram Scan</div></div>
+        <div class="url-item">/services/echocardiogram<div class="note">Private Echocardiogram (Echo Heart Scan)</div></div>
+        <div class="url-item">/services/dexa-scan<div class="note">DEXA Bone Density Scan</div></div>
+        <div class="url-item">/services/prostate-screening<div class="note">Private Prostate Screening</div></div>
+        <div class="url-item">/services/full-body-mri<div class="note">Full Body MRI Scan</div></div>
+        <div class="url-item">/services/bone-density<div class="note">Bone Density Scan</div></div>
+        <div class="url-item">/services/body-composition<div class="note">Body Composition Scan</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-purple">İLERİ</span><span class="sec-title">Advanced Diagnostics (The Diagnostic bağlantısı)</span><span class="sec-count">6 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item">/services/pet-ct<div class="note">PET-CT Scan — oncology, cancer staging</div></div>
+        <div class="url-item">/services/multiparametric-mri<div class="note">mpMRI — prostate cancer, Pi-RADS protocol</div></div>
+        <div class="url-item">/services/cardiac-ct<div class="note">Flash CT Coronary Angiography</div></div>
+        <div class="url-item">/services/eos-imaging<div class="note">EOS 2D/3D Standing Imaging</div></div>
+        <div class="url-item">/services/gamma-knife<div class="note">Gamma Knife Radiosurgery</div></div>
+        <div class="url-item">/services/guided-injection<div class="note">Guided Injection (ultrasound-guided)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-amber">DİĞER</span><span class="sec-title">Diğer Servisler</span><span class="sec-count">2 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item">/services/consultation<div class="note">Book a Private Consultation — online veya yüz yüze</div></div>
+        <div class="url-item">/services/health-check<div class="note">Executive Health Check — full package</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ BODY PARTS ═══ -->
+<div class="panel" id="panel-bodyparts">
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-green">MRI</span><span class="sec-title">MRI Body Parts — /body-parts/mri/[part]</span><span class="sec-count">32 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols4">
+        <div class="url-item">/brain-head</div>
+        <div class="url-item">/knee</div>
+        <div class="url-item">/lumbar-spine</div>
+        <div class="url-item">/cervical-spine</div>
+        <div class="url-item">/thoracic-spine</div>
+        <div class="url-item">/shoulder</div>
+        <div class="url-item">/hip</div>
+        <div class="url-item">/abdomen</div>
+        <div class="url-item">/pelvis</div>
+        <div class="url-item">/liver</div>
+        <div class="url-item">/kidney</div>
+        <div class="url-item">/chest</div>
+        <div class="url-item">/cardiac</div>
+        <div class="url-item">/neck</div>
+        <div class="url-item">/wrist</div>
+        <div class="url-item">/elbow</div>
+        <div class="url-item">/hand</div>
+        <div class="url-item">/foot-ankle</div>
+        <div class="url-item">/achilles</div>
+        <div class="url-item">/spine</div>
+        <div class="url-item">/sinus</div>
+        <div class="url-item">/thyroid</div>
+        <div class="url-item">/prostate</div>
+        <div class="url-item">/testicular</div>
+        <div class="url-item">/pituitary-gland</div>
+        <div class="url-item">/orbits</div>
+        <div class="url-item">/coccyx</div>
+        <div class="url-item">/tmj</div>
+        <div class="url-item">/adrenal-glands</div>
+        <div class="url-item">/small-bowel</div>
+        <div class="url-item">/mrcp</div>
+        <div class="url-item">/leg</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-blue">ULTRASOUND</span><span class="sec-title">Ultrasound Body Parts — /body-parts/ultrasound/[part]</span><span class="sec-count">19 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols4">
+        <div class="url-item">/abdomen</div>
+        <div class="url-item">/pelvis</div>
+        <div class="url-item">/thyroid</div>
+        <div class="url-item">/liver</div>
+        <div class="url-item">/kidney</div>
+        <div class="url-item">/bladder</div>
+        <div class="url-item">/breast</div>
+        <div class="url-item">/neck</div>
+        <div class="url-item">/prostate</div>
+        <div class="url-item">/testicular</div>
+        <div class="url-item">/ovary</div>
+        <div class="url-item">/transvaginal</div>
+        <div class="url-item">/musculoskeletal</div>
+        <div class="url-item">/doppler</div>
+        <div class="url-item">/lymph-node</div>
+        <div class="url-item">/womens</div>
+        <div class="url-item">/mens</div>
+        <div class="url-item">/urinary-tract</div>
+        <div class="url-item">/lumps-bumps</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-amber">CT</span><span class="sec-title">CT Scan Body Parts — /body-parts/ct/[part]</span><span class="sec-count">12 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols4">
+        <div class="url-item">/chest</div>
+        <div class="url-item">/abdomen-pelvis</div>
+        <div class="url-item">/head-brain</div>
+        <div class="url-item">/cardiac</div>
+        <div class="url-item">/lumbar-spine</div>
+        <div class="url-item">/kidney</div>
+        <div class="url-item">/shoulder</div>
+        <div class="url-item">/foot</div>
+        <div class="url-item">/ankle</div>
+        <div class="url-item">/facial-bones</div>
+        <div class="url-item">/calcium-score</div>
+        <div class="url-item">/fracture-assessment</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-teal">X-RAY</span><span class="sec-title">X-Ray Body Parts — /body-parts/x-ray/[part]</span><span class="sec-count">8 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols4">
+        <div class="url-item">/chest</div>
+        <div class="url-item">/knee</div>
+        <div class="url-item">/hip</div>
+        <div class="url-item">/shoulder</div>
+        <div class="url-item">/ankle</div>
+        <div class="url-item">/foot</div>
+        <div class="url-item">/hand</div>
+        <div class="url-item">/wrist</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-pink">KADIN / HAMİLELİK</span><span class="sec-title">Pregnancy & Baby Scan Sayfaları — /services/baby-scan/[type]</span><span class="sec-count">6 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item">/4d-baby-scan<div class="note">4D & 3D Baby Scan</div></div>
+        <div class="url-item">/gender-reveal-scan<div class="note">Gender Reveal Scan</div></div>
+        <div class="url-item">/wellbeing-scan<div class="note">Pregnancy Well-being Check</div></div>
+        <div class="url-item">/anomaly-scan<div class="note">20-Week Anomaly Scan</div></div>
+        <div class="url-item">/growth-scan<div class="note">Growth & Presentation Scan</div></div>
+        <div class="url-item">/early-pregnancy-scan<div class="note">Early Pregnancy / Reassurance Scan</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ CITIES ═══ -->
+<div class="panel" id="panel-cities">
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-dark">ŞEHİR MATRİSİ</span><span class="sec-title">URL yapısı: /cities/[city]/[scan-type]</span><span class="sec-count">15 şehir × 7 scan = 105 sayfa</span></div>
+    <div class="sec-body" style="overflow-x:auto">
+      <table class="matrix">
+        <tr>
+          <th>Şehir</th>
+          <th>MRI</th>
+          <th>CT</th>
+          <th>Ultrasound</th>
+          <th>X-Ray</th>
+          <th>Baby Scan</th>
+          <th>DEXA</th>
+          <th>Echo</th>
+        </tr>
+        <tr>
+          <td>London</td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+        </tr>
+        <tr>
+          <td>Manchester</td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Birmingham</td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Leeds</td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Bristol</td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Edinburgh</td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Glasgow</td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Liverpool</td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Sheffield</td>
+          <td><span class="cell-p1">FAZ 1</span></td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Nottingham</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Newcastle</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Southampton</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Cardiff</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Oxford</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+        <tr>
+          <td>Cambridge</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+          <td>FAZ 2</td>
+        </tr>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:#aaa">FAZ 1 = Haziran öncesi hazır · FAZ 2 = Temmuz sonrası eklenecek</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ COMPANY ═══ -->
+<div class="panel" id="panel-company">
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-dark">HAKKINDA</span><span class="sec-title">About / Şirket Sayfaları</span><span class="sec-count">7 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item priority">/about<div class="note">Our Story — kim olduğumuz, neden kuruldu</div></div>
+        <div class="url-item priority">/how-it-works<div class="note">Nasıl Çalışır — 4 adım, hasta bakış açısı</div></div>
+        <div class="url-item priority">/faq<div class="note">Sık Sorulan Sorular — hasta + klinik</div></div>
+        <div class="url-item">/testimonials<div class="note">Hasta yorumları + video testimonial</div></div>
+        <div class="url-item">/locations<div class="note">Tüm şehirler harita görünümü</div></div>
+        <div class="url-item">/careers<div class="note">Kariyer sayfası (Faz 2)</div></div>
+        <div class="url-item">/contact<div class="note">İletişim formu + telefon + email</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-blue">İÇERİK</span><span class="sec-title">Health Hub / Blog (SEO Motoru)</span><span class="sec-count">Sürekli büyüyen</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item">/health-hub<div class="note">Blog ana sayfası</div></div>
+        <div class="url-item">/health-hub/how-long-does-mri-take<div class="note">Örnek makale — high traffic keyword</div></div>
+        <div class="url-item">/health-hub/mri-vs-ct-scan<div class="note">Karşılaştırma makalesi</div></div>
+        <div class="url-item">/health-hub/private-scan-cost-uk<div class="note">Fiyat rehberi — çok aranan</div></div>
+        <div class="url-item">/health-hub/nhs-waiting-times<div class="note">NHS bekleme süresi — dönüşüm sayfası</div></div>
+        <div class="url-item">/health-hub/baby-scan-guide<div class="note">Hamilelik tarama rehberi</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-dark">YASAL</span><span class="sec-title">Legal Sayfalar</span><span class="sec-count">4 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item priority">/privacy-policy<div class="note">GDPR uyumlu gizlilik politikası</div></div>
+        <div class="url-item priority">/terms-and-conditions<div class="note">Kullanım şartları</div></div>
+        <div class="url-item">/cookie-policy<div class="note">Çerez politikası</div></div>
+        <div class="url-item">/accessibility<div class="note">Erişilebilirlik beyanı (UK hukuku)</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ BUSINESS ═══ -->
+<div class="panel" id="panel-business">
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-green">KLİNİK</span><span class="sec-title">Partner Imaging Centres — scanbook.co.uk/partners</span><span class="sec-count">5 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item priority">/partners<div class="note">Partner Programme ana sayfa — klinik başvurusu</div></div>
+        <div class="url-item priority">/partners/apply<div class="note">Başvuru formu — klinik bilgileri, CQC numarası</div></div>
+        <div class="url-item">/partners/login<div class="note">Klinik portal girişi</div></div>
+        <div class="url-item">/partners/dashboard<div class="note">Klinik dashboard — slot yönetimi, booking, ödemeler</div></div>
+        <div class="url-item">/partners/faq<div class="note">Klinik için SSS — komisyon, ödeme, CQC</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-purple">GP</span><span class="sec-title">GP Referral Network</span><span class="sec-count">3 sayfa</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item">/for-gps<div class="note">GP referral programme landing page</div></div>
+        <div class="url-item">/for-gps/register<div class="note">GP kayıt formu — unique referral link alır</div></div>
+        <div class="url-item">/for-gps/login<div class="note">GP portal — referral takibi, ödeme</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-blue">KURUMSAL</span><span class="sec-title">Corporate / Insurance</span><span class="sec-count">2 sayfa · Faz 2</span></div>
+    <div class="sec-body">
+      <div class="url-grid cols2">
+        <div class="url-item">/for-business<div class="note">Kurumsal sağlık paketleri</div></div>
+        <div class="url-item">/for-insurers<div class="note">Sigorta şirketleri için — Faz 2</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ TIMELINE ═══ -->
+<div class="panel" id="panel-timeline">
+  <div class="sec">
+    <div class="sec-head"><span class="sec-badge b-green">TAKVİM</span><span class="sec-title">İçerik Üretim Takvimi — Mayıs → Haziran doğum günü 🎂</span></div>
+    <div class="sec-body">
+      <div class="timeline">
+
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-date">Şu an</div><div class="tl-sub">Nisan 2026</div></div>
+          <div class="tl-dot green"></div>
+          <div class="tl-content">
+            <div class="tl-title">✅ Enes — Teknik altyapı (devam ediyor)</div>
+            <div class="tl-items">
+              <div class="tl-i">Booking akışı, ödeme, admin panel</div>
+              <div class="tl-i">Railway DB, Stripe, Resend email</div>
+              <div class="tl-i">Partner portal altyapısı</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-line"></div>
+
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-date">15 Mayıs</div><div class="tl-sub">Domain canlıya alınır</div></div>
+          <div class="tl-dot amber"></div>
+          <div class="tl-content">
+            <div class="tl-title">scanbook.uk → Vercel bağlantısı</div>
+            <div class="tl-items">
+              <div class="tl-i">Tasarım taşıması tamamlanır (v3 prototipi)</div>
+              <div class="tl-i">İlk 5 servis sayfası hazır (MRI, CT, US, X-Ray, Baby)</div>
+              <div class="tl-i">/partners sayfası canlı — klinik outreach başlar</div>
+              <div class="tl-i">3 gerçek klinik verisi girilir</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-line"></div>
+
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-date">1 Haziran</div><div class="tl-sub">Son test dönemi</div></div>
+          <div class="tl-dot purple"></div>
+          <div class="tl-content">
+            <div class="tl-title">Tüm temel sayfalar hazır + SEO temel yapısı</div>
+            <div class="tl-items">
+              <div class="tl-i">Tüm servis sayfaları (12 scan tipi)</div>
+              <div class="tl-i">London + Manchester + Birmingham şehir sayfaları</div>
+              <div class="tl-i">Stripe live mode aktif</div>
+              <div class="tl-i">Email onayları test edildi</div>
+              <div class="tl-i">Privacy Policy + T&C sayfaları hazır</div>
+              <div class="tl-i">5+ gerçek partner klinik sisteme girildi</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-line"></div>
+
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-date">🎂 Haziran</div><div class="tl-sub">İlk hasta!</div></div>
+          <div class="tl-dot blue"></div>
+          <div class="tl-content">
+            <div class="tl-title">🚀 scanbook.uk — Halka açık, ilk gerçek booking</div>
+            <div class="tl-items">
+              <div class="tl-i">Google Analytics + Search Console aktif</div>
+              <div class="tl-i">Trustpilot hesabı açılmış</div>
+              <div class="tl-i">İlk hasta booking'i yapıyor</div>
+              <div class="tl-i">Body part sayfaları üretim bandına giriyor</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-line"></div>
+
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-date">Temmuz+</div><div class="tl-sub">Büyüme</div></div>
+          <div class="tl-dot green"></div>
+          <div class="tl-content">
+            <div class="tl-title">SEO motoru çalışıyor — 350+ sayfa üretimi</div>
+            <div class="tl-items">
+              <div class="tl-i">Tüm body part sayfaları (120+ sayfa)</div>
+              <div class="tl-i">Tüm şehir × scan matrisi (105+ sayfa)</div>
+              <div class="tl-i">Health Hub makaleleri (blog)</div>
+              <div class="tl-i">The Diagnostic platformu açılır</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('panel-'+id).classList.add('on');
+  event.target.classList.add('on');
+}
+</script>
+</body>
+</html>

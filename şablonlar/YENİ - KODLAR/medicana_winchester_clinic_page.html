@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00C9A7;
+  --teal-dark:#00a888;
+  --teal-light:#e6faf7;
+  --black:#111;
+  --text:#222;
+  --muted:#666;
+  --subtle:#999;
+  --border:#ebebeb;
+  --bg:#f8f8f8;
+  /* Medicana brand */
+  --med:#003087;
+  --med-light:#e8eef7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* ── TOP BANNER ── */
+.top-banner{background:var(--med);padding:8px 48px;display:flex;align-items:center;justify-content:space-between}
+.tb-left{display:flex;align-items:center;gap:16px;font-size:12px;color:rgba(255,255,255,.6)}
+.tb-left strong{color:#fff}
+.tb-right{display:flex;align-items:center;gap:16px;font-size:12px;color:rgba(255,255,255,.5)}
+.tb-right a{color:rgba(255,255,255,.7);text-decoration:none}
+.tb-right a:hover{color:#fff}
+.tb-divider{color:rgba(255,255,255,.2)}
+
+/* ── NAV ── */
+.nav{height:62px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:0;z-index:200}
+.nav-left{display:flex;align-items:center;gap:20px}
+.clinic-logo{display:flex;align-items:center;gap:12px}
+.clinic-logo-box{width:40px;height:40px;border-radius:10px;background:var(--med);display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff;letter-spacing:-.5px;font-family:'DM Sans',sans-serif}
+.clinic-name-nav{display:flex;flex-direction:column;line-height:1}
+.clinic-name-main{font-size:15px;font-weight:600;color:var(--black);letter-spacing:-.2px}
+.clinic-name-sub{font-size:11px;color:var(--subtle);margin-top:2px}
+.nav-sep{width:1px;height:28px;background:var(--border)}
+.powered{display:flex;align-items:center;gap:5px;font-size:11px;color:#bbb}
+.powered-logo{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700}
+.powered-logo .s{color:var(--black)}.powered-logo .b{color:var(--teal)}
+.nav-mid{display:flex;gap:2px}
+.nav-link{padding:7px 12px;font-size:13px;color:var(--muted);text-decoration:none;border-radius:7px;transition:all .15s}
+.nav-link:hover{color:var(--black);background:var(--bg)}
+.nav-link.on{color:var(--black);font-weight:500}
+.nav-right{display:flex;align-items:center;gap:8px}
+.btn-call{padding:7px 14px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;color:var(--text);background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px}
+.btn-book{padding:8px 18px;border:none;border-radius:7px;background:var(--teal);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
+.btn-book:hover{opacity:.88}
+
+/* ── BREADCRUMB ── */
+.bc{padding:11px 48px;font-size:12px;color:#bbb;border-bottom:1px solid #f5f5f5;background:#fff}
+.bc a{color:#999;text-decoration:none}.bc a:hover{color:var(--black)}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(160deg,#f0f4fb 0%,#fff 60%);padding:48px 48px 0;border-bottom:1px solid var(--border)}
+.hero-inner{max-width:1180px;margin:0 auto}
+.hero-top{display:flex;gap:32px;align-items:flex-start;margin-bottom:36px}
+.clinic-logo-lg{width:72px;height:72px;border-radius:16px;background:var(--med);display:grid;place-items:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-1px}
+.hero-info{}
+.hero-kicker{font-size:11px;color:var(--med);letter-spacing:2px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.hero-kicker::before{content:'';width:20px;height:2px;background:var(--med)}
+.hero-h1{font-family:'Instrument Serif',serif;font-size:38px;letter-spacing:-.8px;color:var(--black);margin-bottom:10px;line-height:1.15}
+.hero-meta{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:14px}
+.hero-meta-item{display:flex;align-items:center;gap:5px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:5px;letter-spacing:.5px}
+.badge-cqc{background:#e6faf7;color:#00a888;border:1px solid #b2edd8}
+.badge-verified{background:var(--med-light);color:var(--med);border:1px solid #c5d5eb}
+.badge-3t{background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe}
+.badge-open{background:#fff8e6;color:#b07800;border:1px solid #fae5a0}
+.hero-rating{margin-left:auto;text-align:right;flex-shrink:0}
+.rating-num{font-family:'Instrument Serif',serif;font-size:44px;color:var(--black);line-height:1;letter-spacing:-2px}
+.rating-stars{color:#f59e0b;font-size:14px;letter-spacing:2px;margin:3px 0}
+.rating-count{font-size:12px;color:#bbb}
+.hero-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:20px 0;border-top:1px solid var(--border)}
+.btn-book-lg{padding:12px 28px;border:none;border-radius:9px;background:var(--teal);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
+.btn-book-lg:hover{opacity:.88}
+.btn-call-lg{padding:12px 20px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:7px}
+.btn-save{padding:12px 16px;border:1.5px solid var(--border);border-radius:9px;font-size:16px;color:#bbb;background:#fff;cursor:pointer;transition:all .15s}
+.btn-save:hover{border-color:#e84393;color:#e84393}
+.hero-response{margin-left:auto;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.response-dot{width:7px;height:7px;border-radius:50%;background:var(--teal)}
+
+/* ── TABS ── */
+.tabs{border-bottom:1px solid var(--border);background:#fff;position:sticky;top:62px;z-index:100}
+.tabs-inner{max-width:1180px;margin:0 auto;padding:0 48px;display:flex;gap:0}
+.tab{padding:14px 18px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;font-weight:400;white-space:nowrap}
+.tab.on{color:var(--black);border-bottom-color:var(--teal);font-weight:500}
+.tab:hover:not(.on){color:var(--text)}
+
+/* ── BODY ── */
+.body{padding:40px 48px;background:var(--bg)}
+.body-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+
+/* ── SCAN TABS ── */
+.scan-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.stab{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif}
+.stab.on{background:var(--black);color:#fff;border-color:var(--black)}
+.scan-panel{display:none}.scan-panel.on{display:block}
+
+/* SCAN LIST */
+.scan-section-label{font-size:10px;color:#bbb;letter-spacing:2.5px;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.scan-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.scan-row{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .15s}
+.scan-row:hover{border-color:var(--teal);box-shadow:0 4px 18px rgba(0,201,167,.08)}
+.sr-left{}
+.sr-name{font-size:14px;font-weight:500;color:var(--black);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sr-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px}
+.tag-3t{background:#f3e8ff;color:#7c3aed}
+.tag-today{background:#e6faf7;color:#00a888}
+.tag-popular{background:#fff8e6;color:#b07800}
+.sr-meta{display:flex;gap:12px;font-size:12px;color:#bbb}
+.sr-right{display:flex;align-items:center;gap:16px;flex-shrink:0}
+.sr-price{font-family:'Instrument Serif',serif;font-size:22px;color:var(--black);white-space:nowrap}
+.sr-price.multi{font-size:14px;color:var(--muted);font-family:'DM Sans',sans-serif}
+.btn-sr{padding:8px 16px;border:1.5px solid var(--teal);border-radius:8px;background:#fff;color:var(--teal-dark);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn-sr:hover{background:var(--teal);color:#fff}
+
+/* BODY PARTS GRID */
+.bp-label{font-size:13px;font-weight:500;color:var(--muted);margin:20px 0 12px;display:flex;align-items:center;gap:8px}
+.bp-label::before{content:'';width:3px;height:14px;background:var(--teal);border-radius:2px}
+.bp-mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px}
+.bp-mini{padding:10px 12px;border:1px solid var(--border);border-radius:9px;font-size:12px;color:var(--text);cursor:pointer;transition:all .15s;background:#fff;display:flex;align-items:center;gap:7px;line-height:1.3}
+.bp-mini:hover{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark)}
+.bp-mini svg{width:14px;height:14px;stroke:var(--subtle);fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0}
+.bp-mini:hover svg{stroke:var(--teal)}
+
+/* PREGNANCY PANEL */
+.preg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.preg-card{border:1.5px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;cursor:pointer;transition:all .2s}
+.preg-card:hover{border-color:#e84393;transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,67,147,.08)}
+.preg-card.featured{border-color:#e84393;background:linear-gradient(160deg,#fff8fc,#fff)}
+.preg-head{padding:18px 18px 14px;border-bottom:1px solid #fce7f3}
+.preg-card.featured .preg-head{border-bottom-color:#fce7f3}
+.preg-week{font-size:10px;color:#e84393;letter-spacing:2px;font-weight:600;margin-bottom:6px}
+.preg-name{font-size:15px;font-weight:600;color:var(--black);margin-bottom:4px}
+.preg-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.preg-price{font-family:'Instrument Serif',serif;font-size:28px;color:var(--black);margin-top:10px}
+.preg-body{padding:14px 18px}
+.preg-features{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.preg-feat{font-size:12px;color:#444;display:flex;align-items:flex-start;gap:7px}
+.preg-feat::before{content:'♥';color:#e84393;font-size:10px;margin-top:1px;flex-shrink:0}
+.btn-preg{width:100%;padding:10px;border:1.5px solid #e84393;border-radius:8px;background:#fff;color:#e84393;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-preg:hover,.preg-card.featured .btn-preg{background:#e84393;color:#fff;border-color:#e84393}
+
+/* ── SIDEBAR ── */
+.sidebar{}
+.scard{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px}
+.scard-title{font-size:13px;font-weight:600;color:var(--black);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.scard-title svg{width:14px;height:14px;stroke:var(--teal);fill:none;stroke-width:2;stroke-linecap:round}
+
+/* QUICK BOOK */
+.qb-scan-select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--black);background:#fff;outline:none;-webkit-appearance:none;margin-bottom:10px;transition:border-color .15s}
+.qb-scan-select:focus{border-color:var(--teal)}
+.qb-date{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.qb-date-btn{flex:1;padding:9px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;text-align:center;cursor:pointer;transition:all .15s;background:#fff;color:var(--text);font-family:'DM Sans',sans-serif;min-width:60px}
+.qb-date-btn:hover{border-color:var(--teal)}
+.qb-date-btn.on{border-color:var(--black);background:var(--black);color:#fff}
+.qb-date-day{font-weight:600;font-size:13px;display:block}
+.qb-date-date{font-size:10px;color:inherit;opacity:.6;margin-top:1px;display:block}
+.btn-qb{width:100%;padding:13px;border:none;border-radius:9px;background:var(--teal);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px;transition:opacity .15s}
+.btn-qb:hover{opacity:.88}
+.qb-guarantees{display:flex;flex-direction:column;gap:5px;margin-top:12px}
+.qb-g{font-size:11px;color:#bbb;display:flex;align-items:center;gap:6px}
+
+/* MAP */
+.map-box{background:linear-gradient(135deg,#eef2f8,#e8eef7);border-radius:10px;height:130px;display:grid;place-items:center;margin-bottom:12px;border:1px solid #dce4f0;cursor:pointer;transition:all .15s}
+.map-box:hover{opacity:.9}
+.map-pin{font-size:28px}
+.map-info{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px}
+.btn-dir{width:100%;padding:9px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:13px;cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif}
+
+/* HOURS */
+.hour-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #f5f5f5}
+.hour-row:last-child{border-bottom:none}
+.hour-day{color:var(--muted)}
+.hour-time{font-weight:500;color:var(--text)}
+.hour-row.today .hour-day{color:var(--teal);font-weight:600}
+.hour-row.today .hour-time{color:var(--teal)}
+
+/* FEATURES */
+.feature-list{display:flex;flex-direction:column;gap:8px}
+.feature-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.feature-icon{width:28px;height:28px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:14px;flex-shrink:0}
+
+/* ABOUT TAB */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:40px 48px;max-width:1180px;margin:0 auto}
+.about-body{font-size:15px;color:var(--muted);line-height:1.85}
+.about-body p{margin-bottom:14px}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.astat{border:1px solid var(--border);border-radius:12px;padding:20px;background:#fff;text-align:center}
+.astat-n{font-family:'Instrument Serif',serif;font-size:34px;color:var(--black);letter-spacing:-1px}
+.astat-l{font-size:12px;color:#bbb;margin-top:4px}
+
+/* REVIEWS TAB */
+.rv-section{padding:40px 48px;max-width:1180px;margin:0 auto}
+.rv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+.rv{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px}
+.rv-stars{color:#f59e0b;font-size:12px;letter-spacing:2px;margin-bottom:10px}
+.rv-text{font-size:13px;color:#444;line-height:1.75;margin-bottom:14px}
+.rv-author{display:flex;align-items:center;gap:9px}
+.rv-av{width:30px;height:30px;border-radius:50%;background:var(--black);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:600;flex-shrink:0}
+.rv-name{font-size:13px;font-weight:600;color:var(--black)}
+.rv-tag{font-size:11px;color:#bbb;margin-top:1px}
+
+/* FOOT */
+.foot{background:var(--black);border-top:1px solid rgba(255,255,255,.06);padding:20px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.foot-left{display:flex;align-items:center;gap:14px}
+.foot-clinic{font-size:13px;color:rgba(255,255,255,.5)}
+.foot-sep{color:rgba(255,255,255,.15)}
+.foot-copy{font-size:11px;color:rgba(255,255,255,.2)}
+.foot-powered{font-size:11px;color:rgba(255,255,255,.3);display:flex;align-items:center;gap:5px}
+.foot-pb{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700}
+.foot-pb .s{color:rgba(255,255,255,.6)}.foot-pb .b{color:var(--teal)}
+</style>
+</head>
+<body>
+
+<!-- TOP BANNER -->
+<div class="top-banner">
+  <div class="tb-left">
+    <span>📍 <strong>Medicana Diagnostic Centre</strong> — Winchester, Hampshire</span>
+    <span class="tb-divider">|</span>
+    <span>🕐 Open today: <strong style="color:rgba(255,255,255,.8)">8am – 7pm</strong></span>
+  </div>
+  <div class="tb-right">
+    <a href="#">Home</a>
+    <span class="tb-divider">|</span>
+    <a href="#">About Medicana</a>
+    <span class="tb-divider">|</span>
+    <a href="#"><strong style="color:var(--teal)">📞 01962 123 456</strong></a>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <div class="clinic-logo">
+      <div class="clinic-logo-box">M</div>
+      <div class="clinic-name-nav">
+        <span class="clinic-name-main">Medicana Diagnostic Centre</span>
+        <span class="clinic-name-sub">Winchester · Hampshire</span>
+      </div>
+    </div>
+    <div class="nav-sep"></div>
+    <div class="powered">
+      <span>Powered by</span>
+      <span class="powered-logo"><span class="s">Scan</span><span class="b">Book</span></span>
+    </div>
+  </div>
+
+  <div class="nav-mid">
+    <a class="nav-link on" href="#">Scans &amp; Pricing</a>
+    <a class="nav-link" href="#">Baby Scans</a>
+    <a class="nav-link" href="#">About Us</a>
+    <a class="nav-link" href="#">Find a Centre</a>
+    <a class="nav-link" href="#">Reviews</a>
+    <a class="nav-link" href="#">Contact</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="btn-call">📞 01962 123 456</button>
+    <button class="btn-book">Book a Scan</button>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="bc">
+  <a href="#">ScanBook</a> &nbsp;/&nbsp;
+  <a href="#">Find a Centre</a> &nbsp;/&nbsp;
+  <a href="#">Winchester</a> &nbsp;/&nbsp;
+  Medicana Diagnostic Centre
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="clinic-logo-lg">M</div>
+      <div class="hero-info">
+        <div class="hero-kicker">SCANBOOK VERIFIED PARTNER</div>
+        <h1 class="hero-h1">Medicana Diagnostic Centre<br><span style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:400;color:var(--muted);letter-spacing:0">Winchester, Hampshire</span></h1>
+        <div class="hero-meta">
+          <div class="hero-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Carfax House, 28 The Square, Winchester SO23 9EX
+          </div>
+          <div class="hero-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            01962 123 456
+          </div>
+          <div class="hero-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Open today until 7pm
+          </div>
+        </div>
+        <div class="badges">
+          <span class="badge badge-cqc">✓ CQC Registered</span>
+          <span class="badge badge-verified">✓ ScanBook Verified</span>
+          <span class="badge badge-3t">3T MRI Available</span>
+          <span class="badge badge-open">🟢 Open Now</span>
+        </div>
+      </div>
+      <div class="hero-rating">
+        <div class="rating-num">4.9</div>
+        <div class="rating-stars">★★★★★</div>
+        <div class="rating-count">184 verified reviews</div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button class="btn-book-lg">Book a Scan Here</button>
+      <button class="btn-call-lg">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call Centre
+      </button>
+      <button class="btn-save">♡</button>
+      <div class="hero-response">
+        <div class="response-dot"></div>
+        Responds within 1 hour
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tabs-inner">
+    <div class="tab on" onclick="showTab('scans',this)">Scans &amp; Pricing</div>
+    <div class="tab" onclick="showTab('about',this)">About</div>
+    <div class="tab" onclick="showTab('reviews',this)">Reviews (184)</div>
+    <div class="tab" onclick="showTab('location',this)">Location &amp; Hours</div>
+  </div>
+</div>
+
+<!-- SCANS TAB -->
+<div id="tab-scans">
+  <div class="body">
+    <div class="body-inner">
+
+      <!-- LEFT: SCAN LIST -->
+      <div>
+        <div class="scan-tabs">
+          <button class="stab on" onclick="showScan('mri',this)">MRI Scan</button>
+          <button class="stab" onclick="showScan('ct',this)">CT Scan</button>
+          <button class="stab" onclick="showScan('us',this)">Ultrasound</button>
+          <button class="stab" onclick="showScan('xray',this)">X-Ray</button>
+          <button class="stab" onclick="showScan('preg',this)" style="border-color:#fce7f3;color:#e84393">♥ Pregnancy &amp; Baby</button>
+        </div>
+
+        <!-- MRI -->
+        <div class="scan-panel on" id="scan-mri">
+          <div class="scan-section-label">MRI SCAN — FIXED PRICING</div>
+
+          <div class="scan-row">
+            <div class="sr-left">
+              <div class="sr-name">1 Body Part <span class="sr-tag tag-today">Available today</span></div>
+              <div class="sr-meta"><span>⚡ Same-day slots available</span><span>📋 Report within 24–48 hrs</span><span>🧲 3T available</span></div>
+            </div>
+            <div class="sr-right">
+              <div class="sr-price">£275</div>
+              <button class="btn-sr">Book</button>
+            </div>
+          </div>
+
+          <div class="scan-row">
+            <div class="sr-left">
+              <div class="sr-name">2 Body Parts <span class="sr-tag tag-popular">Popular</span></div>
+              <div class="sr-meta"><span>⚡ This week</span><span>📋 Combined radiologist's report</span></div>
+            </div>
+            <div class="sr-right">
+              <div class="sr-price">£445</div>
+              <button class="btn-sr">Book</button>
+            </div>
+          </div>
+
+          <div class="scan-row">
+            <div class="sr-left">
+              <div class="sr-name">3 Body Parts</div>
+              <div class="sr-meta"><span>⚡ This week</span><span>📋 Combined radiologist's report</span></div>
+            </div>
+            <div class="sr-right">
+              <div class="sr-price">£575</div>
+              <button class="btn-sr">Book</button>
+            </div>
+          </div>
+
+          <div class="scan-row">
+            <div class="sr-left">
+              <div class="sr-name">4 Body Parts</div>
+              <div class="sr-meta"><span>⚡ This week</span><span>📋 Combined radiologist's report</span></div>
+            </div>
+            <div class="sr-right">
+              <div class="sr-price">£725</div>
+              <button class="btn-sr">Book</button>
+            </div>
+          </div>
+
+          <div class="scan-row" style="border-color:#111;background:#fafafa">
+            <div class="sr-left">
+              <div class="sr-name">Full Body MRI <span class="sr-tag tag-3t">3T · Best Value</span></div>
+              <div class="sr-meta"><span>Whole-body screening</span><span>📋 Full radiologist's report</span></div>
+            </div>
+            <div class="sr-right">
+              <div class="sr-price">£1,450</div>
+              <button class="btn-sr" style="background:var(--black);color:#fff;border-color:var(--black)">Book</button>
+            </div>
+          </div>
+
+          <div class="bp-label">Select a body part to book</div>
+          <div class="bp-mini-grid">
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M8 21v-4a4 4 0 0 1 8 0v4"/></svg>Brain &amp; Head</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><rect x="8" y="8" width="8" height="4" rx="1"/><rect x="8" y="14" width="8" height="4" rx="1"/><line x1="12" y1="18" x2="12" y2="22"/></svg>Lumbar Spine</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="8"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="16" x2="12" y2="22"/></svg>Knee</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M9 12v10"/></svg>Shoulder</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><path d="M12 4c-4 0-7 3-7 7 0 2.5 1.5 4.8 4 6.3L12 22l3-4.7c2.5-1.5 4-3.8 4-6.3 0-4-3-7-7-7z"/></svg>Hip</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="8" ry="7"/><path d="M8 8c0-3 2-5 4-5s4 2 4 5"/></svg>Abdomen</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Cardiac</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 6v2M12 16v2M6 12h2M16 12h2"/></svg>Prostate (mpMRI)</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="3" rx="1"/><rect x="8" y="8" width="8" height="3" rx="1"/><rect x="8" y="13" width="8" height="3" rx="1"/></svg>Cervical Spine</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="12" rx="3"/><path d="M7 10c0 3 2 6 5 8 3-2 5-5 5-8"/></svg>Wrist &amp; Hand</div>
+            <div class="bp-mini"><svg viewBox="0 0 24 24"><path d="M4 19h10l6-9H10z"/></svg>Foot &amp; Ankle</div>
+            <div class="bp-mini" style="border-style:dashed;color:var(--subtle)"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>View all 32</div>
+          </div>
+        </div>
+
+        <!-- CT -->
+        <div class="scan-panel" id="scan-ct">
+          <div class="scan-section-label">CT SCAN</div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">CT Scan — Any body part <span class="sr-tag tag-today">Same day</span></div><div class="sr-meta"><span>Results within 24 hrs</span><span>Low-dose protocol</span></div></div>
+            <div class="sr-right"><div class="sr-price">£249</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">CT Chest</div><div class="sr-meta"><span>Lungs, airways and surrounding structures</span></div></div>
+            <div class="sr-right"><div class="sr-price">£249</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">CT Abdomen and Pelvis</div><div class="sr-meta"><span>Liver, kidneys, bowel and pelvic organs</span></div></div>
+            <div class="sr-right"><div class="sr-price">£299</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">CT Calcium Score <span class="sr-tag tag-popular">Popular</span></div><div class="sr-meta"><span>Cardiac risk assessment</span></div></div>
+            <div class="sr-right"><div class="sr-price">£199</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">CT Head and Brain</div><div class="sr-meta"><span>Acute head injury, stroke, sinuses</span></div></div>
+            <div class="sr-right"><div class="sr-price">£249</div><button class="btn-sr">Book</button></div>
+          </div>
+        </div>
+
+        <!-- ULTRASOUND -->
+        <div class="scan-panel" id="scan-us">
+          <div class="scan-section-label">ULTRASOUND</div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">Ultrasound — General <span class="sr-tag tag-today">Same day</span></div><div class="sr-meta"><span>Abdomen, pelvis, thyroid, musculoskeletal</span></div></div>
+            <div class="sr-right"><div class="sr-price">£99</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">Abdominal Ultrasound</div><div class="sr-meta"><span>Liver, gallbladder, kidneys, spleen</span></div></div>
+            <div class="sr-right"><div class="sr-price">£99</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">Pelvic Ultrasound</div><div class="sr-meta"><span>Uterus, ovaries, bladder — transvaginal available</span></div></div>
+            <div class="sr-right"><div class="sr-price">£120</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">Thyroid Ultrasound</div><div class="sr-meta"><span>Thyroid gland and surrounding lymph nodes</span></div></div>
+            <div class="sr-right"><div class="sr-price">£99</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">Doppler Vascular Scan</div><div class="sr-meta"><span>Blood flow assessment in arteries and veins</span></div></div>
+            <div class="sr-right"><div class="sr-price">£149</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">Breast Ultrasound</div><div class="sr-meta"><span>Lumps, cysts and breast tissue assessment</span></div></div>
+            <div class="sr-right"><div class="sr-price">£149</div><button class="btn-sr">Book</button></div>
+          </div>
+        </div>
+
+        <!-- X-RAY -->
+        <div class="scan-panel" id="scan-xray">
+          <div class="scan-section-label">X-RAY</div>
+          <div class="scan-row">
+            <div class="sr-left"><div class="sr-name">X-Ray — Any area <span class="sr-tag tag-today">Same day · Results in 2 hrs</span></div><div class="sr-meta"><span>Digital X-ray with same-day report</span></div></div>
+            <div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div>
+          </div>
+          <div class="scan-row"><div class="sr-left"><div class="sr-name">Chest X-Ray</div><div class="sr-meta"><span>Lungs, heart and rib cage</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+          <div class="scan-row"><div class="sr-left"><div class="sr-name">Knee X-Ray</div><div class="sr-meta"><span>Bones, joint space and arthritis assessment</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+          <div class="scan-row"><div class="sr-left"><div class="sr-name">Shoulder X-Ray</div><div class="sr-meta"><span>Shoulder joint, clavicle and acromioclavicular joint</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+          <div class="scan-row"><div class="sr-left"><div class="sr-name">Foot and Ankle X-Ray</div><div class="sr-meta"><span>Fracture assessment, deformity, arthritis</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+          <div class="scan-row"><div class="sr-left"><div class="sr-name">Wrist and Hand X-Ray</div><div class="sr-meta"><span>Fractures, joints, bone density</span></div></div><div class="sr-right"><div class="sr-price">£75</div><button class="btn-sr">Book</button></div></div>
+        </div>
+
+        <!-- PREGNANCY -->
+        <div class="scan-panel" id="scan-preg">
+          <div class="scan-section-label" style="color:#e84393;border-color:#fce7f3">♥ PREGNANCY &amp; BABY SCANS</div>
+          <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.7">All baby and pregnancy scans at Medicana Winchester are performed by specialist sonographers in a warm, private setting. Family members are welcome to attend.</p>
+
+          <div class="preg-grid">
+            <div class="preg-card">
+              <div class="preg-head">
+                <div class="preg-week">6–15 WEEKS</div>
+                <div class="preg-name">Early Pregnancy Scan</div>
+                <div class="preg-desc">Confirms heartbeat and estimated due date. Reassurance in early pregnancy.</div>
+                <div class="preg-price">£89</div>
+              </div>
+              <div class="preg-body">
+                <div class="preg-features">
+                  <div class="preg-feat">Confirms fetal heartbeat</div>
+                  <div class="preg-feat">Calculates due date</div>
+                  <div class="preg-feat">Single or multiple pregnancy</div>
+                  <div class="preg-feat">2D scan images included</div>
+                </div>
+                <button class="btn-preg">Book this scan</button>
+              </div>
+            </div>
+
+            <div class="preg-card featured">
+              <div class="preg-head" style="border-bottom-color:#fce7f3">
+                <div class="preg-week">24–34 WEEKS</div>
+                <div class="preg-name">4D Baby Scan <span style="font-size:10px;background:#fce7f3;color:#e84393;padding:2px 7px;border-radius:4px;font-weight:700;margin-left:4px">MOST POPULAR</span></div>
+                <div class="preg-desc">Watch your baby move, yawn and smile in real-time HD. An experience you will never forget.</div>
+                <div class="preg-price">£149</div>
+              </div>
+              <div class="preg-body">
+                <div class="preg-features">
+                  <div class="preg-feat">4D HD live video of baby</div>
+                  <div class="preg-feat">Gender reveal (optional)</div>
+                  <div class="preg-feat">Wellbeing report included</div>
+                  <div class="preg-feat">Colour prints and digital images</div>
+                </div>
+                <button class="btn-preg">Book this scan</button>
+              </div>
+            </div>
+
+            <div class="preg-card">
+              <div class="preg-head">
+                <div class="preg-week">15–40 WEEKS</div>
+                <div class="preg-name">Wellbeing Scan</div>
+                <div class="preg-desc">Checks baby's growth, position, movements and amniotic fluid levels.</div>
+                <div class="preg-price">£99</div>
+              </div>
+              <div class="preg-body">
+                <div class="preg-features">
+                  <div class="preg-feat">Growth and position check</div>
+                  <div class="preg-feat">Amniotic fluid assessment</div>
+                  <div class="preg-feat">Fetal movements noted</div>
+                  <div class="preg-feat">Gender reveal (optional)</div>
+                </div>
+                <button class="btn-preg">Book this scan</button>
+              </div>
+            </div>
+
+            <div class="preg-card">
+              <div class="preg-head">
+                <div class="preg-week">FROM 10 WEEKS</div>
+                <div class="preg-name">NIPT Blood Test</div>
+                <div class="preg-desc">Non-invasive prenatal screening for Down's, Edwards' and Patau's syndromes.</div>
+                <div class="preg-price">£399</div>
+              </div>
+              <div class="preg-body">
+                <div class="preg-features">
+                  <div class="preg-feat">99%+ accuracy</div>
+                  <div class="preg-feat">Wellbeing scan included</div>
+                  <div class="preg-feat">Gender reveal optional</div>
+                  <div class="preg-feat">Results in 5–7 working days</div>
+                </div>
+                <button class="btn-preg">Book this scan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+
+        <!-- QUICK BOOK -->
+        <div class="scard">
+          <div class="scard-title">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Book an appointment
+          </div>
+
+          <select class="qb-scan-select">
+            <option>MRI Scan (1 body part) — £275</option>
+            <option>MRI Scan (2 body parts) — £445</option>
+            <option>MRI Scan (3 body parts) — £575</option>
+            <option>MRI Scan (Full Body) — £1,450</option>
+            <option>CT Scan — from £199</option>
+            <option>Ultrasound — from £99</option>
+            <option>X-Ray — £75</option>
+            <option>4D Baby Scan — £149</option>
+            <option>Early Pregnancy Scan — £89</option>
+          </select>
+
+          <div style="font-size:11px;color:#bbb;letter-spacing:1.5px;margin-bottom:8px;font-weight:500">PREFERRED DATE</div>
+          <div class="qb-date">
+            <button class="qb-date-btn on"><span class="qb-date-day">Today</span><span class="qb-date-date">30 Apr</span></button>
+            <button class="qb-date-btn"><span class="qb-date-day">Thu</span><span class="qb-date-date">1 May</span></button>
+            <button class="qb-date-btn"><span class="qb-date-day">Fri</span><span class="qb-date-date">2 May</span></button>
+            <button class="qb-date-btn"><span class="qb-date-day">Sat</span><span class="qb-date-date">3 May</span></button>
+          </div>
+
+          <button class="btn-qb">Check Availability</button>
+
+          <div class="qb-guarantees">
+            <div class="qb-g">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              CQC registered centre
+            </div>
+            <div class="qb-g">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/></svg>
+              Free cancellation up to 24 hours before
+            </div>
+            <div class="qb-g">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              Secure payment via Stripe
+            </div>
+          </div>
+        </div>
+
+        <!-- LOCATION -->
+        <div class="scard">
+          <div class="scard-title">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Location
+          </div>
+          <div class="map-box"><div class="map-pin">🗺️</div></div>
+          <div class="map-info">
+            Carfax House, 28 The Square<br>
+            Winchester, Hampshire<br>
+            SO23 9EX<br>
+            <span style="color:var(--teal);font-size:12px">5 min walk from Winchester station</span>
+          </div>
+          <button class="btn-dir">Get Directions →</button>
+        </div>
+
+        <!-- HOURS -->
+        <div class="scard">
+          <div class="scard-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Opening Hours
+          </div>
+          <div>
+            <div class="hour-row today"><span class="hour-day">Wednesday (today)</span><span class="hour-time">8am – 7pm ●</span></div>
+            <div class="hour-row"><span class="hour-day">Thursday</span><span class="hour-time">8am – 7pm</span></div>
+            <div class="hour-row"><span class="hour-day">Friday</span><span class="hour-time">8am – 6pm</span></div>
+            <div class="hour-row"><span class="hour-day">Saturday</span><span class="hour-time">9am – 4pm</span></div>
+            <div class="hour-row"><span class="hour-day">Sunday</span><span class="hour-time">Closed</span></div>
+            <div class="hour-row"><span class="hour-day">Monday</span><span class="hour-time">8am – 7pm</span></div>
+          </div>
+        </div>
+
+        <!-- FACILITIES -->
+        <div class="scard">
+          <div class="scard-title">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Facilities
+          </div>
+          <div class="feature-list">
+            <div class="feature-item"><div class="feature-icon">🧲</div>3T MRI Scanner (Siemens)</div>
+            <div class="feature-item"><div class="feature-icon">🔬</div>CT and Ultrasound Suite</div>
+            <div class="feature-item"><div class="feature-icon">👶</div>Dedicated Baby Scan Room</div>
+            <div class="feature-item"><div class="feature-icon">♿</div>Wheelchair accessible</div>
+            <div class="feature-item"><div class="feature-icon">🅿️</div>Free parking on-site</div>
+            <div class="feature-item"><div class="feature-icon">🚉</div>5 min from Winchester station</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT TAB -->
+<div id="tab-about" style="display:none">
+  <div class="about-grid">
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;color:#bbb;margin-bottom:12px">ABOUT THE CENTRE</div>
+      <h2 style="font-family:'Instrument Serif',serif;font-size:32px;letter-spacing:-.5px;margin-bottom:20px;color:var(--black)">Medicana Diagnostic Centre<br><em style="font-style:italic;color:var(--teal)">Winchester</em></h2>
+      <div class="about-body">
+        <p>Medicana Diagnostic Centre Winchester is a CQC registered private imaging facility offering a full range of diagnostic and screening services in the heart of Hampshire. We provide fast access to expert imaging without the need for a GP referral.</p>
+        <p>Our centre is equipped with a Siemens 3 Tesla MRI scanner, a low-dose CT system, and dedicated ultrasound suites. All scans are reported by UK Consultant Radiologists with subspecialty expertise.</p>
+        <p>We also have a warm, private Baby Scan suite where partners and family members are welcome. Our sonographers are BMUS registered and experienced in all stages of pregnancy.</p>
+      </div>
+    </div>
+    <div>
+      <div class="about-stats">
+        <div class="astat"><div class="astat-n">3T</div><div class="astat-l">MRI Scanner</div></div>
+        <div class="astat"><div class="astat-n">4.9★</div><div class="astat-l">Patient Rating</div></div>
+        <div class="astat"><div class="astat-n">24h</div><div class="astat-l">Report Turnaround</div></div>
+        <div class="astat"><div class="astat-n">CQC ✓</div><div class="astat-l">Registered</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEWS TAB -->
+<div id="tab-reviews" style="display:none">
+  <div class="rv-section">
+    <div style="font-size:10px;letter-spacing:3px;color:#bbb;margin-bottom:12px">PATIENT REVIEWS</div>
+    <h2 style="font-family:'Instrument Serif',serif;font-size:30px;letter-spacing:-.5px;color:var(--black)">What our patients say</h2>
+    <div class="rv-grid">
+      <div class="rv"><div class="rv-stars">★★★★★</div><p class="rv-text">"The 3T MRI was recommended for my knee and the image quality was exceptional. The radiologist's report was detailed and arrived within 24 hours. Highly recommend Medicana Winchester."</p><div class="rv-author"><div class="rv-av">TH</div><div><div class="rv-name">Thomas H.</div><div class="rv-tag">MRI Knee &nbsp;·&nbsp; Winchester</div></div></div></div>
+      <div class="rv"><div class="rv-stars">★★★★★</div><p class="rv-text">"Booked my 4D baby scan here and it was a truly special experience. The sonographer was brilliant and the room was lovely and relaxed. We got to bring both sets of grandparents."</p><div class="rv-author"><div class="rv-av">EL</div><div><div class="rv-name">Emma L.</div><div class="rv-tag">4D Baby Scan &nbsp;·&nbsp; Winchester</div></div></div></div>
+      <div class="rv"><div class="rv-stars">★★★★★</div><p class="rv-text">"After months of back pain I finally had clarity. CT scan done the same day I called. Parking was easy, staff were kind, and the report was with my GP by the following morning."</p><div class="rv-author"><div class="rv-av">RB</div><div><div class="rv-name">Robert B.</div><div class="rv-tag">CT Scan &nbsp;·&nbsp; Winchester</div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATION TAB -->
+<div id="tab-location" style="display:none;padding:40px 48px;max-width:1180px;margin:0 auto">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px">
+    <div>
+      <div style="background:linear-gradient(135deg,#eef2f8,#e8eef7);border-radius:16px;height:300px;display:grid;place-items:center;border:1px solid #dce4f0;font-size:48px;margin-bottom:16px">🗺️</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.8">
+        <strong style="color:var(--black);display:block;margin-bottom:4px">Medicana Diagnostic Centre Winchester</strong>
+        Carfax House, 28 The Square<br>Winchester, Hampshire SO23 9EX<br><br>
+        <strong style="color:var(--black)">By train:</strong> 5 minute walk from Winchester station<br>
+        <strong style="color:var(--black)">By car:</strong> Free parking on-site, follow signs to The Square<br>
+        <strong style="color:var(--black)">By bus:</strong> Routes 1, 2 and X64 stop on High Street
+      </div>
+    </div>
+    <div>
+      <div style="font-size:16px;font-weight:600;color:var(--black);margin-bottom:20px">Opening Hours</div>
+      <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <div class="hour-row today" style="padding:12px 16px"><span class="hour-day">Wednesday (today)</span><span class="hour-time">8am – 7pm ●</span></div>
+        <div class="hour-row" style="padding:12px 16px"><span class="hour-day">Thursday</span><span class="hour-time">8am – 7pm</span></div>
+        <div class="hour-row" style="padding:12px 16px"><span class="hour-day">Friday</span><span class="hour-time">8am – 6pm</span></div>
+        <div class="hour-row" style="padding:12px 16px"><span class="hour-day">Saturday</span><span class="hour-time">9am – 4pm</span></div>
+        <div class="hour-row" style="padding:12px 16px"><span class="hour-day">Sunday</span><span class="hour-time">Closed</span></div>
+        <div class="hour-row" style="padding:12px 16px"><span class="hour-day">Monday</span><span class="hour-time">8am – 7pm</span></div>
+        <div class="hour-row" style="padding:12px 16px;border-bottom:none"><span class="hour-day">Tuesday</span><span class="hour-time">8am – 7pm</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="foot">
+  <div class="foot-left">
+    <div style="font-size:13px;color:rgba(255,255,255,.5)">Medicana Diagnostic Centre Winchester</div>
+    <span class="foot-sep">·</span>
+    <div class="foot-copy">CQC Registered · Carfax House, Winchester SO23 9EX</div>
+  </div>
+  <div class="foot-powered">
+    Booking powered by &nbsp;
+    <span class="foot-pb"><span class="s">Scan</span><span class="b">Book</span></span>
+  </div>
+</div>
+
+<script>
+function showTab(id, el){
+  ['scans','about','reviews','location'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display='none';
+  });
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+id).style.display='block';
+  el.classList.add('on');
+}
+function showScan(id, el){
+  document.querySelectorAll('.scan-panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('scan-'+id).classList.add('on');
+  el.classList.add('on');
+}
+document.querySelectorAll('.qb-date-btn').forEach(b=>{
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.qb-date-btn').forEach(x=>x.classList.remove('on'));
+    this.classList.add('on');
+  });
+});
+</script>
+</body>
+</html>
