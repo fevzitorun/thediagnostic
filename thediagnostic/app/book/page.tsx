@@ -39,10 +39,18 @@ interface BookingState {
   needsConcierge: boolean;
   flightNeeded: boolean;
   hotelNeeded: boolean;
+  hotelNights: string;
   transferNeeded: boolean;
   translatorNeeded: boolean;
   translatorLanguage: string;
   departureCity: string;
+  preferredTravelDate: string;
+  companionCount: string;
+  // Medical add-ons
+  preScanDoctorConsult: boolean;
+  postScanDoctorConsult: boolean;
+  checkUpPackage: boolean;
+  insuranceConsultation: boolean;
   // Step 7: Payment
   currency: string;
 }
@@ -57,8 +65,11 @@ const INITIAL_STATE: BookingState = {
   hasMetalImplants: null, isClaustrophobic: null, isPregnant: null,
   weightKg: '', medicalNotes: '',
   needsConcierge: false,
-  flightNeeded: false, hotelNeeded: false, transferNeeded: false,
-  translatorNeeded: false, translatorLanguage: '', departureCity: '',
+  flightNeeded: false, hotelNeeded: false, hotelNights: '1',
+  transferNeeded: false, translatorNeeded: false, translatorLanguage: '',
+  departureCity: '', preferredTravelDate: '', companionCount: '0',
+  preScanDoctorConsult: false, postScanDoctorConsult: false,
+  checkUpPackage: false, insuranceConsultation: false,
   currency: 'GBP',
 };
 
@@ -153,10 +164,14 @@ const CURRENCIES = [
 ];
 
 const CONCIERGE_ITEMS = [
-  { key: 'flightNeeded', icon: '✈️', label: 'Flight Search', desc: 'Best fares from your departure city', price: 'Free (Amadeus)' },
-  { key: 'hotelNeeded', icon: '🏨', label: 'Hotel near Clinic', desc: '1–3 nights, any budget', price: 'From £60/night' },
-  { key: 'transferNeeded', icon: '🚗', label: 'Airport Transfer', desc: 'Private car to clinic & back', price: '£35–£60' },
-  { key: 'translatorNeeded', icon: '🗣️', label: 'Medical Translator', desc: 'Arabic, German, French & more', price: 'From £80' },
+  { key: 'flightNeeded',          icon: '✈️', label: 'Flight Search',              desc: 'Best return fares from your departure city',              price: 'Free assistance' },
+  { key: 'hotelNeeded',           icon: '🏨', label: 'Hotel near Clinic',           desc: '1–3 nights, budget to luxury options',                    price: 'From £60/night' },
+  { key: 'transferNeeded',        icon: '🚗', label: 'Airport Transfer',            desc: 'Private car: airport → clinic → airport',                 price: '£35–£60' },
+  { key: 'translatorNeeded',      icon: '🗣️', label: 'Medical Translator',          desc: 'English, Arabic, German, French & more',                  price: 'From £80' },
+  { key: 'preScanDoctorConsult',  icon: '👨‍⚕️', label: 'Pre-scan Doctor Consultation', desc: 'Video call with a specialist before your appointment',   price: 'From £60' },
+  { key: 'postScanDoctorConsult', icon: '📋', label: 'Post-scan Report Review',     desc: 'Doctor explains your results & advises next steps',       price: 'From £60' },
+  { key: 'checkUpPackage',        icon: '🩺', label: 'Health Check-up Package',     desc: 'Blood, urine, ECG & consultation — add to your visit',    price: 'From £120' },
+  { key: 'insuranceConsultation', icon: '📄', label: 'Insurance Consultation',      desc: 'We liaise with your insurer and handle pre-authorisation', price: 'Free' },
 ];
 
 const STEPS = [
@@ -721,6 +736,55 @@ export default function BookPage() {
                   </select>
                 </div>
               )}
+
+              {/* Hotel nights */}
+              {booking.hotelNeeded && (
+                <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: 22, marginBottom: 14 }}>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', display: 'block', marginBottom: 8 }}>
+                    How many nights?
+                  </label>
+                  <select
+                    value={booking.hotelNights}
+                    onChange={e => update({ hotelNights: e.target.value })}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1.5px solid var(--line)', fontSize: 14, background: '#fff', color: 'var(--text)' }}>
+                    {['1', '2', '3', '4', '5', '6', '7'].map(n => (
+                      <option key={n} value={n}>{n} night{n !== '1' ? 's' : ''}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Travel planning details */}
+              <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: 22, marginBottom: 14 }}>
+                <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text)', marginBottom: 16 }}>Travel Planning Details</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <div>
+                    <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', display: 'block', marginBottom: 6 }}>
+                      Preferred travel date
+                    </label>
+                    <input
+                      type="date"
+                      value={booking.preferredTravelDate}
+                      onChange={e => update({ preferredTravelDate: e.target.value })}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1.5px solid var(--line)', fontSize: 14, background: '#fff', color: 'var(--text)', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', display: 'block', marginBottom: 6 }}>
+                      Travelling with companions?
+                    </label>
+                    <select
+                      value={booking.companionCount}
+                      onChange={e => update({ companionCount: e.target.value })}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1.5px solid var(--line)', fontSize: 14, background: '#fff', color: 'var(--text)' }}>
+                      <option value="0">Travelling alone</option>
+                      <option value="1">1 companion</option>
+                      <option value="2">2 companions</option>
+                      <option value="3">3+ companions</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
               <div style={{ background: 'var(--bg-2)', borderRadius: 12, padding: '14px 18px', fontSize: 13, color: 'var(--text-muted)' }}>
                 ✈️ Most UK patients fly London → Istanbul for under £150 return (1h40 direct). No concierge? No problem — skip this step and we&apos;ll send you clinic directions and local hotel suggestions by email.

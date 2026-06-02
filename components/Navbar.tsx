@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
 const NAV_LINKS = [
-  { label: 'Services',        href: '/services' },
-  { label: 'Find a Centre',   href: '/search' },
+  { label: 'Scans',           href: '/services' },
+  { label: 'Centres',         href: '/centres' },
   { label: 'How it works',    href: '/#how-it-works' },
   { label: 'For Clinicians',  href: '/for-gps' },
   { label: 'Blog',            href: '/blog' },
