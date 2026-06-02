@@ -282,6 +282,8 @@ function YesNoButton({ label, value, selected, onClick }: { label: string; value
 export default function BookPage() {
   const [step, setStep] = useState(1);
   const [booking, setBooking] = useState<BookingState>(INITIAL_STATE);
+  const [submitting, setSubmitting] = useState(false);
+  const [payError, setPayError] = useState('');
 
   const update = (fields: Partial<BookingState>) => setBooking(prev => ({ ...prev, ...fields }));
   const next = () => setStep(s => Math.min(s + 1, 7));
@@ -290,6 +292,46 @@ export default function BookPage() {
   const slots = generateSlots(booking.scanType);
   const selectedClinic = CLINICS.find(c => c.id === booking.clinicId);
   const clinicPrice = selectedClinic?.prices[booking.scanType] ?? 0;
+
+  async function handlePayment() {
+    setPayError('');
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clinicSlug: booking.clinicSlug,
+          clinicName: booking.clinicName,
+          clinicCity: booking.city,
+          packageName: booking.scanName,
+          bodyPart: '',
+          side: '',
+          date: booking.selectedDate,
+          time: booking.selectedTime,
+          reportHours: selectedClinic?.turnaround === '18h report' ? 18 : 24,
+          amount: clinicPrice,
+          addConsultation: booking.postScanDoctorConsult,
+          consultationPrice: 60,
+          patientName: `${booking.firstName} ${booking.lastName}`,
+          patientEmail: booking.email,
+          patientPhone: booking.phone,
+          patientDob: booking.dateOfBirth,
+          scanReason: booking.medicalNotes,
+        }),
+      });
+      if (!res.ok) throw new Error('Server error');
+      const { url } = await res.json() as { url?: string };
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error('No checkout URL');
+      }
+    } catch {
+      setPayError('Payment could not be initiated. Please try again or contact us on WhatsApp.');
+      setSubmitting(false);
+    }
+  }
 
   // ── Nav Buttons ──
   const NavButtons = ({ canNext, nextLabel = 'Continue →' }: { canNext: boolean; nextLabel?: string }) => (
@@ -891,13 +933,21 @@ export default function BookPage() {
                     <span>✓ PCI DSS</span>
                   </div>
 
-                  <button style={{
-                    width: '100%', background: 'var(--accent)', color: '#fff',
-                    border: 'none', borderRadius: 12, padding: '16px 0',
-                    fontSize: 17, fontWeight: 700, cursor: 'pointer',
-                    marginBottom: 12,
-                  }}>
-                    Pay £{clinicPrice.toLocaleString()} & Confirm Booking →
+                  {payError && (
+                    <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#C0392B' }}>
+                      {payError}
+                    </div>
+                  )}
+                  <button
+                    onClick={handlePayment}
+                    disabled={submitting}
+                    style={{
+                      width: '100%', background: submitting ? '#aaa' : 'var(--accent)', color: '#fff',
+                      border: 'none', borderRadius: 12, padding: '16px 0',
+                      fontSize: 17, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer',
+                      marginBottom: 12, transition: 'background 0.2s',
+                    }}>
+                    {submitting ? 'Redirecting to payment…' : `Pay £${clinicPrice.toLocaleString()} & Confirm Booking →`}
                   </button>
 
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.6 }}>
