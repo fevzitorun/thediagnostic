@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "scans": "Tarama Türleri",
+    "clinics": "Klinikler",
+    "destinations": "Destinasyonlar",
+    "howItWorks": "Nasıl Çalışır",
+    "blog": "Blog",
+    "bookNow": "Randevu Al",
+    "myAccount": "Hesabım",
+    "whatsapp": "WhatsApp'tan Yaz"
+  },
+  "hero": {
+    "badge": "Avrupa ve İngiltere'den hastalara %70'e varan tasarruf",
+    "title": "Dünya Standartında Tıbbi Görüntüleme,",
+    "titleAccent": "Bekleme Olmadan",
+    "subtitle": "PET-BT, 3T MRI, GammaKnife ve daha fazlası — JCI akredite kliniklerde. Hızlı randevu, uzman radyologlar, 24 saatte sonuç.",
+    "cta": "Müsait Slot Bul",
+    "ctaSecondary": "Nasıl Çalışır",
+    "trustLine": "İngiltere, Almanya, BAE'den hastalar güveniyor · JCI Akredite Klinikler"
+  },
+  "scans": {
+    "title": "İleri Tanı Cihazları",
+    "subtitle": "Avrupa'da uzun bekleme listesi gerektiren teknolojiler — Türkiye'de 3-7 gün içinde"
+  },
+  "savings": {
+    "vsUK": "İngiltere özel fiyatına kıyasla",
+    "save": "Tasarruf edin"
+  },
+  "clinics": {
+    "title": "Anlaşmalı Klinikler",
+    "subtitle": "Titizlikle seçilmiş, uluslararası akredite tanı merkezleri",
+    "viewAll": "Tüm Klinikleri Gör"
+  },
+  "howItWorks": {
+    "title": "Nasıl Çalışır",
+    "subtitle": "Semptomdan taramaya 3 basit adımda",
+    "step1Title": "İhtiyacınızı Anlatın",
+    "step1Desc": "Semptomlarınızı veya doktorunuzun önerdiği taramayı belirtin. AI danışmanımız sizi doğru tarama ve klinikle eşleştirir.",
+    "step2Title": "Seçin & Rezervasyon Yapın",
+    "step2Desc": "Akredite kliniklerdeki müsait slotlara göz atın. Fiyatları karşılaştırın, incelemeleri okuyun ve anında rezervasyon yapın.",
+    "step3Title": "Taranın & Sonuçları Alın",
+    "step3Desc": "Randevunuza uçun. Uzman radyologlar tarafından taranın. 24 saat içinde İngilizce raporunuzu alın."
+  },
+  "concierge": {
+    "title": "Hepsi Dahil Konkierge",
+    "subtitle": "Uçuş, otel, havalimanı transferi ve tıbbi tercümanı biz ayarlarız — siz sadece sağlığınıza odaklanın.",
+    "cta": "Konkierge Paketi Ekle"
+  },
+  "testimonials": {
+    "title": "Hasta Hikayeleri",
+    "subtitle": "Avrupa genelindeki hastalardan gerçek deneyimler"
+  },
+  "footer": {
+    "tagline": "İleri tanı. Bekleme listesi yok. Kalite yok sayılmaz.",
+    "company": "© 2026 Connective Hub Dijital Teknolojiler A.Ş. & Connective Hub Limited."
+  }
+}
