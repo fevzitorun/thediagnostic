@@ -122,30 +122,51 @@ const HOW_IT_WORKS = [
   {
     step: '01',
     icon: '💬',
-    title: 'Describe Your Needs',
-    desc: 'Tell us your symptoms or the scan your doctor recommended. Our AI advisor instantly matches you with the right scan type and accredited clinic.',
+    title: 'Request',
+    desc: 'Tell us your symptoms or the scan your doctor recommended. Our AI and clinical team identify the best technology for your specific case.',
     color: '#17A589',
   },
   {
     step: '02',
-    icon: '📅',
-    title: 'Choose & Book',
-    desc: 'Browse real-time available slots. Compare prices, read clinic reviews, and book instantly — no referral letter required.',
+    icon: '🧠',
+    title: 'Analyse',
+    desc: 'Not all MRI machines are the same. We identify the exact device suited to your condition — 3T Prisma, PET-MRI, Flash CT or GammaKnife.',
     color: '#1B4F72',
   },
   {
     step: '03',
-    icon: '✈️',
-    title: 'Travel & Scan',
-    desc: 'Fly to Istanbul. Our concierge team can arrange airport transfer, hotel and medical translator. Your scan is with subspecialist radiologists.',
+    icon: '🌍',
+    title: 'Source',
+    desc: 'We scan our network across the UK and Istanbul to find the soonest availability at the best price — with the right machine, not just any machine.',
     color: '#E67E22',
   },
   {
     step: '04',
     icon: '📄',
-    title: 'Receive Your Report',
-    desc: 'Get your full radiology report in English within 24 hours. AI-powered plain-language summary included. GP letter template available.',
+    title: 'Execute',
+    desc: 'We book your slot, manage your travel if needed, and deliver your UK-standard radiology report within 24 hours. GP letter included.',
     color: '#17A589',
+  },
+];
+
+const WHY_US = [
+  {
+    icon: '🧠',
+    title: 'The Technology Broker',
+    headline: 'Precision Matching',
+    body: 'Not all MRI machines are the same. A standard scan might miss what a 3 Tesla Prisma reveals. Our platform directs you to the exact device suited to your condition — cardiac precision, oncological detail, or orthopaedic clarity.',
+  },
+  {
+    icon: '🌍',
+    title: 'The Global Inventory',
+    headline: 'Borderless Excellence',
+    body: "Why wait weeks for standard care when you can access world-class technology tomorrow? We manage idle capacity across a global network of Centres of Excellence — from UK partners to high-tech hubs in Istanbul.",
+  },
+  {
+    icon: '🤝',
+    title: 'The Concierge Experience',
+    headline: 'End-to-End Care',
+    body: 'We handle more than just the appointment. From VIP transfers and hotel to ensuring your reports meet strict UK clinical standards — our team manages the entire process. You focus on your health.',
   },
 ];
 
@@ -367,9 +388,70 @@ export default function HomePage() {
         </div>
 
         {/* ══════════════════════════════════════════════
-            SCAN TYPES
+            WHY THE DIAGNOSTIC
         ══════════════════════════════════════════════ */}
         <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+                WHY THE DIAGNOSTIC
+              </div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 16 }}>
+                Beyond Booking: Intelligent Diagnostic Access
+              </h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 17, maxWidth: 600, margin: '0 auto', lineHeight: 1.7 }}>
+                We don&apos;t just find you a slot. We match your specific medical needs with the world&apos;s most advanced diagnostic technology.
+              </p>
+            </div>
+
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28,
+            }}>
+              {WHY_US.map(item => (
+                <div key={item.title} style={{
+                  background: '#fff',
+                  border: '1px solid var(--line)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 32,
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}>
+                  {/* Accent top bar */}
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+                    background: 'linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%)',
+                  }} />
+                  <div style={{ fontSize: 36, marginBottom: 16 }}>{item.icon}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
+                    {item.title}
+                  </div>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--primary)', marginBottom: 12 }}>
+                    {item.headline}
+                  </h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.75 }}>
+                    {item.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Slogan */}
+            <div style={{ textAlign: 'center', marginTop: 44 }}>
+              <p style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'clamp(18px, 2.5vw, 26px)',
+                color: 'var(--primary)', fontStyle: 'italic',
+              }}>
+                &ldquo;Don&apos;t just scan. Scan with the best.&rdquo;
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
+            SCAN TYPES
+        ══════════════════════════════════════════════ */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg-2)' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div style={{ marginBottom: 48 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
@@ -469,19 +551,19 @@ export default function HomePage() {
         </section>
 
         {/* ══════════════════════════════════════════════
-            HOW IT WORKS
+            HOW IT WORKS — THE BROKERAGE FLOW
         ══════════════════════════════════════════════ */}
-        <section style={{ padding: '80px 24px', background: 'var(--bg-2)' }}>
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 56 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
-                HOW IT WORKS
+                THE BROKERAGE FLOW
               </div>
               <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 12 }}>
-                From Symptom to Scan Report in Days
+                You Request. We Source the Best.
               </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 500, margin: '0 auto' }}>
-                We handle everything — booking, travel, translation and report delivery.
+              <p style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 520, margin: '0 auto' }}>
+                From symptom to scan report in days — with the right technology, not just the nearest available slot.
               </p>
             </div>
 
