@@ -42,19 +42,9 @@ export default function Navbar() {
       }}>
         {/* Logo */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, textDecoration: 'none' }}>
-          {/* Circuit-pin logo mark */}
-          <svg width="38" height="42" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M148 38 C132 18, 108 8, 82 8 C46 8, 16 38, 16 74 C16 100, 30 122, 52 137 L82 162 L112 137 C134 122, 148 100, 148 74 C148 66, 146 59, 143 52"
-              stroke="white" strokeWidth="8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M152 32 C158 24, 162 14, 158 6" stroke="white" strokeWidth="8" fill="none" strokeLinecap="round"/>
-            <circle cx="90" cy="44" r="7" fill="white"/>
-            <line x1="90" y1="51" x2="90" y2="72" stroke="white" strokeWidth="5" strokeLinecap="round"/>
-            <path d="M90 72 Q104 76, 108 90" stroke="white" strokeWidth="5" fill="none" strokeLinecap="round"/>
-            <circle cx="108" cy="96" r="10" fill="white"/>
-            <line x1="78" y1="80" x2="50" y2="116" stroke="white" strokeWidth="5" strokeLinecap="round"/>
-            <circle cx="50" cy="116" r="6" stroke="white" strokeWidth="4" fill="none"/>
-            <circle cx="78" cy="80" r="6" fill="white"/>
-          </svg>
+          {/* Real logo mark */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo-mark.png" alt="" width={36} height={36} style={{ objectFit: 'contain' }} />
           <div style={{ lineHeight: 1.1 }}>
             <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 10, fontWeight: 400, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>The</div>
             <div style={{ color: '#fff', fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', fontFamily: 'var(--font-body)' }}>Diagnostic</div>

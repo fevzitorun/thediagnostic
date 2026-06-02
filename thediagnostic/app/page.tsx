@@ -203,90 +203,137 @@ export default function HomePage() {
             HERO
         ══════════════════════════════════════════════ */}
         <section style={{
-          background: 'linear-gradient(135deg, var(--primary-3) 0%, var(--primary) 50%, #1a6e94 100%)',
-          padding: '96px 24px 80px',
+          background: 'linear-gradient(135deg, #0d2d44 0%, var(--primary) 60%, #1a6e94 100%)',
+          padding: '80px 24px 64px',
           position: 'relative',
           overflow: 'hidden',
         }}>
-          {/* Background decoration */}
+          {/* Subtle dot grid */}
           <div style={{
-            position: 'absolute', inset: 0, opacity: 0.04,
-            backgroundImage: 'radial-gradient(circle at 20% 50%, #fff 1px, transparent 1px), radial-gradient(circle at 80% 20%, #fff 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
+            position: 'absolute', inset: 0, opacity: 0.03,
+            backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
           }} />
 
-          <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
-            {/* Badge */}
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'rgba(23,165,137,0.2)', border: '1px solid rgba(23,165,137,0.4)',
-              borderRadius: 100, padding: '6px 16px', marginBottom: 28,
-            }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#17A589', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-              <span style={{ color: '#5DEDE0', fontSize: 13, fontWeight: 500 }}>
-                UK patients save up to 70% on advanced diagnostics
-              </span>
-            </div>
-
-            {/* Headline */}
-            <h1 style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(38px, 6vw, 72px)',
-              color: '#fff',
-              lineHeight: 1.1,
-              marginBottom: 12,
-              maxWidth: 800,
-            }}>
-              World-Class Medical Imaging,{' '}
-              <span style={{ color: '#5DEDE0' }}>Without the Wait</span>
-            </h1>
-
-            <p style={{
-              fontSize: 'clamp(16px, 2vw, 20px)',
-              color: 'rgba(255,255,255,0.75)',
-              maxWidth: 600,
-              lineHeight: 1.7,
-              marginBottom: 40,
-            }}>
-              PET-CT, MRI 3T, GammaKnife and more — at JCI-accredited clinics in Istanbul.
-              Fast appointments, expert radiologists, results in English within 24 hours.
-            </p>
-
-            {/* CTA Buttons */}
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 48 }}>
-              <Link href="/book" style={{
-                background: 'var(--accent)', color: '#fff',
-                padding: '14px 28px', borderRadius: 10,
-                fontSize: 16, fontWeight: 600,
+          <div style={{
+            maxWidth: 1100, margin: '0 auto', position: 'relative',
+            display: 'grid', gridTemplateColumns: '1fr 480px', gap: 48, alignItems: 'center',
+          }}>
+            {/* LEFT: Text */}
+            <div>
+              {/* Badge */}
+              <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
+                background: 'rgba(23,165,137,0.18)', border: '1px solid rgba(23,165,137,0.35)',
+                borderRadius: 100, padding: '5px 14px', marginBottom: 24,
               }}>
-                Find Available Slots →
-              </Link>
-              <Link href="/scan/pet-ct" style={{
-                background: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                color: '#fff', padding: '14px 28px', borderRadius: 10,
-                fontSize: 16, fontWeight: 500,
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#17A589', display: 'inline-block' }} />
+                <span style={{ color: '#5DEDE0', fontSize: 13, fontWeight: 500 }}>
+                  Medical Tech Broker · UK · Turkey · UAE
+                </span>
+              </div>
+
+              {/* Headline */}
+              <h1 style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'clamp(34px, 5vw, 62px)',
+                color: '#fff',
+                lineHeight: 1.12,
+                marginBottom: 16,
               }}>
-                See Scan Types
-              </Link>
+                Advanced Diagnostics,{' '}
+                <span style={{ color: '#5DEDE0' }}>Without the Wait</span>
+              </h1>
+
+              <p style={{
+                fontSize: 'clamp(15px, 1.6vw, 18px)',
+                color: 'rgba(255,255,255,0.72)',
+                lineHeight: 1.75,
+                marginBottom: 36,
+                maxWidth: 520,
+              }}>
+                PET-CT, MRI 3T, GammaKnife and 70+ advanced imaging technologies —
+                at JCI-accredited partner clinics in Istanbul. Results in English within 24 hours.
+                Up to 70% less than UK private prices.
+              </p>
+
+              {/* CTA Buttons */}
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 44 }}>
+                <Link href="/book" style={{
+                  background: 'var(--accent)', color: '#fff',
+                  padding: '13px 26px', borderRadius: 10,
+                  fontSize: 15, fontWeight: 600,
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                }}>
+                  Find Available Slots →
+                </Link>
+                <Link href="/scan/pet-ct" style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  color: '#fff', padding: '13px 26px', borderRadius: 10,
+                  fontSize: 15, fontWeight: 500,
+                }}>
+                  See Scan Types
+                </Link>
+              </div>
+
+              {/* Stats Strip */}
+              <div style={{
+                display: 'grid', gridTemplateColumns: 'repeat(4, auto)',
+                gap: 28, justifyContent: 'start',
+              }}>
+                {STATS.map(stat => (
+                  <div key={stat.label} style={{ borderLeft: '2px solid rgba(93,237,224,0.3)', paddingLeft: 14 }}>
+                    <div style={{ fontSize: 'clamp(18px, 2.5vw, 26px)', fontWeight: 700, color: '#5DEDE0', fontFamily: 'var(--font-serif)' }}>
+                      {stat.value}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Stats Strip */}
+            {/* RIGHT: Hero image */}
             <div style={{
-              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: 24, maxWidth: 700,
+              position: 'relative',
+              borderRadius: 20,
+              overflow: 'hidden',
+              boxShadow: '0 32px 80px rgba(0,0,0,0.5)',
+              aspectRatio: '4/3',
             }}>
-              {STATS.map(stat => (
-                <div key={stat.label}>
-                  <div style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 700, color: '#5DEDE0', fontFamily: 'var(--font-serif)' }}>
-                    {stat.value}
-                  </div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
-                    {stat.label}
-                  </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/hero-scanner.jpg"
+                alt="Advanced medical diagnostic technology"
+                style={{
+                  width: '100%', height: '100%',
+                  objectFit: 'cover', objectPosition: 'center',
+                  display: 'block',
+                }}
+              />
+              {/* Gradient overlay at bottom for text legibility */}
+              <div style={{
+                position: 'absolute', bottom: 0, left: 0, right: 0,
+                height: '40%',
+                background: 'linear-gradient(to top, rgba(13,45,68,0.85) 0%, transparent 100%)',
+              }} />
+              {/* Float tag */}
+              <div style={{
+                position: 'absolute', bottom: 20, left: 20, right: 20,
+                display: 'flex', alignItems: 'center', gap: 10,
+                background: 'rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 12, padding: '10px 16px',
+              }}>
+                <span style={{ fontSize: 22 }}>🔬</span>
+                <div>
+                  <div style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>PET-CT · MRI 3T · GammaKnife</div>
+                  <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11 }}>JCI-accredited partner clinics · Istanbul</div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </section>

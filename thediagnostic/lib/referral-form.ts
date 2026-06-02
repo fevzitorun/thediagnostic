@@ -133,17 +133,23 @@ export function generateReferralFormHtml(data: ReferralFormData): string {
   <!-- Header -->
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #2B7A9E">
     <div style="display:flex;align-items:center;gap:12px">
-      <svg width="44" height="50" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M148 38 C132 18, 108 8, 82 8 C46 8, 16 38, 16 74 C16 100, 30 122, 52 137 L82 162 L112 137 C134 122, 148 100, 148 74 C148 66, 146 59, 143 52"
-          stroke="#2B7A9E" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M152 32 C158 24, 162 14, 158 6" stroke="#2B7A9E" stroke-width="8" fill="none" stroke-linecap="round"/>
-        <circle cx="90" cy="44" r="7" fill="#2B7A9E"/>
-        <line x1="90" y1="51" x2="90" y2="72" stroke="#2B7A9E" stroke-width="5" stroke-linecap="round"/>
-        <path d="M90 72 Q104 76, 108 90" stroke="#2B7A9E" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <circle cx="108" cy="96" r="10" fill="#2B7A9E"/>
-        <line x1="78" y1="80" x2="50" y2="116" stroke="#2B7A9E" stroke-width="5" stroke-linecap="round"/>
-        <circle cx="50" cy="116" r="6" stroke="#2B7A9E" stroke-width="4" fill="none"/>
-        <circle cx="78" cy="80" r="6" fill="#2B7A9E"/>
+      <svg width="44" height="44" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Pin outline: D-shape open at top-right, pointed at bottom -->
+        <path d="M88 22 C78 10, 62 5, 46 5 C24 5, 6 23, 6 45 C6 62, 16 76, 30 85 L46 100 L62 85 C76 76, 86 62, 86 45 C86 39, 84 34, 82 30"
+          stroke="#3AABDB" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M90 18 C94 12, 96 5, 93 1" stroke="#3AABDB" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <!-- Top node -->
+        <circle cx="54" cy="26" r="5" fill="#3AABDB"/>
+        <!-- Curved line right to large node -->
+        <path d="M54 31 Q64 46, 66 58" stroke="#3AABDB" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <!-- Large right node -->
+        <circle cx="66" cy="60" r="7" fill="#3AABDB"/>
+        <!-- Diagonal probe line lower-left -->
+        <line x1="47" y1="48" x2="28" y2="72" stroke="#3AABDB" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Hollow probe tip -->
+        <circle cx="28" cy="72" r="4" stroke="#3AABDB" stroke-width="3" fill="none"/>
+        <!-- Junction node -->
+        <circle cx="47" cy="48" r="4" fill="#3AABDB"/>
       </svg>
       <div>
         <div style="font-size:10px;color:#666;letter-spacing:0.12em;text-transform:uppercase">The</div>
