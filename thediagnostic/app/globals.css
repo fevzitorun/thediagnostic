@@ -1,6 +1,9 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
 
 :root {
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
   /* thediagnostic Brand Colours */
   --primary:       #1B4F72;   /* Deep navy — main brand */
   --primary-2:     #154360;   /* Darker navy */

@@ -1,20 +1,6 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { Instrument_Serif } from 'next/font/google';
 import './globals.css';
-
-const inter = Inter({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
-const instrumentSerif = Instrument_Serif({
-  weight: '400',
-  subsets: ['latin'],
-  variable: '--font-serif',
-  display: 'swap',
-});
+// Fonts loaded via globals.css Google Fonts link for CDN resilience
 
 export const metadata: Metadata = {
   title: {
@@ -47,7 +33,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${instrumentSerif.variable}`}>
+      <body>
         {children}
       </body>
     </html>

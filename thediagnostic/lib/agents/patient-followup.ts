@@ -46,6 +46,25 @@ const EMAIL_SUBJECTS: Record<FollowUpDay, Record<string, string>> = {
   },
 };
 
+// Aliases used by the API route
+export type FollowUpStage = 'day3' | 'day7' | 'day14' | 'day30';
+
+export interface PatientFollowUpInput {
+  bookingId: string;
+  stage: FollowUpStage;
+  patientData: FollowUpData;
+}
+
+export async function sendPatientFollowUp(input: PatientFollowUpInput): Promise<void> {
+  const stageToDay: Record<FollowUpStage, FollowUpDay> = {
+    day3: 'post_1d',
+    day7: 'post_7d',
+    day14: 'post_7d',
+    day30: 'post_30d',
+  };
+  await sendFollowUpEmail(stageToDay[input.stage], input.patientData);
+}
+
 export async function sendFollowUpEmail(day: FollowUpDay, data: FollowUpData): Promise<void> {
   const locale = data.locale ?? 'en';
 
