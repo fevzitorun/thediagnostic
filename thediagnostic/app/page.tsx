@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import TriageWidget from '@/components/TriageWidget';
+import SavingsCalculator from '@/components/SavingsCalculator';
 
 // ─── Data ───────────────────────────────────────────────────
 
@@ -213,6 +215,51 @@ const CONCIERGE_FEATURES = [
   { icon: '🔄', label: 'GP Letter', desc: 'Report summary for your GP' },
 ];
 
+const DEVICE_CATALOG = [
+  {
+    category: 'Nuclear Medicine',
+    color: '#17A589',
+    bg: '#D1F2EB',
+    icon: '☢️',
+    devices: ['PET-CT (Siemens Biograph)', 'PET-MRI (Siemens Biograph mMR)', 'SPECT-CT', 'Cyclotron F-18', 'MIBG Therapy', 'Lutetium-177 PSMA', 'Ga-68 DOTATATE'],
+  },
+  {
+    category: 'Radiation Therapy',
+    color: '#E67E22',
+    bg: '#FEF9F0',
+    icon: '⚡',
+    devices: ['GammaKnife Icon', 'CyberKnife M6', 'TrueBeam STx', 'Tomotherapy H', 'Proton Therapy', 'Brachytherapy HDR', 'SBRT/SABR'],
+  },
+  {
+    category: 'Robotic Surgery',
+    color: '#8E44AD',
+    bg: '#F4ECF7',
+    icon: '🤖',
+    devices: ['Da Vinci Xi (4th gen)', 'MAKO Robot (knee/hip)', 'Versius Laparoscopic', 'Senhance System', 'Robotic Bronchoscopy', 'Rosa Brain Robot'],
+  },
+  {
+    category: 'Advanced Imaging',
+    color: '#1B4F72',
+    bg: '#EBF5FB',
+    icon: '🧲',
+    devices: ['MRI 3T Siemens Prisma', 'MRI 1.5T', 'Whole Body MRI', 'DECT Dual Energy CT', 'Spectral CT', '320-Row CT Scanner', 'Cardiac CT Angio'],
+  },
+  {
+    category: 'Interventional',
+    color: '#C0392B',
+    bg: '#FDEDEC',
+    icon: '🔬',
+    devices: ['Biplane DSA Suite', 'O-Arm Navigation', 'Fusion-Guided Biopsy', 'HIFU (ultrasound ablation)', 'MR-Guided HIFU', 'IRE NanoKnife', 'Endovascular Suite'],
+  },
+  {
+    category: 'Ophthalmology',
+    color: '#2E86C1',
+    bg: '#EBF5FB',
+    icon: '👁️',
+    devices: ['Femtosecond LASIK Laser', 'LASIK/LASEK', 'OCT Angiography', 'Scheimpflug Topography', 'Phacoemulsification', 'Vitreoretinal Surgery', 'ICL Implantation'],
+  },
+];
+
 // ─── Page ────────────────────────────────────────────────────
 
 export default function HomePage() {
@@ -388,6 +435,47 @@ export default function HomePage() {
         </div>
 
         {/* ══════════════════════════════════════════════
+            AI TRIAGE WIDGET
+        ══════════════════════════════════════════════ */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center',
+            }}>
+              {/* Left: Text */}
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+                  AI SCAN ADVISOR
+                </div>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 16 }}>
+                  Not Sure Which Scan You Need?
+                </h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: 17, lineHeight: 1.75, marginBottom: 28 }}>
+                  Our AI Scan Advisor — powered by Claude — analyses your symptoms and suggests the most appropriate diagnostic technology. Used by hundreds of patients weekly.
+                </p>
+                <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {[
+                    'Analyses symptoms against clinical protocols',
+                    'Recommends specific scan type + machine model',
+                    'Estimates NHS wait vs. thediagnostic availability',
+                    'Not a medical diagnosis — always consult your GP',
+                  ].map(txt => (
+                    <li key={txt} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 14, color: 'var(--text-muted)' }}>
+                      <span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                      {txt}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* Right: Widget */}
+              <div>
+                <TriageWidget />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
             WHY THE DIAGNOSTIC
         ══════════════════════════════════════════════ */}
         <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
@@ -551,6 +639,71 @@ export default function HomePage() {
         </section>
 
         {/* ══════════════════════════════════════════════
+            DEVICE CATALOG
+        ══════════════════════════════════════════════ */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+                60+ TECHNOLOGIES
+              </div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 12 }}>
+                The World&apos;s Most Advanced Diagnostic Devices
+              </h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 600, margin: '0 auto', lineHeight: 1.7 }}>
+                From nuclear medicine and robotic surgery to next-generation MRI — our network gives you access to technology unavailable in most UK private hospitals.
+              </p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
+              {DEVICE_CATALOG.map(cat => (
+                <div key={cat.category} style={{
+                  background: '#fff', border: '1px solid var(--line)',
+                  borderRadius: 'var(--radius-lg)', padding: 24, position: 'relative', overflow: 'hidden',
+                }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: cat.color }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 10,
+                      background: cat.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+                    }}>
+                      {cat.icon}
+                    </div>
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: 'var(--primary)', margin: 0 }}>
+                      {cat.category}
+                    </h3>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {cat.devices.map(d => (
+                      <span key={d} style={{
+                        background: cat.bg, color: cat.color,
+                        borderRadius: 6, padding: '4px 10px',
+                        fontSize: 12, fontWeight: 500,
+                      }}>
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: 40 }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>
+                Can&apos;t find the technology you need? We can source from additional centres.
+              </p>
+              <a href="https://wa.me/447700000000?text=I%27m%20looking%20for%20a%20specific%20technology" target="_blank" rel="noopener noreferrer" style={{
+                border: '1.5px solid var(--accent)', color: 'var(--accent)',
+                borderRadius: 8, padding: '10px 24px',
+                fontSize: 14, fontWeight: 500, display: 'inline-block',
+              }}>
+                Ask About Specific Technology →
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
             HOW IT WORKS — THE BROKERAGE FLOW
         ══════════════════════════════════════════════ */}
         <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
@@ -620,6 +773,144 @@ export default function HomePage() {
                 Book Your Scan Now →
               </Link>
             </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
+            UK REPORTS
+        ══════════════════════════════════════════════ */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg-2)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center',
+            }}>
+              {/* Left: Report mockup */}
+              <div style={{
+                background: '#fff', border: '1px solid var(--line)',
+                borderRadius: 'var(--radius-xl)', overflow: 'hidden',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.1)',
+              }}>
+                {/* Header */}
+                <div style={{ background: 'var(--primary)', padding: '18px 24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em' }}>RADIOLOGY REPORT — CONFIDENTIAL</div>
+                      <div style={{ color: '#fff', fontSize: 16, fontWeight: 700, marginTop: 2 }}>thediagnostic</div>
+                    </div>
+                    <div style={{
+                      background: '#17A589', color: '#fff',
+                      borderRadius: 6, padding: '4px 10px',
+                      fontSize: 11, fontWeight: 700, letterSpacing: '0.05em',
+                    }}>
+                      ✓ VERIFIED
+                    </div>
+                  </div>
+                </div>
+                {/* Body */}
+                <div style={{ padding: '20px 24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+                    {[
+                      ['Patient', 'J. Thompson'],
+                      ['DOB', '14 Mar 1972'],
+                      ['Scan Type', 'Whole Body PET-CT'],
+                      ['Date', '29 May 2025'],
+                      ['Clinic', 'HSM Radyoloji, Istanbul'],
+                      ['Report Ref', 'TD-2025-8821'],
+                    ].map(([label, val]) => (
+                      <div key={label}>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>{label}</div>
+                        <div style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 500 }}>{val}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Scan image placeholder */}
+                  <div style={{
+                    background: '#0d1a2a', borderRadius: 8, height: 90,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: 14,
+                  }}>
+                    <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>DICOM Image — Encrypted · Full resolution in report</span>
+                  </div>
+                  {/* Findings */}
+                  <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.7, marginBottom: 14 }}>
+                    <span style={{ fontWeight: 700 }}>Findings: </span>
+                    No evidence of pathological FDG uptake. Physiological distribution of tracer. No metastatic disease identified on this study.
+                  </div>
+                  {/* Signature */}
+                  <div style={{
+                    borderTop: '1px solid var(--line)', paddingTop: 12,
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
+                  }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary)' }}>Dr. R. Ashworth FRCR</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Consultant Radiologist · GMC #7654321</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>NHS GP-accepted · GDPR compliant</div>
+                    </div>
+                    <div style={{
+                      background: '#D1F2EB', color: '#0E6655', borderRadius: 6,
+                      padding: '4px 10px', fontSize: 11, fontWeight: 700,
+                    }}>
+                      18h turnaround
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Text */}
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+                  UK-STANDARD REPORTS
+                </div>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 40px)', color: 'var(--primary-3)', marginBottom: 16 }}>
+                  Reports Your GP Will Accept
+                </h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 28 }}>
+                  Every report is produced by a GMC-registered subspecialist radiologist, written in English, and formatted for direct use with UK GPs and NHS specialists.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {[
+                    { icon: '📋', title: 'Consultant Radiologist Signature', desc: 'GMC-registered · NHS GP-accepted · subspecialist reporting' },
+                    { icon: '🖥️', title: 'DICOM + Written Report', desc: 'Full-resolution images + formal written findings in English' },
+                    { icon: '📝', title: 'GP Referral Letter Template', desc: 'Pre-formatted letter for onward NHS referral if needed' },
+                    { icon: '🔄', title: 'Free Second Opinion', desc: '30-day window for a second read at no extra cost' },
+                    { icon: '🔒', title: 'Encrypted Secure Delivery', desc: 'GDPR-compliant · delivered to your email within 24h' },
+                  ].map(feat => (
+                    <div key={feat.title} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                        background: '#EBF5FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+                      }}>
+                        {feat.icon}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600, color: 'var(--primary)', fontSize: 14 }}>{feat.title}</div>
+                        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>{feat.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
+            SAVINGS CALCULATOR
+        ══════════════════════════════════════════════ */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 48 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+                TRANSPARENT PRICING
+              </div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 12 }}>
+                See What You Save
+              </h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 500, margin: '0 auto' }}>
+                Compare our all-inclusive prices against average UK private hospital costs.
+              </p>
+            </div>
+            <SavingsCalculator />
           </div>
         </section>
 
@@ -896,6 +1187,80 @@ export default function HomePage() {
                 }}>
                   Compare Prices
                 </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
+            PARTNER BANNER
+        ══════════════════════════════════════════════ */}
+        <section style={{
+          padding: '64px 24px',
+          background: 'linear-gradient(135deg, #0d2d44 0%, #1a4a6e 100%)',
+        }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr auto', gap: 40, alignItems: 'center',
+            }}>
+              {/* Left */}
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#5DEDE0', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+                  FOR CLINICS &amp; HOSPITALS
+                </div>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(24px, 3.5vw, 38px)', color: '#fff', marginBottom: 12 }}>
+                  Have Empty Scanner Slots?<br />
+                  <span style={{ color: '#5DEDE0' }}>Partner with thediagnostic.</span>
+                </h2>
+                <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 16, lineHeight: 1.7, marginBottom: 28, maxWidth: 540 }}>
+                  Join our network and fill idle capacity with pre-qualified international patients. Zero setup cost. You set your own prices and availability.
+                </p>
+                <div style={{ display: 'flex', gap: 32, marginBottom: 32 }}>
+                  {[
+                    { value: '12,000+', label: 'patients searching monthly' },
+                    { value: '£0', label: 'setup cost' },
+                    { value: '48h', label: 'avg. time to first booking' },
+                  ].map(s => (
+                    <div key={s.label} style={{ borderLeft: '2px solid rgba(93,237,224,0.3)', paddingLeft: 14 }}>
+                      <div style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', fontWeight: 700, color: '#5DEDE0', fontFamily: 'var(--font-serif)' }}>
+                        {s.value}
+                      </div>
+                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Right: CTA card */}
+              <div style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 16, padding: '32px 28px',
+                minWidth: 260, textAlign: 'center',
+              }}>
+                <div style={{ fontSize: 36, marginBottom: 14 }}>🏥</div>
+                <div style={{ color: '#fff', fontWeight: 700, fontSize: 16, marginBottom: 8 }}>
+                  Start Receiving Patients
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13, marginBottom: 20, lineHeight: 1.5 }}>
+                  Connect your clinic in 48 hours.<br />Full onboarding support included.
+                </div>
+                <Link href="/partner" style={{
+                  display: 'block',
+                  background: '#17A589', color: '#fff',
+                  borderRadius: 9, padding: '12px 20px',
+                  fontSize: 14, fontWeight: 600,
+                  marginBottom: 10,
+                }}>
+                  Apply as a Partner Clinic →
+                </Link>
+                <a href="https://wa.me/447700000000?text=Hi%2C%20I%27d%20like%20to%20partner%20my%20clinic%20with%20thediagnostic" target="_blank" rel="noopener noreferrer" style={{
+                  display: 'block',
+                  background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)',
+                  borderRadius: 9, padding: '10px 20px',
+                  fontSize: 13,
+                }}>
+                  WhatsApp us first
+                </a>
               </div>
             </div>
           </div>
