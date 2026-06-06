@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+:root {
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  /* thediagnostic Brand Colours */
+  --primary:       #1B4F72;   /* Deep navy — main brand */
+  --primary-2:     #154360;   /* Darker navy */
+  --primary-3:     #0E2F48;   /* Darkest — footer, CTA */
+  --primary-05:    #EBF5FB;   /* Very light navy — hover bg */
+  --accent:        #17A589;   /* Teal — technology + health */
+  --accent-2:      #0E6655;   /* Dark teal */
+  --accent-light:  #D1F2EB;   /* Light teal — badges */
+  --warm:          #E67E22;   /* Amber — featured CTA */
+  --warm-light:    #FEF9F0;   /* Light amber bg */
+  --bg:            #F8FFFE;   /* Slightly teal-tinted white */
+  --bg-2:          #EEF9F7;   /* Secondary bg */
+  --line:          #D5E8E4;   /* Border colour */
+  --text:          #1C2833;   /* Main text */
+  --text-muted:    #5D6D7E;   /* Muted text */
+  --success:       #27AE60;
+  --warning:       #F39C12;
+  --danger:        #C0392B;
+  --white:         #FFFFFF;
+
+  /* Typography */
+  --font-body:     var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-heading:  var(--font-serif), Georgia, serif;
+
+  /* Spacing */
+  --radius:        10px;
+  --radius-lg:     16px;
+  --radius-xl:     24px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  line-height: 1.2;
+  color: var(--primary-3);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+[dir="rtl"] {
+  text-align: right;
+  font-family: 'Noto Sans Arabic', var(--font-body);
+}

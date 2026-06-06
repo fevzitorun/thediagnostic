@@ -316,6 +316,115 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ─── AI SEARCH BAR ─── */}
+      <section style={{ background: 'var(--paper)', padding: '72px 0 60px', borderTop: '1.5px solid var(--line)' }}>
+        <div className="page-pad" style={{ maxWidth: 780, margin: '0 auto', padding: '0 48px', textAlign: 'center' }}>
+          {/* Badge */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--ink-05)', border: '1px solid rgba(15,76,129,.15)', borderRadius: 20, padding: '5px 14px', marginBottom: 28 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+            </svg>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink)', letterSpacing: 0.3 }}>Powered by AI</span>
+          </div>
+
+          <h2 style={{ fontFamily: 'var(--serif)', fontSize: 48, color: 'var(--ink-3)', letterSpacing: -1.6, lineHeight: 1.05, marginBottom: 12 }}>
+            Find the right scan,<br /><em style={{ color: 'var(--ink)' }}>instantly.</em>
+          </h2>
+          <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.65, marginBottom: 36, maxWidth: 520, margin: '0 auto 36px' }}>
+            Describe your symptoms or tell us what you need — our clinical AI will match you to the right scan and centre.
+          </p>
+
+          {/* Search bar */}
+          <form
+            action="/search"
+            method="get"
+            style={{ position: 'relative', marginBottom: 18 }}
+          >
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              background: '#fff',
+              border: '2px solid var(--line)',
+              borderRadius: 100,
+              boxShadow: '0 8px 40px rgba(15,76,129,.1), 0 2px 8px rgba(0,0,0,.04)',
+              padding: '6px 6px 6px 28px',
+              transition: 'border-color .15s, box-shadow .15s',
+            }}>
+              {/* Mic icon */}
+              <svg
+                width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                style={{ flexShrink: 0, marginRight: 14 }}
+              >
+                <rect x="9" y="2" width="6" height="12" rx="3"/>
+                <path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/>
+                <line x1="8" y1="22" x2="16" y2="22"/>
+              </svg>
+
+              <input
+                name="q"
+                type="text"
+                placeholder="Describe your symptoms or tell us what scan you need..."
+                style={{
+                  flex: 1, border: 'none', outline: 'none',
+                  fontSize: 16, color: '#111', background: 'transparent',
+                  fontFamily: 'inherit', lineHeight: 1.5,
+                  padding: '10px 0',
+                }}
+              />
+
+              {/* Submit button */}
+              <button
+                type="submit"
+                style={{
+                  flexShrink: 0,
+                  background: 'var(--ink-3)', color: '#fff', border: 'none',
+                  borderRadius: 100, padding: '13px 24px',
+                  fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  transition: 'background .15s',
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                </svg>
+                Search
+              </button>
+            </div>
+          </form>
+
+          {/* Quick-pick chips */}
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
+            {[
+              { label: 'Knee MRI',           q: 'Knee MRI' },
+              { label: 'Full Body Check',    q: 'Full Body Check' },
+              { label: 'Breast Screening',   q: 'Breast Screening' },
+              { label: 'Back Pain Scan',     q: 'Back Pain Scan' },
+            ].map(chip => (
+              <Link
+                key={chip.label}
+                href={`/search?q=${encodeURIComponent(chip.q)}`}
+                className="search-pill"
+                style={{
+                  fontSize: 13, fontWeight: 500, color: '#4B5563',
+                  padding: '8px 18px', borderRadius: 100,
+                  border: '1.5px solid var(--line)', textDecoration: 'none',
+                  background: '#fff', transition: 'all .15s',
+                }}
+              >
+                {chip.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Subtext */}
+          <p style={{ fontSize: 12, color: '#9CA3AF', letterSpacing: 0.2 }}>
+            Ask our clinical AI &middot; No GP referral needed
+          </p>
+        </div>
+      </section>
+
       {/* ─── AI TRIAGE ─── */}
       <section style={{ background: 'var(--ink-3)', padding: '80px 0' }}>
         <div className="page-pad" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 48px', display: 'flex', gap: 64, alignItems: 'center', flexWrap: 'wrap' }}>

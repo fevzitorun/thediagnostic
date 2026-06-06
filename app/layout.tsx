@@ -1,13 +1,7 @@
 import type { Metadata } from 'next'
-import { DM_Sans } from 'next/font/google'
 import CookieBanner from '@/components/CookieBanner'
 import './globals.css'
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-dm-sans',
-})
+// DM Sans loaded via globals.css for CDN resilience
 
 export const metadata: Metadata = {
   title: {
@@ -25,11 +19,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className={`${dmSans.variable} antialiased`} style={{ fontFamily: 'var(--font-dm-sans), system-ui, sans-serif' }}>
+      <body style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
         {children}
         <CookieBanner />
       </body>

@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "scans": "Scan Types",
+    "clinics": "Clinics",
+    "destinations": "Destinations",
+    "howItWorks": "How It Works",
+    "blog": "Blog",
+    "bookNow": "Book Now",
+    "myAccount": "My Account",
+    "whatsapp": "WhatsApp Us"
+  },
+  "hero": {
+    "badge": "UK patients save up to 70% on advanced diagnostics",
+    "title": "World-Class Medical Imaging,",
+    "titleAccent": "Without the Wait",
+    "subtitle": "PET-CT, MRI 3T, GammaKnife and more — at JCI-accredited clinics in Turkey. Fast appointments, expert radiologists, results in 24 hours.",
+    "cta": "Find Available Slots",
+    "ctaSecondary": "How It Works",
+    "trustLine": "Trusted by patients from UK, Germany, UAE · JCI Accredited Clinics"
+  },
+  "scans": {
+    "title": "Advanced Diagnostics",
+    "subtitle": "Technologies not available privately in the UK — or with 6–18 month waits"
+  },
+  "savings": {
+    "vsUK": "vs UK private price",
+    "save": "Save up to"
+  },
+  "clinics": {
+    "title": "Partner Clinics",
+    "subtitle": "Rigorously vetted, internationally accredited diagnostic centres",
+    "viewAll": "View All Clinics"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "From symptom to scan in 3 simple steps",
+    "step1Title": "Describe Your Needs",
+    "step1Desc": "Tell us your symptoms or the scan your doctor recommended. Our AI advisor matches you with the right scan and clinic.",
+    "step2Title": "Choose & Book",
+    "step2Desc": "Browse available slots at accredited clinics. Compare prices, read reviews, and book instantly — no referral needed.",
+    "step3Title": "Scan & Receive Results",
+    "step3Desc": "Fly to your appointment. Get scanned by expert radiologists. Receive your report in English within 24 hours."
+  },
+  "concierge": {
+    "title": "All-Inclusive Concierge",
+    "subtitle": "We handle flights, hotel, airport transfer & medical translator — you focus on your health.",
+    "cta": "Add Concierge Package"
+  },
+  "testimonials": {
+    "title": "Patient Stories",
+    "subtitle": "Real experiences from patients across Europe"
+  },
+  "footer": {
+    "tagline": "Advanced diagnostics. No waiting lists. No compromise.",
+    "company": "© 2026 Connective Hub Limited. Registered in England & Wales."
+  }
+}
