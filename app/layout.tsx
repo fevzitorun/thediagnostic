@@ -1,38 +1,41 @@
-import type { Metadata } from 'next'
-import { DM_Sans } from 'next/font/google'
-import CookieBanner from '@/components/CookieBanner'
-import './globals.css'
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-dm-sans',
-})
+import type { Metadata } from 'next';
+import './globals.css';
+// Fonts loaded via globals.css Google Fonts link for CDN resilience
 
 export const metadata: Metadata = {
   title: {
-    default: 'ScanBook — Private Medical Scans, Booked Online',
-    template: '%s | ScanBook',
+    default: 'thediagnostic — Advanced Medical Imaging Abroad',
+    template: '%s | thediagnostic',
   },
   description:
-    'Book private MRI, CT, ultrasound and baby scans at CQC-registered centres across the UK. No GP referral needed. Radiologist reports in 24–72 hours.',
-  keywords: ['private MRI scan', 'private CT scan', 'baby scan', 'private ultrasound', 'UK imaging centres'],
-}
+    'Book PET-CT, MRI 3T, GammaKnife and advanced diagnostics at world-class clinics in Turkey. Save up to 70% vs UK private prices. Fast appointments, expert radiologists.',
+  keywords: [
+    'PET CT scan Turkey',
+    'MRI scan abroad',
+    'medical imaging Turkey',
+    'GammaKnife Turkey',
+    'medical tourism Turkey',
+    'private scan abroad affordable',
+    'NHS waiting list alternative',
+  ],
+  openGraph: {
+    siteName: 'thediagnostic',
+    locale: 'en_GB',
+    type: 'website',
+  },
+  robots: { index: true, follow: true },
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className={`${dmSans.variable} antialiased`} style={{ fontFamily: 'var(--font-dm-sans), system-ui, sans-serif' }}>
+    <html lang="en" suppressHydrationWarning>
+      <body>
         {children}
-        <CookieBanner />
       </body>
     </html>
-  )
+  );
 }

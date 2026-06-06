@@ -1,614 +1,663 @@
-import Link from 'next/link'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
-import TriageWidget from '@/components/TriageWidget'
-import { getFeaturedClinics } from '@/lib/clinics.data'
+import Link from 'next/link';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import TriageWidget from '@/components/TriageWidget';
+import SavingsCalculator from '@/components/SavingsCalculator';
 
-export const metadata = {
-  title: 'ScanBook — Private Medical Scans, Booked Online',
-  description: 'Access 200+ CQC-registered imaging centres. MRI, CT, Ultrasound, X-Ray and Baby Scans from £75. Reports in 24 hours.',
-}
+// ─── Data ───────────────────────────────────────────────────
+
+const SCAN_TYPES = [
+  {
+    code: 'pet_ct',
+    icon: '🔬',
+    name: 'PET-CT Scan',
+    tagline: 'Full-body cancer & disease detection',
+    priceFrom: 1200,
+    ukPrice: 4000,
+    savingPct: 70,
+    href: '/scan/pet-ct',
+    badge: 'Most Booked',
+    badgeColor: '#17A589',
+    description: 'Detects cancer, metastasis, cardiac & neurological disease at cellular level.',
+  },
+  {
+    code: 'mri_3t',
+    icon: '🧲',
+    name: 'MRI 3T',
+    tagline: 'High-field magnetic resonance imaging',
+    priceFrom: 320,
+    ukPrice: 1200,
+    savingPct: 73,
+    href: '/scan/mri-3t',
+    badge: null,
+    badgeColor: null,
+    description: 'Superior soft tissue imaging for brain, spine, joints and abdomen.',
+  },
+  {
+    code: 'gamma_knife',
+    icon: '⚡',
+    name: 'GammaKnife',
+    tagline: 'Non-invasive brain tumour treatment',
+    priceFrom: 6500,
+    ukPrice: 20000,
+    savingPct: 68,
+    href: '/scan/gamma-knife',
+    badge: 'Advanced',
+    badgeColor: '#E67E22',
+    description: 'Stereotactic radiosurgery — no incision, no anaesthesia, day procedure.',
+  },
+  {
+    code: 'pet_mri',
+    icon: '🔮',
+    name: 'PET-MRI',
+    tagline: 'Simultaneous metabolic + tissue imaging',
+    priceFrom: 1850,
+    ukPrice: 5500,
+    savingPct: 66,
+    href: '/scan/pet-mri',
+    badge: 'Premium',
+    badgeColor: '#1B4F72',
+    description: 'The most advanced hybrid scanner — PET metabolic data combined with 3T MRI.',
+  },
+  {
+    code: 'spect_ct',
+    icon: '💫',
+    name: 'SPECT-CT',
+    tagline: 'Bone, thyroid & cardiac perfusion',
+    priceFrom: 650,
+    ukPrice: 2200,
+    savingPct: 70,
+    href: '/scan/spect-ct',
+    badge: null,
+    badgeColor: null,
+    description: 'Nuclear medicine imaging for bone scans, thyroid studies and cardiac perfusion.',
+  },
+  {
+    code: 'mri_whole_body',
+    icon: '🫁',
+    name: 'Whole Body MRI',
+    tagline: 'Complete health screening, no radiation',
+    priceFrom: 950,
+    ukPrice: 3500,
+    savingPct: 73,
+    href: '/scan/whole-body-mri',
+    badge: null,
+    badgeColor: null,
+    description: 'Head-to-toe cancer screening and full health check without any radiation.',
+  },
+];
+
+const CLINICS = [
+  {
+    slug: 'hsm-radyoloji-istanbul',
+    name: 'HSM Radyoloji',
+    city: 'Istanbul, Turkey',
+    lead: 'Prof. Dr. Mustafa ÖZATEŞ',
+    role: 'Consultant Radiologist',
+    description: 'Two state-of-the-art clinics in central Istanbul led by one of Turkey\'s foremost radiologists. Expert subspecialist reporting — results in English within 24 hours.',
+    scans: ['PET-CT', 'MRI 3T', 'SPECT-CT', 'CT Angio'],
+    jci: false,
+    iso: true,
+    rating: 4.9,
+    priceFrom: 320,
+    currency: 'GBP',
+    accentColor: '#17A589',
+  },
+  {
+    slug: 'acibadem-maslak-istanbul',
+    name: 'Acıbadem Maslak Hospital',
+    city: 'Istanbul, Turkey',
+    lead: 'International Patient Centre',
+    role: 'JCI Accredited · HIMSS Stage 6',
+    description: 'Turkey\'s first JCI-accredited hospital. The most advanced nuclear medicine suite in the region — GammaKnife, PET-MRI, PET-CT and robotic 3T MRI under one roof.',
+    scans: ['PET-CT', 'PET-MRI', 'GammaKnife', 'MRI 3T', 'SPECT-CT'],
+    jci: true,
+    iso: true,
+    rating: 4.8,
+    priceFrom: 380,
+    currency: 'GBP',
+    accentColor: '#1B4F72',
+  },
+];
+
+const HOW_IT_WORKS = [
+  {
+    step: '01',
+    icon: '💬',
+    title: 'Request',
+    desc: 'Tell us your symptoms or the scan your doctor recommended. Our AI and clinical team identify the best technology for your specific case.',
+    color: '#17A589',
+  },
+  {
+    step: '02',
+    icon: '🧠',
+    title: 'Analyse',
+    desc: 'Not all MRI machines are the same. We identify the exact device suited to your condition — 3T Prisma, PET-MRI, Flash CT or GammaKnife.',
+    color: '#1B4F72',
+  },
+  {
+    step: '03',
+    icon: '🌍',
+    title: 'Source',
+    desc: 'We scan our network across the UK and Istanbul to find the soonest availability at the best price — with the right machine, not just any machine.',
+    color: '#E67E22',
+  },
+  {
+    step: '04',
+    icon: '📄',
+    title: 'Execute',
+    desc: 'We book your slot, manage your travel if needed, and deliver your UK-standard radiology report within 24 hours. GP letter included.',
+    color: '#17A589',
+  },
+];
+
+const WHY_US = [
+  {
+    icon: '🧠',
+    title: 'The Technology Broker',
+    headline: 'Precision Matching',
+    body: 'Not all MRI machines are the same. A standard scan might miss what a 3 Tesla Prisma reveals. Our platform directs you to the exact device suited to your condition — cardiac precision, oncological detail, or orthopaedic clarity.',
+  },
+  {
+    icon: '🌍',
+    title: 'The Global Inventory',
+    headline: 'Borderless Excellence',
+    body: "Why wait weeks for standard care when you can access world-class technology tomorrow? We manage idle capacity across a global network of Centres of Excellence — from UK partners to high-tech hubs in Istanbul.",
+  },
+  {
+    icon: '🤝',
+    title: 'The Concierge Experience',
+    headline: 'End-to-End Care',
+    body: 'We handle more than just the appointment. From VIP transfers and hotel to ensuring your reports meet strict UK clinical standards — our team manages the entire process. You focus on your health.',
+  },
+];
+
+const STATS = [
+  { value: 'Up to 70%', label: 'cheaper than UK private' },
+  { value: '3–7 days', label: 'appointment availability' },
+  { value: '24h', label: 'report turnaround' },
+  { value: '2', label: 'accredited partner clinics' },
+];
+
+const TESTIMONIALS = [
+  {
+    name: 'Sarah M.',
+    location: 'London, UK',
+    scan: 'PET-CT at HSM Radyoloji',
+    text: 'My oncologist needed a full-body PET-CT urgently. The NHS told me 14 weeks minimum. thediagnostic had me booked in Istanbul within 4 days. The clinic was spotless, the radiologist spoke perfect English, and I had my report before I even landed back in London.',
+    rating: 5,
+    saving: '£2,800 saved',
+  },
+  {
+    name: 'James T.',
+    location: 'Manchester, UK',
+    scan: 'GammaKnife at Acıbadem',
+    text: 'I was quoted £22,000 for GammaKnife at a London private hospital with a 6-week wait. Acıbadem Maslak did it for £6,500 and I was treated within 10 days. The quality of care was exceptional — truly world-class.',
+    rating: 5,
+    saving: '£15,500 saved',
+  },
+  {
+    name: 'Fatima K.',
+    location: 'Dubai, UAE',
+    scan: 'PET-MRI at Acıbadem',
+    text: 'The concierge service made everything seamless. Flight, hotel, and transfer all arranged. The Acıbadem team had an Arabic-speaking coordinator waiting for me. My PET-MRI report was ready in 18 hours.',
+    rating: 5,
+    saving: 'AED 22,000 saved',
+  },
+];
+
+const CONCIERGE_FEATURES = [
+  { icon: '✈️', label: 'Flight Search', desc: 'Best fares from your city' },
+  { icon: '🏨', label: 'Hotel Booking', desc: 'Near the clinic, any budget' },
+  { icon: '🚗', label: 'Airport Transfer', desc: 'Private car to clinic & back' },
+  { icon: '🗣️', label: 'Medical Translator', desc: 'Arabic, German, French & more' },
+  { icon: '📋', label: 'Pre-Departure Pack', desc: 'Checklist & clinic prep guide' },
+  { icon: '🔄', label: 'GP Letter', desc: 'Report summary for your GP' },
+];
+
+const DEVICE_CATALOG = [
+  {
+    category: 'Nuclear Medicine',
+    color: '#17A589',
+    bg: '#D1F2EB',
+    icon: '☢️',
+    devices: ['PET-CT (Siemens Biograph)', 'PET-MRI (Siemens Biograph mMR)', 'SPECT-CT', 'Cyclotron F-18', 'MIBG Therapy', 'Lutetium-177 PSMA', 'Ga-68 DOTATATE'],
+  },
+  {
+    category: 'Radiation Therapy',
+    color: '#E67E22',
+    bg: '#FEF9F0',
+    icon: '⚡',
+    devices: ['GammaKnife Icon', 'CyberKnife M6', 'TrueBeam STx', 'Tomotherapy H', 'Proton Therapy', 'Brachytherapy HDR', 'SBRT/SABR'],
+  },
+  {
+    category: 'Robotic Surgery',
+    color: '#8E44AD',
+    bg: '#F4ECF7',
+    icon: '🤖',
+    devices: ['Da Vinci Xi (4th gen)', 'MAKO Robot (knee/hip)', 'Versius Laparoscopic', 'Senhance System', 'Robotic Bronchoscopy', 'Rosa Brain Robot'],
+  },
+  {
+    category: 'Advanced Imaging',
+    color: '#1B4F72',
+    bg: '#EBF5FB',
+    icon: '🧲',
+    devices: ['MRI 3T Siemens Prisma', 'MRI 1.5T', 'Whole Body MRI', 'DECT Dual Energy CT', 'Spectral CT', '320-Row CT Scanner', 'Cardiac CT Angio'],
+  },
+  {
+    category: 'Interventional',
+    color: '#C0392B',
+    bg: '#FDEDEC',
+    icon: '🔬',
+    devices: ['Biplane DSA Suite', 'O-Arm Navigation', 'Fusion-Guided Biopsy', 'HIFU (ultrasound ablation)', 'MR-Guided HIFU', 'IRE NanoKnife', 'Endovascular Suite'],
+  },
+  {
+    category: 'Ophthalmology',
+    color: '#2E86C1',
+    bg: '#EBF5FB',
+    icon: '👁️',
+    devices: ['Femtosecond LASIK Laser', 'LASIK/LASEK', 'OCT Angiography', 'Scheimpflug Topography', 'Phacoemulsification', 'Vitreoretinal Surgery', 'ICL Implantation'],
+  },
+];
+
+// ─── Page ────────────────────────────────────────────────────
 
 export default function HomePage() {
-  const featured = getFeaturedClinics()
-
   return (
     <>
-      <style>{`
-        :root {
-          --ink:    #0F4C81;
-          --ink-2:  #0A3A66;
-          --ink-3:  #082A4A;
-          --ink-05: #E8F0F8;
-          --accent: #EF4444;
-          --paper:  #FAFAF7;
-          --paper-2:#F2F1EC;
-          --line:   #E5E1D8;
-          --serif:  'Instrument Serif', Georgia, serif;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--paper); -webkit-font-smoothing: antialiased; }
-
-        .hero-h1 { font-family: var(--serif); font-size: 96px; line-height: .97; letter-spacing: -3.4px; color: var(--ink-3); }
-        .hero-h1 em { font-style: italic; color: var(--ink); }
-        .search-pill:hover { background: var(--ink-05) !important; color: var(--ink) !important; border-color: var(--ink) !important; }
-        .needs-card:hover { border-color: var(--ink) !important; transform: translateY(-2px); }
-        .centre-card:hover { box-shadow: 0 8px 30px rgba(15,76,129,.12) !important; transform: translateY(-2px); }
-        .hiw-step { transition: opacity .2s; }
-        .cta-btn-outline:hover { background: rgba(255,255,255,.08) !important; }
-
-        @media (max-width: 768px) {
-          .hero-h1 { font-size: 52px !important; letter-spacing: -1.8px !important; }
-          .hero-grid { grid-template-columns: 1fr !important; }
-          .avail-panel { display: none !important; }
-          .stats-band { grid-template-columns: repeat(2,1fr) !important; }
-          .trust-band { grid-template-columns: repeat(2,1fr) !important; }
-          .needs-grid { grid-template-columns: 1fr !important; }
-          .wait-grid { grid-template-columns: 1fr !important; }
-          .centres-grid { display: flex !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; }
-          .centre-card { min-width: 300px !important; flex-shrink: 0 !important; }
-          .hiw-grid { grid-template-columns: 1fr !important; text-align: left !important; }
-          .hiw-step { display: flex !important; gap: 16px !important; align-items: flex-start !important; text-align: left !important; }
-          .reviews-grid { display: flex !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
-          .review-card { min-width: 280px !important; flex-shrink: 0 !important; }
-          .footer-grid { grid-template-columns: 1fr !important; }
-          .page-pad { padding-left: 20px !important; padding-right: 20px !important; }
-        }
-      `}</style>
-
       <Navbar />
-
-      {/* ─── HERO ─── */}
-      <section style={{ background: 'var(--paper)', padding: '72px 0 64px' }}>
-        <div className="page-pad" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 48px' }}>
-          <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 460px', gap: 64, alignItems: 'center' }}>
-
-            {/* Left */}
+      <main>
+        {/* HERO */}
+        <section style={{
+          background: 'linear-gradient(135deg, #0d2d44 0%, var(--primary) 60%, #1a6e94 100%)',
+          padding: '80px 24px 64px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+          <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', display: 'grid', gridTemplateColumns: '1fr 480px', gap: 48, alignItems: 'center' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 28 }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', letterSpacing: 0.4 }}>
-                  200+ CQC-registered centres · No GP referral needed
-                </span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(23,165,137,0.18)', border: '1px solid rgba(23,165,137,0.35)', borderRadius: 100, padding: '5px 14px', marginBottom: 24 }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#17A589', display: 'inline-block' }} />
+                <span style={{ color: '#5DEDE0', fontSize: 13, fontWeight: 500 }}>Medical Tech Broker · UK · Turkey · UAE</span>
               </div>
-
-              <h1 className="hero-h1">
-                A scan within<br />
-                the week. Reports<br />
-                <em>within the day.</em>
+              <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(34px, 5vw, 62px)', color: '#fff', lineHeight: 1.12, marginBottom: 16 }}>
+                Advanced Diagnostics,{' '}<span style={{ color: '#5DEDE0' }}>Without the Wait</span>
               </h1>
-
-              <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.65, marginTop: 24, marginBottom: 36, maxWidth: 460 }}>
-                Private medical imaging, booked online in minutes. MRI, CT, Ultrasound, X-Ray and Baby Scans — from £75.
+              <p style={{ fontSize: 'clamp(15px, 1.6vw, 18px)', color: 'rgba(255,255,255,0.72)', lineHeight: 1.75, marginBottom: 36, maxWidth: 520 }}>
+                PET-CT, MRI 3T, GammaKnife and 70+ advanced imaging technologies — at JCI-accredited partner clinics in Istanbul. Results in English within 24 hours. Up to 70% less than UK private prices.
               </p>
-
-              {/* Search form */}
-              <form
-                action="/search"
-                method="get"
-                style={{
-                  display: 'flex', background: '#fff', border: '1.5px solid var(--line)',
-                  borderRadius: 14, overflow: 'hidden',
-                  boxShadow: '0 4px 24px rgba(15,76,129,.08)',
-                  marginBottom: 20,
-                }}
-              >
-                <div style={{ flex: 1, padding: '14px 18px', borderRight: '1.5px solid var(--line)' }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 5 }}>Scan type</div>
-                  <select
-                    name="type"
-                    style={{ width: '100%', border: 'none', outline: 'none', fontSize: 14, color: '#111', background: 'transparent', fontFamily: 'inherit', cursor: 'pointer', appearance: 'none' }}
-                  >
-                    <option value="">All scans</option>
-                    <option value="mri">MRI</option>
-                    <option value="ct">CT Scan</option>
-                    <option value="ultrasound">Ultrasound</option>
-                    <option value="xray">X-Ray</option>
-                    <option value="baby-scan">Baby Scan</option>
-                    <option value="mri&pathway=full-body">Full Body MRI</option>
-                  </select>
-                </div>
-                <div style={{ flex: 1.2, padding: '14px 18px' }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 5 }}>Location</div>
-                  <input
-                    name="location"
-                    placeholder="Postcode or city"
-                    style={{ width: '100%', border: 'none', outline: 'none', fontSize: 14, color: '#111', background: 'transparent', fontFamily: 'inherit' }}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  style={{
-                    background: 'var(--ink-3)', color: '#fff', border: 'none',
-                    padding: '0 28px', fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    fontFamily: 'inherit', whiteSpace: 'nowrap',
-                    transition: 'background .15s',
-                  }}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                  Search
-                </button>
-              </form>
-
-              {/* Quick pills */}
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 12, color: '#9CA3AF', display: 'flex', alignItems: 'center' }}>Popular:</span>
-                {[
-                  { label: 'MRI Scan',        href: '/services/mri-scan' },
-                  { label: 'CT Scan',         href: '/services/ct-scan' },
-                  { label: 'Full Body MRI',   href: '/services/full-body-mri' },
-                  { label: 'Ultrasound',      href: '/services/ultrasound' },
-                  { label: 'Women\'s Health', href: '/services/womens-health' },
-                  { label: 'Baby Scan',       href: '/services/baby-scan' },
-                  { label: 'PET Scan',        href: '/search?type=pet' },
-                ].map(p => (
-                  <Link
-                    key={p.label}
-                    href={p.href}
-                    className="search-pill"
-                    style={{
-                      fontSize: 12, fontWeight: 500, color: '#6B7280',
-                      padding: '5px 12px', borderRadius: 20,
-                      border: '1px solid var(--line)', textDecoration: 'none',
-                      background: '#fff', transition: 'all .15s',
-                    }}
-                  >
-                    {p.label}
-                  </Link>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 44 }}>
+                <Link href="/book" style={{ background: 'var(--accent)', color: '#fff', padding: '13px 26px', borderRadius: 10, fontSize: 15, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>Find Available Slots →</Link>
+                <Link href="/scan/pet-ct" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', padding: '13px 26px', borderRadius: 10, fontSize: 15, fontWeight: 500 }}>See Scan Types</Link>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, auto)', gap: 28, justifyContent: 'start' }}>
+                {STATS.map(stat => (
+                  <div key={stat.label} style={{ borderLeft: '2px solid rgba(93,237,224,0.3)', paddingLeft: 14 }}>
+                    <div style={{ fontSize: 'clamp(18px, 2.5vw, 26px)', fontWeight: 700, color: '#5DEDE0', fontFamily: 'var(--font-serif)' }}>{stat.value}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{stat.label}</div>
+                  </div>
                 ))}
               </div>
             </div>
-
-            {/* Right — Live availability panel */}
-            <div className="avail-panel" style={{ background: '#fff', border: '1.5px solid var(--line)', borderRadius: 20, padding: 28, boxShadow: '0 8px 40px rgba(15,76,129,.1)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.5)', aspectRatio: '4/3' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/hero-scanner.jpg" alt="Advanced medical diagnostic technology" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(to top, rgba(13,45,68,0.85) 0%, transparent 100%)' }} />
+              <div style={{ position: 'absolute', bottom: 20, left: 20, right: 20, display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 12, padding: '10px 16px' }}>
+                <span style={{ fontSize: 22 }}>🔬</span>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>Live availability</div>
-                  <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>Next available slots</div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', display: 'block' }} />
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#22C55E' }}>Live</span>
+                  <div style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>PET-CT · MRI 3T · GammaKnife</div>
+                  <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11 }}>JCI-accredited partner clinics · Istanbul</div>
                 </div>
               </div>
-
-              {[
-                { scan: 'MRI — Knee', clinic: 'Medicana Winchester', time: 'Today, 2:30 pm', price: '£455' },
-                { scan: 'CT Scan — Chest', clinic: 'Medicana Winchester', time: 'Tomorrow, 9:00 am', price: '£525' },
-                { scan: 'Ultrasound — Abdo', clinic: 'Unirad Glasgow', time: 'Tomorrow, 11:15 am', price: '£195' },
-                { scan: 'Baby Scan — 20 wk', clinic: 'MotherScan Wimbledon', time: 'Thu, 10:00 am', price: '£149' },
-              ].map((slot, i) => (
-                <Link
-                  key={i}
-                  href="/search"
-                  style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: i < 3 ? '1px solid var(--line)' : 'none' }}
-                >
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111' }}>{slot.scan}</div>
-                    <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{slot.clinic}</div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{slot.price}</div>
-                    <div style={{ fontSize: 11, color: '#22C55E', marginTop: 2, fontWeight: 500 }}>{slot.time}</div>
-                  </div>
-                </Link>
-              ))}
-
-              <Link
-                href="/search"
-                style={{
-                  display: 'block', marginTop: 20, padding: '12px', textAlign: 'center',
-                  background: 'var(--ink-3)', color: '#fff', borderRadius: 10,
-                  fontSize: 13, fontWeight: 600, textDecoration: 'none',
-                }}
-              >
-                See all available slots →
-              </Link>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ─── STATS BAND ─── */}
-      <section style={{ background: '#fff', borderTop: '1.5px solid var(--line)', borderBottom: '1.5px solid var(--line)' }}>
-        <div className="page-pad stats-band" style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 48px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0 }}>
-          {[
-            { value: '4.9★', label: 'Trustpilot rating', sub: '2,418 verified reviews' },
-            { value: '207',  label: 'Imaging centres', sub: 'Across the UK' },
-            { value: '£75',  label: 'From', sub: 'For ultrasound & X-Ray' },
-            { value: '24h',  label: 'Report turnaround', sub: 'For most scan types' },
-          ].map((s, i) => (
-            <div key={i} style={{ padding: '16px 24px', borderRight: i < 3 ? '1px solid var(--line)' : 'none', textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--serif)', fontSize: 32, color: 'var(--ink-3)', fontWeight: 400, letterSpacing: -1 }}>{s.value}</div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginTop: 4 }}>{s.label}</div>
-              <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{s.sub}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── TRUST BAND ─── */}
-      <section style={{ background: 'var(--ink-3)', padding: '28px 48px' }}>
-        <div className="trust-band page-pad" style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, alignItems: 'center' }}>
-          {[
-            { title: 'CQC Registered',    desc: 'All partner centres inspected and approved' },
-            { title: 'ISO 27001',          desc: 'Medical data handled to highest standards' },
-            { title: 'UK GDPR Compliant', desc: 'Your health data is never sold or shared' },
-            { title: 'Stripe Secured',     desc: 'PCI-DSS Level 1 payment processing' },
-          ].map((t, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,.08)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        {/* TRUST BAR */}
+        <div style={{ background: 'var(--primary-2)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '16px 24px' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 32, flexWrap: 'wrap', justifyContent: 'center' }}>
+            {[{ icon: '✓', text: 'JCI-Accredited Clinics' }, { icon: '✓', text: 'Subspecialist Radiologists' }, { icon: '✓', text: 'Reports in English · 24h' }, { icon: '✓', text: 'UK, Germany & UAE Patients Welcome' }, { icon: '✓', text: 'No Referral Required' }].map(item => (
+              <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ color: '#17A589', fontWeight: 700 }}>{item.icon}</span>
+                <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13 }}>{item.text}</span>
               </div>
-              <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{t.title}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,.45)', marginTop: 2, lineHeight: 1.4 }}>{t.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── NEEDS / USE CASES ─── */}
-      <section style={{ background: 'var(--paper)', padding: '80px 0' }}>
-        <div className="page-pad" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 48px' }}>
-          <div style={{ marginBottom: 48 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 12 }}>Why patients choose ScanBook</div>
-            <h2 style={{ fontFamily: 'var(--serif)', fontSize: 44, color: 'var(--ink-3)', letterSpacing: -1.2 }}>What brings you here?</h2>
-          </div>
-
-          <div className="needs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
-            {[
-              {
-                icon: '🦴',
-                title: 'Injury or pain',
-                desc: "Knee, back, shoulder — get clarity fast without months of NHS waiting.",
-                href: '/search?type=mri&part=knee',
-                dark: false,
-              },
-              {
-                icon: '🤰',
-                title: 'Pregnancy scan',
-                desc: 'Dating, anomaly, growth and gender scans — reassurance at every stage.',
-                href: '/search?type=baby-scan',
-                dark: false,
-              },
-              {
-                icon: '💙',
-                title: 'Health MOT',
-                desc: 'Full Body MRI — a complete head-to-toe screen. No symptoms needed.',
-                href: '/search?type=mri&pathway=full-body',
-                dark: true,
-              },
-              {
-                icon: '📋',
-                title: 'GP referred',
-                desc: 'Your GP recommended a scan? We accept GP letters and referral codes.',
-                href: '/search',
-                dark: false,
-              },
-            ].map((card, i) => (
-              <Link
-                key={i}
-                href={card.href}
-                className="needs-card"
-                style={{
-                  display: 'block', textDecoration: 'none', padding: '28px 24px',
-                  borderRadius: 16, border: `1.5px solid ${card.dark ? 'var(--ink-3)' : 'var(--line)'}`,
-                  background: card.dark ? 'var(--ink-3)' : '#fff',
-                  transition: 'all .18s', cursor: 'pointer',
-                }}
-              >
-                <div style={{ fontSize: 32, marginBottom: 16 }}>{card.icon}</div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: card.dark ? '#fff' : 'var(--ink-3)', marginBottom: 10 }}>
-                  {card.title}
-                </div>
-                <div style={{ fontSize: 13, color: card.dark ? 'rgba(255,255,255,.6)' : '#6B7280', lineHeight: 1.6 }}>
-                  {card.desc}
-                </div>
-                <div style={{ marginTop: 20, fontSize: 12, fontWeight: 700, color: card.dark ? 'rgba(255,255,255,.5)' : 'var(--ink)', letterSpacing: 0.2 }}>
-                  Browse scans →
-                </div>
-              </Link>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* ─── AI TRIAGE ─── */}
-      <section style={{ background: 'var(--ink-3)', padding: '80px 0' }}>
-        <div className="page-pad" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 48px', display: 'flex', gap: 64, alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: 280 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.4)', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 16 }}>
-              AI Scan Finder
+        {/* AI TRIAGE */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>AI SCAN ADVISOR</div>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 16 }}>Not Sure Which Scan You Need?</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: 17, lineHeight: 1.75, marginBottom: 28 }}>Our AI Scan Advisor — powered by Claude — analyses your symptoms and suggests the most appropriate diagnostic technology. Used by hundreds of patients weekly.</p>
+                <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {['Analyses symptoms against clinical protocols', 'Recommends specific scan type + machine model', 'Estimates NHS wait vs. thediagnostic availability', 'Not a medical diagnosis — always consult your GP'].map(txt => (
+                    <li key={txt} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 14, color: 'var(--text-muted)' }}><span style={{ color: 'var(--accent)', fontWeight: 700, flexShrink: 0 }}>✓</span>{txt}</li>
+                  ))}
+                </ul>
+              </div>
+              <div><TriageWidget /></div>
             </div>
-            <h2 style={{ fontFamily: 'var(--serif)', fontSize: 40, color: '#fff', letterSpacing: -1.2, lineHeight: 1.1, marginBottom: 16 }}>
-              Not sure which scan you need?
-            </h2>
-            <p style={{ fontSize: 15, color: 'rgba(255,255,255,.6)', lineHeight: 1.7 }}>
-              Describe your symptoms and our AI assistant will recommend the most appropriate scan — instantly, and for free.
-            </p>
           </div>
-          <div style={{ flex: 1, minWidth: 320, maxWidth: 520 }}>
-            <TriageWidget />
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ─── WAIT GAP ─── */}
-      <section style={{ background: 'var(--paper-2)', padding: '80px 0', borderTop: '1.5px solid var(--line)' }}>
-        <div className="page-pad wait-grid" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 48px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
-
-          {/* Sticky text */}
-          <div style={{ position: 'sticky', top: 100 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 16 }}>The NHS wait gap</div>
-            <h2 style={{ fontFamily: 'var(--serif)', fontSize: 44, color: 'var(--ink-3)', letterSpacing: -1.2, lineHeight: 1.1, marginBottom: 20 }}>
-              Weeks of waiting — or tomorrow.
-            </h2>
-            <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, marginBottom: 32 }}>
-              NHS waiting times for diagnostic imaging have reached record highs. ScanBook gives you access to the same radiologists and equipment — privately, this week.
-            </p>
-            <Link
-              href="/search"
-              style={{ display: 'inline-block', padding: '13px 24px', background: 'var(--ink-3)', color: '#fff', borderRadius: 10, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}
-            >
-              Find a slot this week →
-            </Link>
-          </div>
-
-          {/* Comparison table */}
-          <div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 0, borderRadius: 14, overflow: 'hidden', border: '1.5px solid var(--line)', background: '#fff' }}>
-              {/* Header */}
-              <div style={{ padding: '12px 16px', background: 'var(--ink-05)', borderBottom: '1.5px solid var(--line)', fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.8 }}>Scan type</div>
-              <div style={{ padding: '12px 16px', background: '#fef2f2', borderBottom: '1.5px solid var(--line)', borderLeft: '1.5px solid var(--line)', fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.8 }}>NHS (avg wait)</div>
-              <div style={{ padding: '12px 16px', background: 'var(--ink-05)', borderBottom: '1.5px solid var(--line)', borderLeft: '1.5px solid var(--line)', fontSize: 11, fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: 0.8 }}>ScanBook</div>
-
-              {[
-                { scan: 'MRI — Knee',        nhs: '22–36 weeks', sb: 'This week' },
-                { scan: 'MRI — Spine',        nhs: '18–28 weeks', sb: 'This week' },
-                { scan: 'CT — Chest',         nhs: '14–20 weeks', sb: 'Tomorrow' },
-                { scan: 'Ultrasound — Abdo',  nhs: '10–16 weeks', sb: 'Today' },
-                { scan: 'Full Body MRI',       nhs: 'Not available', sb: 'This week' },
-              ].map((row, i) => (
-                <>
-                  <div key={row.scan + '-scan'} style={{ padding: '14px 16px', borderBottom: i < 4 ? '1px solid var(--line)' : 'none', fontSize: 13, fontWeight: 500, color: '#374151', background: i % 2 === 0 ? '#fff' : '#FAFAF7' }}>
-                    {row.scan}
-                  </div>
-                  <div key={row.scan + '-nhs'} style={{ padding: '14px 16px', borderBottom: i < 4 ? '1px solid var(--line)' : 'none', borderLeft: '1.5px solid var(--line)', fontSize: 13, color: '#EF4444', fontWeight: 500, background: i % 2 === 0 ? '#fff' : '#FAFAF7', textDecoration: 'line-through', textDecorationColor: '#EF4444' }}>
-                    {row.nhs}
-                  </div>
-                  <div key={row.scan + '-sb'} style={{ padding: '14px 16px', borderBottom: i < 4 ? '1px solid var(--line)' : 'none', borderLeft: '1.5px solid var(--line)', fontSize: 13, color: 'var(--ink)', fontWeight: 700, fontStyle: 'italic', fontFamily: 'var(--serif)', background: i % 2 === 0 ? 'var(--ink-05)' : '#EBF2FA' }}>
-                    {row.sb}
-                  </div>
-                </>
+        {/* WHY THE DIAGNOSTIC */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>WHY THE DIAGNOSTIC</div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 16 }}>Beyond Booking: Intelligent Diagnostic Access</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 17, maxWidth: 600, margin: '0 auto', lineHeight: 1.7 }}>We don&apos;t just find you a slot. We match your specific medical needs with the world&apos;s most advanced diagnostic technology.</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28 }}>
+              {WHY_US.map(item => (
+                <div key={item.title} style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--radius-lg)', padding: 32, position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%)' }} />
+                  <div style={{ fontSize: 36, marginBottom: 16 }}>{item.icon}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>{item.title}</div>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--primary)', marginBottom: 12 }}>{item.headline}</h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.75 }}>{item.body}</p>
+                </div>
               ))}
             </div>
-            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 10 }}>
-              * NHS wait times sourced from NHS England referral-to-treatment statistics, 2024.
+            <div style={{ textAlign: 'center', marginTop: 44 }}>
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2.5vw, 26px)', color: 'var(--primary)', fontStyle: 'italic' }}>&ldquo;Don&apos;t just scan. Scan with the best.&rdquo;</p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ─── FEATURED CENTRES ─── */}
-      <section style={{ background: 'var(--paper)', padding: '80px 0' }}>
-        <div className="page-pad" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 48px' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 40 }}>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 12 }}>Our partner centres</div>
-              <h2 style={{ fontFamily: 'var(--serif)', fontSize: 44, color: 'var(--ink-3)', letterSpacing: -1.2 }}>Featured imaging centres</h2>
+        {/* SCAN TYPES */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg-2)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ marginBottom: 48 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>ADVANCED DIAGNOSTICS</div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 12 }}>Technologies Not Available on the NHS</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 560 }}>Or available with 6–18 month waiting times. Book within days, not months.</p>
             </div>
-            <Link href="/search" style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', textDecoration: 'none' }}>
-              View all centres →
-            </Link>
-          </div>
-
-          <div className="centres-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
-            {featured.map(clinic => (
-              <Link
-                key={clinic.id}
-                href={`/clinics/${clinic.slug}`}
-                className="centre-card"
-                style={{
-                  textDecoration: 'none', color: 'inherit', display: 'block',
-                  border: '1.5px solid var(--line)', borderRadius: 16, overflow: 'hidden',
-                  background: '#fff', transition: 'all .2s',
-                }}
-              >
-                {/* Gradient image placeholder */}
-                <div style={{
-                  height: 160,
-                  background: 'linear-gradient(135deg, var(--ink) 0%, var(--ink-3) 100%)',
-                  display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '20px 22px',
-                }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
-                    {clinic.city}
-                  </div>
-                  <div style={{ fontSize: 17, fontWeight: 700, color: '#fff' }}>{clinic.name}</div>
-                </div>
-
-                <div style={{ padding: '18px 22px' }}>
-                  {/* Capabilities */}
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
-                    {clinic.capabilities.slice(0, 4).map(cap => (
-                      <span
-                        key={cap}
-                        style={{
-                          fontSize: 10, padding: '3px 9px', borderRadius: 5,
-                          background: 'var(--ink-05)', color: 'var(--ink)',
-                          fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5,
-                        }}
-                      >
-                        {cap.replace('_', ' ')}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
+              {SCAN_TYPES.map(scan => (
+                <Link key={scan.code} href={scan.href} style={{ display: 'block', background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--radius-lg)', padding: 24, textDecoration: 'none', position: 'relative', overflow: 'hidden' }}>
+                  {scan.badge && <div style={{ position: 'absolute', top: 16, right: 16, background: scan.badgeColor || 'var(--accent)', color: '#fff', borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 600 }}>{scan.badge}</div>}
+                  <div style={{ fontSize: 36, marginBottom: 14 }}>{scan.icon}</div>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--primary)', marginBottom: 4 }}>{scan.name}</h3>
+                  <p style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500, marginBottom: 10 }}>{scan.tagline}</p>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 20 }}>{scan.description}</p>
+                  <div style={{ background: 'var(--bg-2)', borderRadius: 8, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontSize: 12, color: '#6B7280' }}>From</div>
-                      <div style={{ fontFamily: 'var(--serif)', fontSize: 24, color: 'var(--ink-3)', letterSpacing: -0.5 }}>£{clinic.priceFrom}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>thediagnostic from</div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--primary)' }}>£{scan.priceFrom.toLocaleString()}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>★ {clinic.rating}</div>
-                      <div style={{ fontSize: 11, color: '#9CA3AF' }}>{clinic.reviewCount} reviews</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>UK private avg</div>
+                      <div style={{ fontSize: 14, color: 'var(--text-muted)', textDecoration: 'line-through' }}>£{scan.ukPrice.toLocaleString()}</div>
+                      <div style={{ display: 'inline-block', background: '#D1F2EB', color: '#0E6655', borderRadius: 100, padding: '2px 8px', fontSize: 11, fontWeight: 700, marginTop: 2 }}>Save {scan.savingPct}%</div>
                     </div>
                   </div>
+                  <div style={{ marginTop: 16, color: 'var(--accent)', fontSize: 14, fontWeight: 500 }}>View slots →</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
-                  <div style={{ marginTop: 14, padding: '10px 0 0', borderTop: '1px solid var(--line)', fontSize: 12, fontWeight: 600, color: 'var(--ink)', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>View centre</span>
-                    <span>→</span>
+        {/* DEVICE CATALOG */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>60+ TECHNOLOGIES</div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 12 }}>The World&apos;s Most Advanced Diagnostic Devices</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 600, margin: '0 auto', lineHeight: 1.7 }}>From nuclear medicine and robotic surgery to next-generation MRI — our network gives you access to technology unavailable in most UK private hospitals.</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
+              {DEVICE_CATALOG.map(cat => (
+                <div key={cat.category} style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--radius-lg)', padding: 24, position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: cat.color }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 10, background: cat.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{cat.icon}</div>
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: 'var(--primary)', margin: 0 }}>{cat.category}</h3>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {cat.devices.map(d => (<span key={d} style={{ background: cat.bg, color: cat.color, borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 500 }}>{d}</span>))}
                   </div>
                 </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── HOW IT WORKS ─── */}
-      <section id="how-it-works" style={{ background: 'var(--ink-3)', padding: '80px 0' }}>
-        <div className="page-pad" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 48px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.3)', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 12 }}>Simple process</div>
-            <h2 style={{ fontFamily: 'var(--serif)', fontSize: 44, color: '#fff', letterSpacing: -1.2 }}>From search to results in days</h2>
-          </div>
-
-          <div className="hiw-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0 }}>
-            {[
-              { n: '01', title: 'Search', desc: 'Find your scan type and nearest centre. Filter by date, price and body part.', accent: true },
-              { n: '02', title: 'Book & Pay', desc: 'Secure Stripe checkout. Instant confirmation to your email and patient portal.' },
-              { n: '03', title: 'Attend',    desc: 'Visit the centre at your appointment time. Show your booking reference.' },
-              { n: '04', title: 'Get results', desc: 'Radiologist report delivered to your secure portal within 24 hours.' },
-            ].map((step, i) => (
-              <div
-                key={i}
-                className="hiw-step"
-                style={{
-                  padding: '0 32px', textAlign: 'center',
-                  borderRight: i < 3 ? '1px solid rgba(255,255,255,.08)' : 'none',
-                }}
-              >
-                <div style={{
-                  width: 48, height: 48, borderRadius: '50%',
-                  border: `2px solid ${step.accent ? 'var(--accent)' : 'rgba(255,255,255,.15)'}`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  margin: '0 auto 20px',
-                  fontSize: 13, fontWeight: 700,
-                  color: step.accent ? 'var(--accent)' : 'rgba(255,255,255,.5)',
-                }}>
-                  {step.n}
-                </div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 10 }}>{step.title}</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,.5)', lineHeight: 1.65 }}>{step.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── REVIEWS ─── */}
-      <section style={{ background: 'var(--paper)', padding: '80px 0' }}>
-        <div className="page-pad" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 48px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 40 }}>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 12 }}>Patient reviews</div>
-              <h2 style={{ fontFamily: 'var(--serif)', fontSize: 44, color: 'var(--ink-3)', letterSpacing: -1.2 }}>What patients say</h2>
+              ))}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ fontFamily: 'var(--serif)', fontSize: 28, color: 'var(--ink-3)' }}>4.9</div>
+            <div style={{ textAlign: 'center', marginTop: 40 }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>Can&apos;t find the technology you need? We can source from additional centres.</p>
+              <a href="https://wa.me/447700000000" target="_blank" rel="noopener noreferrer" style={{ border: '1.5px solid var(--accent)', color: 'var(--accent)', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 500, display: 'inline-block' }}>Ask About Specific Technology →</a>
+            </div>
+          </div>
+        </section>
+
+        {/* BROKERAGE FLOW */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>THE BROKERAGE FLOW</div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 12 }}>You Request. We Source the Best.</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 520, margin: '0 auto' }}>From symptom to scan report in days — with the right technology, not just the nearest available slot.</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 28 }}>
+              {HOW_IT_WORKS.map((step, i) => (
+                <div key={i} style={{ background: '#fff', borderRadius: 'var(--radius-lg)', padding: 28, border: '1px solid var(--line)', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: -1, right: 20, fontSize: 64, fontWeight: 900, color: 'rgba(23,165,137,0.06)', lineHeight: 1, userSelect: 'none', fontFamily: 'var(--font-serif)' }}>{step.step}</div>
+                  <div style={{ fontSize: 36, marginBottom: 16 }}>{step.icon}</div>
+                  <div style={{ display: 'inline-block', background: step.color === '#17A589' ? '#D1F2EB' : step.color === '#E67E22' ? '#FEF9F0' : '#EBF5FB', color: step.color, borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 600, marginBottom: 12 }}>Step {step.step}</div>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 20, color: 'var(--primary)', marginBottom: 10 }}>{step.title}</h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7 }}>{step.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{ textAlign: 'center', marginTop: 48 }}>
+              <Link href="/book" style={{ background: 'var(--accent)', color: '#fff', padding: '14px 32px', borderRadius: 10, fontSize: 16, fontWeight: 600, display: 'inline-block' }}>Book Your Scan Now →</Link>
+            </div>
+          </div>
+        </section>
+
+        {/* UK REPORTS */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg-2)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+              <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--radius-xl)', overflow: 'hidden', boxShadow: '0 12px 40px rgba(0,0,0,0.1)' }}>
+                <div style={{ background: 'var(--primary)', padding: '18px 24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em' }}>RADIOLOGY REPORT — CONFIDENTIAL</div>
+                      <div style={{ color: '#fff', fontSize: 16, fontWeight: 700, marginTop: 2 }}>thediagnostic</div>
+                    </div>
+                    <div style={{ background: '#17A589', color: '#fff', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700 }}>✓ VERIFIED</div>
+                  </div>
+                </div>
+                <div style={{ padding: '20px 24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+                    {[['Patient','J. Thompson'],['DOB','14 Mar 1972'],['Scan Type','Whole Body PET-CT'],['Date','29 May 2025'],['Clinic','HSM Radyoloji, Istanbul'],['Report Ref','TD-2025-8821']].map(([label, val]) => (<div key={label}><div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>{label}</div><div style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 500 }}>{val}</div></div>))}
+                  </div>
+                  <div style={{ background: '#0d1a2a', borderRadius: 8, height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+                    <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>DICOM Image — Encrypted · Full resolution in report</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.7, marginBottom: 14 }}><span style={{ fontWeight: 700 }}>Findings: </span>No evidence of pathological FDG uptake. Physiological distribution of tracer. No metastatic disease identified on this study.</div>
+                  <div style={{ borderTop: '1px solid var(--line)', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary)' }}>Dr. R. Ashworth FRCR</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Consultant Radiologist · GMC #7654321</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>NHS GP-accepted · GDPR compliant</div>
+                    </div>
+                    <div style={{ background: '#D1F2EB', color: '#0E6655', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700 }}>18h turnaround</div>
+                  </div>
+                </div>
+              </div>
               <div>
-                <div style={{ fontSize: 13, color: '#F59E0B', letterSpacing: -1 }}>★★★★★</div>
-                <div style={{ fontSize: 11, color: '#9CA3AF' }}>2,418 reviews · Trustpilot</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>UK-STANDARD REPORTS</div>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 40px)', color: 'var(--primary-3)', marginBottom: 16 }}>Reports Your GP Will Accept</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 28 }}>Every report is produced by a GMC-registered subspecialist radiologist, written in English, and formatted for direct use with UK GPs and NHS specialists.</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {[{icon:'📋',title:'Consultant Radiologist Signature',desc:'GMC-registered · NHS GP-accepted · subspecialist reporting'},{icon:'🖥️',title:'DICOM + Written Report',desc:'Full-resolution images + formal written findings in English'},{icon:'📝',title:'GP Referral Letter Template',desc:'Pre-formatted letter for onward NHS referral if needed'},{icon:'🔄',title:'Free Second Opinion',desc:'30-day window for a second read at no extra cost'},{icon:'🔒',title:'Encrypted Secure Delivery',desc:'GDPR-compliant · delivered to your email within 24h'}].map(feat => (
+                    <div key={feat.title} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, background: '#EBF5FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>{feat.icon}</div>
+                      <div><div style={{ fontWeight: 600, color: 'var(--primary)', fontSize: 14 }}>{feat.title}</div><div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>{feat.desc}</div></div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
+        </section>
 
-          <div className="reviews-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-            {[
-              {
-                name: 'Sarah M.',
-                scan: 'MRI — Knee',
-                text: "Booked at 9pm, had my scan at 8am the next day. Report was in my portal by lunchtime. Absolutely outstanding service — wish I'd found this sooner.",
-                date: 'December 2024',
-              },
-              {
-                name: 'James R.',
-                scan: 'Baby Scan — 20 weeks',
-                text: "We were so anxious before the anomaly scan. The sonographer was brilliant, took time to explain everything. Results were clear and reassuring. Highly recommend.",
-                date: 'January 2025',
-              },
-              {
-                name: 'Priya K.',
-                scan: 'Full Body MRI',
-                text: "Had the full body MRI for peace of mind. The report was incredibly detailed. My GP was actually impressed by the level of information. Worth every penny.",
-                date: 'November 2024',
-              },
-            ].map((review, i) => (
-              <div
-                key={i}
-                className="review-card"
-                style={{ background: '#fff', border: '1.5px solid var(--line)', borderRadius: 16, padding: '24px 26px' }}
-              >
-                <div style={{ color: '#F59E0B', fontSize: 14, letterSpacing: -0.5, marginBottom: 14 }}>★★★★★</div>
-                <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.7, marginBottom: 20 }}>"{review.text}"</p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>{review.name}</div>
-                    <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{review.scan}</div>
+        {/* SAVINGS CALCULATOR */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 48 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>TRANSPARENT PRICING</div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 12 }}>See What You Save</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 500, margin: '0 auto' }}>Compare our all-inclusive prices against average UK private hospital costs.</p>
+            </div>
+            <SavingsCalculator />
+          </div>
+        </section>
+
+        {/* PARTNER CLINICS */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ marginBottom: 48 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>PARTNER CLINICS</div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)', marginBottom: 12 }}>Rigorously Vetted. Internationally Accredited.</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 560 }}>Every clinic on thediagnostic is personally verified — accreditation, equipment, radiologist credentials and English-language reporting.</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(440px, 1fr))', gap: 24 }}>
+              {CLINICS.map(clinic => (
+                <div key={clinic.slug} style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--radius-xl)', overflow: 'hidden' }}>
+                  <div style={{ background: clinic.accentColor, padding: '24px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div><h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, color: '#fff', marginBottom: 4 }}>{clinic.name}</h3><p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>{clinic.city}</p></div>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      {clinic.jci && <span style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', borderRadius: 4, padding: '3px 8px', fontSize: 11, fontWeight: 600 }}>JCI</span>}
+                      {clinic.iso && <span style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', borderRadius: 4, padding: '3px 8px', fontSize: 11, fontWeight: 600 }}>ISO</span>}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>{review.date}</div>
+                  <div style={{ padding: 28 }}>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 18, padding: '12px 16px', background: 'var(--bg-2)', borderRadius: 8 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: '50%', background: clinic.accentColor, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 18, flexShrink: 0 }}>👨‍⚕️</div>
+                      <div><div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text)' }}>{clinic.lead}</div><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{clinic.role}</div></div>
+                    </div>
+                    <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>{clinic.description}</p>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+                      {clinic.scans.map(s => (<span key={s} style={{ background: 'var(--bg-2)', color: 'var(--primary)', borderRadius: 100, padding: '4px 12px', fontSize: 12, fontWeight: 500 }}>{s}</span>))}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ display: 'flex', gap: 2, marginBottom: 2 }}>{'★★★★★'.split('').map((s, i) => (<span key={i} style={{ color: '#F39C12', fontSize: 14 }}>{s}</span>))}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{clinic.rating}/5 · from £{clinic.priceFrom}</div>
+                      </div>
+                      <Link href={`/clinics/${clinic.slug}`} style={{ background: clinic.accentColor, color: '#fff', borderRadius: 8, padding: '9px 18px', fontSize: 14, fontWeight: 600 }}>View Clinic →</Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ textAlign: 'center', marginTop: 32 }}>
+              <Link href="/clinics" style={{ border: '1.5px solid var(--accent)', color: 'var(--accent)', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 500, display: 'inline-block' }}>View All Partner Clinics</Link>
+            </div>
+          </div>
+        </section>
+
+        {/* CONCIERGE */}
+        <section style={{ padding: '80px 24px', background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-3) 100%)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>ALL-INCLUSIVE CONCIERGE</div>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 40px)', color: '#fff', marginBottom: 16 }}>We Handle Everything.<br />You Focus on Your Health.</h2>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, lineHeight: 1.7, marginBottom: 32 }}>Add our concierge package to your booking and we arrange flights, hotel, airport transfer, and a medical translator — so you can focus entirely on getting better.</p>
+                <Link href="/book/concierge" style={{ background: 'var(--accent)', color: '#fff', borderRadius: 8, padding: '12px 24px', fontSize: 15, fontWeight: 600, display: 'inline-block' }}>Add Concierge to My Booking →</Link>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                {CONCIERGE_FEATURES.map(feat => (
+                  <div key={feat.label} style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: 20 }}>
+                    <div style={{ fontSize: 28, marginBottom: 10 }}>{feat.icon}</div>
+                    <div style={{ fontWeight: 600, color: '#fff', fontSize: 14, marginBottom: 4 }}>{feat.label}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{feat.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* TESTIMONIALS */}
+        <section style={{ padding: '80px 24px', background: 'var(--bg-2)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 48 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>PATIENT STORIES</div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--primary-3)' }}>Real Patients. Real Savings.</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+              {TESTIMONIALS.map((t, i) => (
+                <div key={i} style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--radius-lg)', padding: 28 }}>
+                  <div style={{ display: 'flex', gap: 2, marginBottom: 16 }}>{'★★★★★'.split('').map((s, j) => (<span key={j} style={{ color: '#F39C12', fontSize: 16 }}>{s}</span>))}</div>
+                  <p style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.8, marginBottom: 20, fontStyle: 'italic' }}>&ldquo;{t.text}&rdquo;</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <div><div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text)' }}>{t.name}</div><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t.location}</div><div style={{ fontSize: 12, color: 'var(--accent)', marginTop: 2 }}>{t.scan}</div></div>
+                    <div style={{ background: '#D1F2EB', color: '#0E6655', borderRadius: 8, padding: '6px 12px', fontSize: 13, fontWeight: 700 }}>{t.saving}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PRICE CTA */}
+        <section style={{ padding: '64px 24px', background: 'var(--bg)' }}>
+          <div style={{ maxWidth: 900, margin: '0 auto', background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent-2) 100%)', borderRadius: 'var(--radius-xl)', padding: '56px 48px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', inset: 0, opacity: 0.05, backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+            <div style={{ position: 'relative' }}>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 44px)', color: '#fff', marginBottom: 16 }}>NHS Waiting List Too Long?</h2>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 17, marginBottom: 32, maxWidth: 560, margin: '0 auto 32px' }}>The average NHS wait for a PET-CT is 12–18 months. thediagnostic has appointments available within 3–7 days — at a fraction of UK private hospital prices.</p>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link href="/book" style={{ background: '#fff', color: 'var(--primary)', borderRadius: 10, padding: '14px 28px', fontSize: 16, fontWeight: 700, display: 'inline-block' }}>Find a Slot This Week →</Link>
+                <Link href="/compare/pet-ct-uk-vs-turkey" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', borderRadius: 10, padding: '14px 28px', fontSize: 16, fontWeight: 500, display: 'inline-block' }}>Compare Prices</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* PARTNER BANNER */}
+        <section style={{ padding: '64px 24px', background: 'linear-gradient(135deg, #0d2d44 0%, #1a4a6e 100%)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 40, alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#5DEDE0', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>FOR CLINICS &amp; HOSPITALS</div>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(24px, 3.5vw, 38px)', color: '#fff', marginBottom: 12 }}>Have Empty Scanner Slots?<br /><span style={{ color: '#5DEDE0' }}>Partner with thediagnostic.</span></h2>
+                <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 16, lineHeight: 1.7, marginBottom: 28, maxWidth: 540 }}>Join our network and fill idle capacity with pre-qualified international patients. Zero setup cost. You set your own prices and availability.</p>
+                <div style={{ display: 'flex', gap: 32, marginBottom: 32 }}>
+                  {[{value:'12,000+',label:'patients searching monthly'},{value:'£0',label:'setup cost'},{value:'48h',label:'avg. time to first booking'}].map(s => (
+                    <div key={s.label} style={{ borderLeft: '2px solid rgba(93,237,224,0.3)', paddingLeft: 14 }}>
+                      <div style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', fontWeight: 700, color: '#5DEDE0', fontFamily: 'var(--font-serif)' }}>{s.value}</div>
+                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{s.label}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+              <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 16, padding: '32px 28px', minWidth: 260, textAlign: 'center' }}>
+                <div style={{ fontSize: 36, marginBottom: 14 }}>🏥</div>
+                <div style={{ color: '#fff', fontWeight: 700, fontSize: 16, marginBottom: 8 }}>Start Receiving Patients</div>
+                <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13, marginBottom: 20, lineHeight: 1.5 }}>Connect your clinic in 48 hours.<br />Full onboarding support included.</div>
+                <Link href="/partner" style={{ display: 'block', background: '#17A589', color: '#fff', borderRadius: 9, padding: '12px 20px', fontSize: 14, fontWeight: 600, marginBottom: 10 }}>Apply as a Partner Clinic →</Link>
+                <a href="https://wa.me/447700000000" target="_blank" rel="noopener noreferrer" style={{ display: 'block', background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)', borderRadius: 9, padding: '10px 20px', fontSize: 13 }}>WhatsApp us first</a>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ─── CTA BAND ─── */}
-      <section style={{ background: 'var(--paper-2)', borderTop: '1.5px solid var(--line)', padding: '100px 48px', textAlign: 'center' }}>
-        <div style={{ maxWidth: 640, margin: '0 auto' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 20 }}>Book today</div>
-          <h2 style={{ fontFamily: 'var(--serif)', fontSize: 80, color: 'var(--ink-3)', letterSpacing: -2.5, lineHeight: .94, marginBottom: 32 }}>
-            Ready when<br /><em style={{ color: 'var(--ink)' }}>you are.</em>
-          </h2>
-          <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.65, marginBottom: 40 }}>
-            No GP referral needed. No waiting room. Just fast, accurate imaging from radiologists who care.
-          </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/search" style={{ padding: '15px 32px', background: 'var(--ink-3)', color: '#fff', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
-              Find a scan →
-            </Link>
-            <Link href="/search" className="cta-btn-outline" style={{ padding: '15px 32px', background: 'transparent', color: 'var(--ink-3)', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none', border: '1.5px solid var(--line)', transition: 'background .15s' }}>
-              Compare centres
-            </Link>
-          </div>
-        </div>
-      </section>
-
+        {/* WHATSAPP FLOAT */}
+        <a href="https://wa.me/447700000000" target="_blank" rel="noopener noreferrer" style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 999, background: '#25D366', color: '#fff', width: 60, height: 60, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,0.4)' }} title="Chat on WhatsApp">
+          <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+      </main>
       <Footer />
-
-      {/* ─── MOBILE STICKY CTA ─── */}
-      <style>{`
-        @media (min-width: 769px) { .mobile-sticky { display: none !important; } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-      `}</style>
-      <div className="mobile-sticky" style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
-        background: 'var(--ink-3)', padding: '14px 20px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        borderTop: '1px solid rgba(255,255,255,.1)',
-      }}>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>6 centres free tomorrow</div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,.5)', marginTop: 2 }}>No GP referral needed</div>
-        </div>
-        <Link href="/search" style={{ padding: '10px 20px', background: '#fff', color: 'var(--ink-3)', borderRadius: 8, fontSize: 13, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-          Book now →
-        </Link>
-      </div>
     </>
-  )
+  );
 }
