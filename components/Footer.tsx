@@ -1,108 +1,151 @@
-import Link from 'next/link'
-import { ScanBookLogo } from './Navbar'
+import Link from 'next/link';
 
-const COLS = [
-  {
-    title: 'Scans',
-    links: [
-      { label: 'MRI Scan',        href: '/search?type=mri' },
-      { label: 'CT Scan',         href: '/search?type=ct' },
-      { label: 'Ultrasound',      href: '/search?type=ultrasound' },
-      { label: 'X-Ray',           href: '/search?type=xray' },
-      { label: 'Baby Scan',       href: '/search?type=baby-scan' },
-      { label: 'Full Body MRI',   href: '/search?type=mri&pathway=full-body' },
-    ],
-  },
-  {
-    title: 'Locations',
-    links: [
-      { label: 'London',          href: '/search?location=london' },
-      { label: 'Manchester',      href: '/search?location=manchester' },
-      { label: 'Birmingham',      href: '/search?location=birmingham' },
-      { label: 'Edinburgh',       href: '/search?location=edinburgh' },
-      { label: 'Bristol',         href: '/search?location=bristol' },
-      { label: 'All centres',     href: '/search' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { label: 'About us',        href: '/about' },
-      { label: 'For Clinicians',  href: '/partners' },
-      { label: 'For GPs',        href: '/gp-referrals' },
-      { label: 'Blog',            href: '/blog' },
-      { label: 'Careers',        href: '/careers' },
-      { label: 'Contact',        href: '/contact' },
-    ],
-  },
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Privacy policy',  href: '/privacy-policy' },
-      { label: 'Terms',           href: '/terms-and-conditions' },
-      { label: 'Cookie policy',   href: '/cookie-policy' },
-      { label: 'Accessibility',   href: '/accessibility' },
-    ],
-  },
-]
+const SCANS = [
+  { href: '/scan/pet-ct', label: 'PET-CT Scan' },
+  { href: '/scan/mri-3t', label: 'MRI 3T' },
+  { href: '/scan/gamma-knife', label: 'GammaKnife' },
+  { href: '/scan/spect-ct', label: 'SPECT-CT' },
+  { href: '/scan/pet-mri', label: 'PET-MRI' },
+];
+
+const DESTINATIONS = [
+  { href: '/destinations/turkey/istanbul', label: 'Istanbul, Turkey' },
+  { href: '/destinations/turkey/ankara', label: 'Ankara, Turkey' },
+  { href: '/destinations/germany/munich', label: 'Munich, Germany' },
+  { href: '/destinations/uae/dubai', label: 'Dubai, UAE' },
+];
+
+const COMPARE = [
+  { href: '/compare/pet-ct-uk-vs-turkey', label: 'PET-CT: UK vs Turkey' },
+  { href: '/compare/mri-uk-vs-turkey', label: 'MRI: UK vs Turkey' },
+  { href: '/compare/gamma-knife-uk-vs-germany', label: 'GammaKnife: UK vs Germany' },
+];
+
+const COMPANY = [
+  { href: '/about', label: 'About Us' },
+  { href: '/clinics', label: 'Partner Clinics' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/faq', label: 'FAQ' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Service' },
+];
 
 export default function Footer() {
   return (
-    <footer style={{ background: '#082A4A', color: '#fff', padding: '64px 48px 32px' }}>
-      <style>{`@media(max-width:768px){.footer-top-grid{grid-template-columns:1fr 1fr !important;gap:32px !important;}.footer-wrap{padding:40px 20px 24px !important;}}`}</style>
-      <div className="footer-wrap" style={{ maxWidth: 1100, margin: '0 auto' }}>
-
-        {/* Top grid */}
-        <div className="footer-top-grid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr 1fr 1fr', gap: 40, marginBottom: 56 }}>
-
-          {/* Brand column */}
-          <div>
-            <ScanBookLogo light />
-            <p style={{ fontSize: 13, color: 'rgba(250,250,247,.5)', lineHeight: 1.7, marginTop: 16, maxWidth: 240 }}>
-              Private medical imaging, booked online. Access 200+ CQC-registered centres across the UK.
+    <footer style={{
+      background: 'var(--primary-3)',
+      color: 'rgba(255,255,255,0.75)',
+      paddingTop: 64,
+      paddingBottom: 40,
+    }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 40,
+          marginBottom: 48,
+        }}>
+          <div style={{ gridColumn: 'span 1' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <div style={{
+                width: 36, height: 36, background: 'var(--accent)',
+                borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <span style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>td</span>
+              </div>
+              <span style={{ color: '#fff', fontSize: 18, fontFamily: 'var(--font-serif)' }}>
+                the<strong>diagnostic</strong>
+              </span>
+            </div>
+            <p style={{ fontSize: 13, lineHeight: 1.7, marginBottom: 20 }}>
+              Advanced diagnostics. No waiting lists. No compromise.
             </p>
-            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-              {/* Trust badges */}
-              {['CQC', 'ISO', 'GDPR'].map(b => (
-                <div key={b} style={{ padding: '4px 10px', border: '1px solid rgba(255,255,255,.15)', borderRadius: 6, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,.4)', letterSpacing: 0.8 }}>
-                  {b}
-                </div>
-              ))}
+            <div style={{ display: 'flex', gap: 12 }}>
+              <a href="https://wa.me/447700000000" target="_blank" rel="noopener noreferrer"
+                style={{ color: '#25D366', fontSize: 13 }}>WhatsApp</a>
+              <a href="mailto:care@thediagnostic.co.uk"
+                style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>care@thediagnostic.co.uk</a>
             </div>
           </div>
 
-          {/* Link columns */}
-          {COLS.map(col => (
-            <div key={col.title}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.35)', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 16 }}>
-                {col.title}
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {col.links.map(l => (
-                  <Link
-                    key={l.href}
-                    href={l.href}
-                    style={{ fontSize: 13, color: 'rgba(255,255,255,.55)', textDecoration: 'none', transition: 'color .15s' }}
-                  >
-                    {l.label}
+          <div>
+            <h4 style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginBottom: 16, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>
+              Scan Types
+            </h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {SCANS.map(s => (
+                <li key={s.href}>
+                  <Link href={s.href} style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', transition: 'color 0.15s' }}>
+                    {s.label}
                   </Link>
-                ))}
-              </div>
-            </div>
-          ))}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginBottom: 16, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>
+              Destinations
+            </h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {DESTINATIONS.map(d => (
+                <li key={d.href}>
+                  <Link href={d.href} style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
+                    {d.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginBottom: 16, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>
+              Price Compare
+            </h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {COMPARE.map(c => (
+                <li key={c.href}>
+                  <Link href={c.href} style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
+                    {c.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginBottom: 16, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>
+              Company
+            </h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {COMPANY.map(c => (
+                <li key={c.href}>
+                  <Link href={c.href} style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
+                    {c.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        {/* Bottom bar */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,.3)', margin: 0 }}>
-            © 2026 ScanBook · A trading name of Connective Hub Limited · Company No. 11148446
+        <div style={{
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          paddingTop: 24, display: 'flex',
+          justifyContent: 'space-between', alignItems: 'center',
+          flexWrap: 'wrap', gap: 12,
+        }}>
+          <p style={{ fontSize: 13 }}>
+            &copy; 2026 Connective Hub Limited. Registered in England &amp; Wales. &middot; Connective Hub Dijital Teknolojiler A.&Scaron;.
           </p>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00C9A7' }} />
-            <span style={{ fontSize: 12, color: 'rgba(255,255,255,.3)' }}>All systems operational</span>
+          <div style={{ display: 'flex', gap: 16, fontSize: 13 }}>
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}>🇬🇧 EN</span>
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}>🇹🇷 TR</span>
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}>🇸🇦 AR</span>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

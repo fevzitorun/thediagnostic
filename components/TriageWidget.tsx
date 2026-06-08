@@ -1,164 +1,180 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState } from 'react';
+import Link from 'next/link';
 
 interface TriageResult {
-  recommendedScan: string
-  scanSlug: string
-  urgency: 'routine' | 'soon' | 'urgent'
-  reasoning: string
-  alternativeScans?: string[]
-  bookingHref: string
+  urgency: 'routine' | 'soon' | 'urgent';
+  urgencyLabel: string;
+  recommendedScans: { code: string; name: string; reason: string; priceFrom: number }[];
+  clinicalSummary: string;
+  nhsWaitEstimate: string;
+  thediagnosticWait: string;
+  estimatedSavingPct: number;
+  shouldSeeGPFirst: boolean;
+  gpNote?: string;
 }
 
-const URGENCY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  routine: { bg: '#F0FDF4', text: '#15803D', label: 'Routine — book within a few weeks' },
-  soon:    { bg: '#FFFBEB', text: '#D97706', label: 'Soon — book within 1–2 weeks' },
-  urgent:  { bg: '#FEF2F2', text: '#DC2626', label: 'Urgent — book as soon as possible' },
-}
+const URGENCY_CONFIG = {
+  routine: { color: '#17A589', bg: '#D1F2EB', label: 'Routine', icon: '🟢' },
+  soon: { color: '#E67E22', bg: '#FEF9F0', label: 'Soon', icon: '🟡' },
+  urgent: { color: '#C0392B', bg: '#FDEDEC', label: 'Urgent', icon: '🔴' },
+};
 
 export default function TriageWidget() {
-  const [symptoms, setSymptoms] = useState('')
-  const [result, setResult] = useState<TriageResult | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [symptoms, setSymptoms] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<TriageResult | null>(null);
+  const [error, setError] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+    e.preventDefault();
     if (symptoms.trim().length < 10) {
-      setError('Please describe your symptoms in a little more detail.')
-      return
+      setError('Please describe your symptoms in at least 10 characters.');
+      return;
     }
-    setError('')
-    setLoading(true)
-    setResult(null)
-
+    setLoading(true);
+    setError('');
+    setResult(null);
     try {
       const res = await fetch('/api/agents/triage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ symptoms }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error ?? 'Something went wrong. Please try again.')
-      } else {
-        setResult(data as TriageResult)
-      }
+      });
+      if (!res.ok) throw new Error('Service unavailable');
+      const data = await res.json();
+      setResult(data);
     } catch {
-      setError('Network error. Please check your connection and try again.')
+      setError('Our AI advisor is temporarily unavailable. Please WhatsApp us for immediate help.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
-  const urgencyStyle = result ? URGENCY_STYLES[result.urgency] : null
+  const urgencyConf = result ? URGENCY_CONFIG[result.urgency] : null;
 
   return (
-    <div style={{ background: '#fff', border: '1.5px solid #E5E1D8', borderRadius: 16, padding: '32px 32px 28px', maxWidth: 560 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, color: '#9CA3AF', textTransform: 'uppercase', marginBottom: 10 }}>
-        AI Scan Finder
+    <div style={{
+      background: '#fff', border: '1.5px solid var(--line)',
+      borderRadius: 'var(--radius-xl)', padding: 32, maxWidth: 640,
+    }}>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 20 }}>
+        <div style={{ fontSize: 32, flexShrink: 0 }}>🤖</div>
+        <div>
+          <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--primary)', marginBottom: 4 }}>
+            AI Scan Advisor
+          </h3>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+            Describe your symptoms or the scan your doctor recommended &mdash; our AI will suggest the most appropriate diagnostic scan.
+          </p>
+        </div>
       </div>
-      <h3 style={{ fontSize: 18, fontWeight: 700, color: '#082A4A', margin: '0 0 6px', lineHeight: 1.3 }}>
-        Not sure which scan you need?
-      </h3>
-      <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px', lineHeight: 1.6 }}>
-        Describe your symptoms and our AI assistant will recommend the most appropriate scan.
-      </p>
 
-      {!result && (
+      {!result ? (
         <form onSubmit={handleSubmit}>
           <textarea
             value={symptoms}
-            onChange={e => setSymptoms(e.target.value)}
-            placeholder="e.g. I have pain in my lower back that radiates down my left leg. It started 3 weeks ago after lifting something heavy..."
+            onChange={e => { setSymptoms(e.target.value); setError(''); }}
+            placeholder="e.g. 'I've had unexplained weight loss and fatigue for 3 months. My GP wants a scan to check for lymphoma.'"
             rows={4}
             style={{
-              width: '100%', border: '1.5px solid #E5E1D8', borderRadius: 10, padding: '12px 14px',
-              fontSize: 13, color: '#111', resize: 'vertical', fontFamily: 'inherit',
-              outline: 'none', boxSizing: 'border-box', lineHeight: 1.6,
+              width: '100%', padding: '14px 16px',
+              border: `1.5px solid ${error ? '#C0392B' : 'var(--line)'}`,
+              borderRadius: 10, fontSize: 14, resize: 'vertical',
+              background: '#fff', color: 'var(--text)',
+              boxSizing: 'border-box', lineHeight: 1.6,
             }}
           />
-          {error && (
-            <p style={{ fontSize: 12, color: '#DC2626', margin: '8px 0 0' }}>{error}</p>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              marginTop: 12, width: '100%', padding: '13px 20px',
-              background: loading ? '#9CA3AF' : '#0F4C81', color: '#fff',
-              border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer', transition: 'background .15s',
-            }}
-          >
-            {loading ? 'Analysing symptoms…' : 'Find my scan →'}
-          </button>
-          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '10px 0 0', textAlign: 'center', lineHeight: 1.5 }}>
-            This tool provides general guidance only. It is not a diagnosis or medical advice.
-            Always consult a clinician if you are concerned.
-          </p>
+          {error && <p style={{ color: '#C0392B', fontSize: 13, marginTop: 6 }}>{error}</p>}
+          <div style={{ display: 'flex', gap: 10, marginTop: 12, alignItems: 'center' }}>
+            <button type="submit" disabled={loading} style={{
+              background: loading ? 'var(--line)' : 'var(--accent)',
+              color: loading ? 'var(--text-muted)' : '#fff',
+              border: 'none', borderRadius: 9, padding: '11px 22px',
+              fontSize: 15, fontWeight: 600, cursor: loading ? 'wait' : 'pointer',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              {loading ? 'Analysing...' : 'Get Scan Recommendation →'}
+            </button>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Powered by Claude AI &middot; Not a medical diagnosis</span>
+          </div>
         </form>
-      )}
-
-      {result && urgencyStyle && (
+      ) : (
         <div>
-          {/* Urgency badge */}
           <div style={{
-            display: 'inline-block', padding: '4px 10px', borderRadius: 20,
-            background: urgencyStyle.bg, color: urgencyStyle.text,
-            fontSize: 11, fontWeight: 700, marginBottom: 16,
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: urgencyConf!.bg, borderRadius: 100,
+            padding: '6px 16px', marginBottom: 16,
           }}>
-            {urgencyStyle.label}
+            <span>{urgencyConf!.icon}</span>
+            <span style={{ fontWeight: 700, fontSize: 14, color: urgencyConf!.color }}>
+              {result.urgencyLabel}
+            </span>
           </div>
 
-          {/* Recommended scan */}
-          <div style={{ background: '#F8F9FB', borderRadius: 12, padding: '20px 20px', marginBottom: 16 }}>
-            <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>
-              Recommended scan
+          {result.shouldSeeGPFirst && (
+            <div style={{ background: '#FEF9F0', border: '1.5px solid var(--warm)', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#7D5A00' }}>
+              {result.gpNote ?? 'We recommend seeing your GP before booking this scan.'}
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#082A4A', marginBottom: 10 }}>
-              {result.recommendedScan}
-            </div>
-            <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.7, margin: 0 }}>
-              {result.reasoning}
-            </p>
-          </div>
-
-          {result.alternativeScans && result.alternativeScans.length > 0 && (
-            <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 16px' }}>
-              <strong>Also worth considering:</strong> {result.alternativeScans.join(', ')}
-            </p>
           )}
+
+          <p style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.7, marginBottom: 20 }}>
+            {result.clinicalSummary}
+          </p>
+
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
+              Recommended Scans
+            </div>
+            {result.recommendedScans.map(scan => (
+              <div key={scan.code} style={{
+                background: 'var(--bg-2)', borderRadius: 10, padding: '12px 16px',
+                marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              }}>
+                <div>
+                  <div style={{ fontWeight: 600, color: 'var(--primary)', fontSize: 14 }}>{scan.name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{scan.reason}</div>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--primary)' }}>from £{scan.priceFrom.toLocaleString()}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+            <div style={{ background: '#FDEDEC', borderRadius: 10, padding: '12px 14px', textAlign: 'center' }}>
+              <div style={{ fontSize: 11, color: '#922B21', marginBottom: 2 }}>NHS Wait</div>
+              <div style={{ fontWeight: 700, color: '#922B21' }}>{result.nhsWaitEstimate}</div>
+            </div>
+            <div style={{ background: 'var(--accent-light)', borderRadius: 10, padding: '12px 14px', textAlign: 'center' }}>
+              <div style={{ fontSize: 11, color: 'var(--accent-2)', marginBottom: 2 }}>thediagnostic</div>
+              <div style={{ fontWeight: 700, color: 'var(--accent-2)' }}>{result.thediagnosticWait}</div>
+            </div>
+          </div>
 
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <Link
-              href={result.bookingHref}
-              style={{
-                flex: 1, display: 'block', textAlign: 'center',
-                padding: '12px 20px', background: '#082A4A', color: '#fff',
-                borderRadius: 10, fontSize: 14, fontWeight: 600, textDecoration: 'none',
-              }}
-            >
-              Book {result.recommendedScan} →
+            <Link href={`/book?scan=${result.recommendedScans[0]?.code ?? ''}`} style={{
+              background: 'var(--accent)', color: '#fff',
+              borderRadius: 9, padding: '11px 20px',
+              fontSize: 14, fontWeight: 600, display: 'inline-block',
+            }}>
+              Book {result.recommendedScans[0]?.name ?? 'Scan'} →
             </Link>
-            <button
-              onClick={() => { setResult(null); setSymptoms('') }}
-              style={{
-                padding: '12px 18px', background: 'transparent', border: '1.5px solid #E5E1D8',
-                borderRadius: 10, fontSize: 13, color: '#6B7280', cursor: 'pointer',
-              }}
-            >
-              Start over
+            <button onClick={() => { setResult(null); setSymptoms(''); }} style={{
+              background: '#fff', border: '1.5px solid var(--line)', color: 'var(--text-muted)',
+              borderRadius: 9, padding: '11px 18px', fontSize: 14, cursor: 'pointer',
+            }}>
+              Try Again
             </button>
           </div>
 
-          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '12px 0 0', textAlign: 'center', lineHeight: 1.5 }}>
-            This is AI-generated guidance, not medical advice. Please speak to a clinician if you are unwell.
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 14, lineHeight: 1.5 }}>
+            This is an AI recommendation tool, not a medical diagnosis. Always consult a qualified physician before making healthcare decisions.
           </p>
         </div>
       )}
     </div>
-  )
+  );
 }
