@@ -1,158 +1,83 @@
-# ScanBook — Master Plan & Developer Roadmap
-**Versiyon: 5.0 · Güncelleme: 19 Mayıs 2026**
-**The Connective UK Ltd · Confidential**
+# thediagnostic — Master Plan & Durum Raporu
+**Versiyon: 7.0 · Güncelleme: 15 Haziran 2026**
+**Repo: github.com/fevzitorun/thediagnostic · Branch: `main`**
+
+> Detaylı modül-modül plan ve ilerleme için bkz. [MODULES.md](MODULES.md)
+> (37 modül, 8 faz). Bu doküman genel durumu özetler.
 
 ---
 
-## MEVCUT DURUM — Tam Tablo
+## ÖZET — Genel Durum
 
-> Site **canlı** → [preview.scanbook.co.uk](https://preview.scanbook.co.uk)
-> GitHub aktif · Railway aktif · Vercel aktif · Stripe aktif · Resend aktif
+Bu repo iki farklı projenin (ScanBook UK ve thediagnostic TR) kodlarının üst
+üste binmesiyle oluştu. **FAZ 0 (Temizlik) ve FAZ 1 (Türkiye Klinik Verisi &
+Veritabanı) artık tamamlandı** — main branch'inde gerçek TR klinik verisi,
+görseller ve TR'ye özel DB şeması var. Kalan iş FAZ 2-7: SEO sayfaları,
+marka/tasarım, çoklu para birimi, AI agent güncellemeleri, portal/dashboard
+ve deploy/QA.
+
+`claude/thediagnostic-phase-2-LK1dc` branch'i hâlâ `thediagnostic/` adlı
+yanlış alt klasör yapısında duruyor ve PR #1 olduğu gibi merge edilemez
+(Modül 5, hâlâ ⬜). Bu sefer içerik branch'ten **tek tek çıkarılıp** doğru
+konuma main'e işlendi — PR #1'in kendisi henüz düzleştirilmedi/kapatılmadı.
 
 ---
 
-### ✅ Altyapı — Tamamlandı
+## ✅ TAMAMLANAN İŞ (FAZ 0 + FAZ 1, Modül 1-11)
 
-| Bileşen | Durum | Not |
+| # | Modül | Sonuç |
 |---|---|---|
-| **Vercel** | ✅ Canlı | preview.scanbook.co.uk üzerinde deploy edildi |
-| **GitHub** | ✅ Aktif | Geliştirici 1 aydır çalışıyor |
-| **Railway PostgreSQL** | ✅ Aktif | `DATABASE_URL` Vercel'e tanımlı |
-| **Stripe** | ✅ Aktif | Checkout + webhook çalışıyor |
-| **Resend** | ✅ Aktif | Booking confirmation + partner emailler gidiyor |
-| **NextAuth v5** | ✅ Aktif | JWT strateji, Credentials + Google OAuth |
+| 1 | Görsel Varlıkları Kurtarma | `public/images/*` (6 dosya: hero-scanner, logo-mark, logo-horizontal-dark/light, logo-stacked*) + `public/logo.svg` eklendi → logo/hero artık kırık değil |
+| 2 | Çöp Dosya Temizliği | Kök dizindeki 1 byte'lık boş `images` dosyası silindi |
+| 3 | README.md Yeniden Yazımı | create-next-app boilerplate kaldırıldı, thediagnostic kurulum dökümanı yazıldı |
+| 4 | LINKEDIN_PAGE_COPY.md Yeniden Yazımı | ScanBook içeriği → thediagnostic LinkedIn şirket sayfası metni |
+| 5 | PR #1 Düzleştirme | ⬜ **Henüz yapılmadı** — aşağıda "Kalan İş"te |
+| 6 | Klinik Veri Taşıma | `lib/tr-clinics.data.ts` (13 TR kliniği, 9 grup: HSM, Acıbadem×2, Medicana×2, Koç, Florence Nightingale, Memorial×2, Liv, Medical Park×2, Anadolu) — homepage `CLINICS` artık `getFeaturedClinics()` ile 8 grup gösteriyor |
+| 7 | Cihaz Kataloğu Taşıma | `lib/scanTypes.config.ts` UK-only olarak bırakıldı; TR kataloğu `tr-clinics.data.ts` içindeki `SCAN_TYPES` (18 kod, EN/TR/AR) ile geldi |
+| 8 | DB Şema Birleştirme | `lib/schema-tr-migrations.sql` — `tr_clinics`/`tr_scan_types` (paralel TR tabloları) + 13 destek tablosu (scan_slots, clinic_scan_types, concierge_requests, scan_reports, whatsapp_*, vb.) + `profiles`/`bookings` additive ALTER |
+| 9 | Seed Verisi | `lib/seed-tr.sql` — 13 TR klinik + 18 cihaz kodu + fiyatlandırma + İngilizce açıklamalar |
+| 10 | Klinik Slot Yönetimi | `app/clinic/slots/page.tsx` + `app/api/clinic/slots/route.ts`, sidebar'a "Slots" linki |
+| 11 | Public Slots API | `app/api/slots/route.ts` → `tr_clinics` JOIN'i düzeltildi |
+
+**Önemli not:** Tüm bu değişiklikler şu an **local/uncommitted** — henüz
+GitHub'a push edilmedi (push bu oturumda yapılıyor).
 
 ---
 
-### ✅ Tamamlandı — Sayfalar ve Rotalar
+## ⚠️ KALAN İŞ — KRİTİK / YÜKSEK ÖNCELİK
 
-#### Core & Auth
-| Dosya | Açıklama |
-|---|---|
-| `app/layout.tsx` | DM Sans + Instrument Serif, CSS değişkenleri |
-| `app/page.tsx` | Homepage — 11 bölüm, ink/paper renk sistemi |
-| `components/Navbar.tsx` | SVG logo, sticky, oturum durumuna göre değişen butonlar |
-| `components/Footer.tsx` | Dark navy, 5 kolon |
-| `proxy.ts` | /patient, /clinic, /admin, /gp rota koruması (NextAuth) |
-| `app/(auth)/login/page.tsx` | Email + Google OAuth |
-| `app/(auth)/register/page.tsx` | GDPR onay + doğrulama |
-| `app/auth/signout/route.ts` | GET + POST |
-
-#### Arama & Booking
-| Dosya | Açıklama |
-|---|---|
-| `app/search/page.tsx` | Gerçek klinik verisi, filtre paneli |
-| `app/clinics/[slug]/page.tsx` | Klinik detay + booking sidebar |
-| `app/book/page.tsx` | 5-adım flow, MRI güvenliği, gerçek API çağrıları |
-| `app/book/success/page.tsx` | Stripe sonrası onay sayfası |
-
-#### API Rotaları
-| Route | Açıklama |
-|---|---|
-| `api/stripe/checkout` | Stripe Checkout Session oluşturur |
-| `api/stripe/webhook` | checkout.session.completed → DB yaz + email gönder |
-| `api/bookings/draft` | Callback request booking |
-| `api/bookings/confirm` | Session ID ile status → confirmed |
-| `api/admin/bookings/[id]/status` | Admin status güncelleme |
-| `api/admin/partner-leads/[id]` | Partner lead status/notlar güncelleme |
-| `api/clinic/bookings/[id]/status` | Klinik status güncelleme (clinicId ile kısıtlı) |
-| `api/partners/apply` | Partner başvurusu → DB + email bildirimi |
-| `api/agents/triage` | AI triage (Claude API) |
-| `api/agents/clinic-outreach` | CQC API → partner email kampanyası |
-| `api/agents/patient-followup` | Gün 3/7/14/30 hasta takip emailleri |
-| `api/auth/register` | bcrypt hash + users + profiles tablosu |
-| `api/auth/[...nextauth]` | NextAuth handler |
-
-#### Portaller
-| Portal | Sayfalar |
-|---|---|
-| **Patient** | dashboard, bookings/[id], profile, reports |
-| **Admin** | dashboard, bookings, bookings/[id], clinics, clinics/[id], clinics/new, patients, finance, marketing, messages, settings, outreach (CRM), agents |
-| **Clinic** | redirect, dashboard, appointments, reports, packages, messages, settings |
-| **GP** | redirect, dashboard, refer, referrals, earnings, settings |
-
-#### SEO Sayfaları (SSG — 190 statik sayfa)
-| Tip | URL Pattern |
-|---|---|
-| Services hub | `/services` |
-| Service detail | `/services/[slug]` × 10 |
-| MRI body parts | `/mri-scan/[part]` × 9 |
-| CT body parts | `/ct-scan/[part]` × 2 |
-| Ultrasound variants | `/ultrasound/[variant]` × 20 |
-| X-Ray body parts + cities | `/x-ray/[part]` × 21 |
-| City pages | `/mri-scan`, `/ct-scan`, `/ultrasound`, `/pregnancy-scan`, `/baby-scan` × şehir |
-| Pregnancy & Baby | `/pregnancy-scan`, `/baby-scan` hub + city |
-| For GPs landing | `/for-gps` |
-| Partners landing | `/partners` + `/partners/thank-you` |
-| Blog scaffold | `/blog`, `/blog/[slug]` |
-
-#### AI Agents & CRM
-| Dosya | Açıklama |
-|---|---|
-| `lib/agents/triage.ts` | Claude sonnet-4-6 triage → urgency: routine/soon/urgent |
-| `lib/agents/patient-followup.ts` | Gün 3/7/14/30 post-scan email akışı |
-| `lib/agents/cqc-client.ts` | CQC public API → imaging provider verisi |
-| `lib/agents/outreach-email.ts` | Zengin HTML partner email (Resend) |
-| `components/TriageWidget.tsx` | Semptom girişi → urgency badge + booking CTA |
-| `app/admin/agents/page.tsx` | Admin agent paneli — manuel tetikleme + JSON yanıt |
-| `app/admin/outreach/page.tsx` | Partner CRM — durum filtresi, arama, lead detay drawer |
-
-#### Veritabanı & Email
-| Dosya | Açıklama |
-|---|---|
-| `lib/db.ts` | Railway bağlantısı (lazy proxy) + QueryBuilder compat shim |
-| `lib/auth.ts` | NextAuth v5 config — JWT, Credentials, Google |
-| `lib/supabase/server.ts` | Compat shim (eski server component import'larını karşılar) |
-| `lib/clinics.data.ts` | 4 test klinik |
-| `lib/scanTypes.config.ts` | 9 scan tipi |
-| `lib/services-content.ts` | 10 servis + women's health |
-| `lib/body-parts-content.ts` | MRI/CT/X-Ray body part SEO içerikleri |
-| `lib/cities-content.ts` | 15+ şehir, 6 scan tipi config |
-| `lib/email/booking-confirmation.ts` | Resend email template |
-| `lib/schema-migrations.sql` | partner_leads tablosu dahil tüm migration'lar |
-| `lib/seed.sql` | Test verisi |
-
----
-
-### ⚠️ Açık Teknik Borçlar
-
-| Öncelik | Sorun | Detay |
+| # | İş | Detay |
 |---|---|---|
-| 🟠 | **Client mutations** | `ClinicAdminActions`, `ReferralForm`, `GPSettingsForm`, `NewClinicForm`, `ClinicSettingsForm`, `PackageManager`, `ReportUploader` — Supabase import'ları kaldırıldı ama henüz API route'a bağlanmadı. Runtime'da hata verir. |
-| 🟠 | **`@ts-nocheck`** | 34 data display sayfasında geçici — `postgres` paketi `unknown` döndürüyor, tipleme yapılacak |
-| 🟡 | **Eski paketler** | `@supabase/ssr` ve `@supabase/supabase-js` hâlâ `package.json`'da — migration tamamlanınca kaldırılabilir |
-| 🟡 | **`stripe_payment_intent` duplikasyonu** | `schema.sql`'de `stripe_payment_intent_id`, migration'da `stripe_payment_intent` — ikisi ayrı kolon; eski olanı silinmeli |
+| 1 | **PR #1 Düzleştirme (Modül 5)** | `claude/thediagnostic-phase-2-LK1dc` branch'indeki `thediagnostic/` alt klasör yapısı hâlâ düzeltilmedi. main artık kendi yoluyla TR verisini aldığı için bu PR'ın **artık gerekli olup olmadığı gözden geçirilmeli** — büyük olasılıkla kapatılıp arşivlenebilir, çünkü değerli içerik (görseller, klinik verisi, şema, slot sayfası) zaten manuel olarak main'e taşındı. Geriye kalan tek potansiyel değer: `lib/whatsapp/*`, `lib/agents/cqc-client.ts`, `outreach-email.ts` (Modül 29 kapsamında ayrıca değerlendirilecek) |
+| 2 | **DB migration'larının Railway'e uygulanması** | `lib/schema-tr-migrations.sql` ve `lib/seed-tr.sql` sadece dosya olarak hazır — production/staging DB'sine henüz **çalıştırılmadı**. Sıra: `schema-vercel.sql` → `schema-migrations.sql` → `schema-tr-migrations.sql` → `seed.sql` → `seed-tr.sql` |
+| 3 | **`/book` sayfası hâlâ UK akışında** | `app/book/page.tsx` ve `app/clinics/[slug]/page.tsx` hâlâ `lib/clinics.data.ts` (UK `ClinicData`/`ScanPackage`) kullanıyor. TR klinikleri için booking UI entegrasyonu Modül 18 (TR klinik detay sayfaları) kapsamında yapılacak |
+| 4 | **node_modules durumu** | Geliştirme ortamında `node_modules` eksik/bozuk paketler içeriyordu (`npx tsc` başarısız oldu — "Cannot find type definition file"). Bir sonraki oturumda `npm install` çalıştırılması önerilir |
 
 ---
 
-### 📋 Kalan İşler (Sonraki Sprint)
+## 📋 SIRADAKİ MODÜLLER (FAZ 2-7, Modül 12-37)
 
-| Öncelik | İş | Not |
+Detaylar [MODULES.md](MODULES.md)'de. Özet:
+
+| Faz | Kapsam | Modül # |
 |---|---|---|
-| 🔴 | **Client mutations API route'a bağla** | 7 component, yukarıdaki listeye bak |
-| 🔴 | **Railway schema çalıştır** | Enes, `lib/schema-migrations.sql` + `lib/seed.sql` Railway'de çalıştırmalı |
-| 🟠 | **`sitemap.xml` + `robots.txt`** | SEO için kritik — 190 statik sayfa var ama Google görmüyor |
-| 🟠 | **Mobile responsive** | Hiç dokunulmadı — öncelikli |
-| 🟠 | **GDPR cookie banner** | UK GDPR / ICO zorunluluğu |
-| 🟡 | **Blog içeriği (ilk 5 yazı)** | NHS bekleme süreleri, MRI rehberi, özel scan avantajları vb. |
-| 🟡 | **Analytics** | Vercel Analytics + GA4 |
-| 🟡 | **`@ts-nocheck` temizliği** | `sql<Row[]>` generic tipler ile 34 sayfayı tip-güvenli yap |
-| 🟡 | **Eski Supabase paketleri kaldır** | `npm uninstall @supabase/ssr @supabase/supabase-js` |
-| 🟡 | **TriageWidget entegrasyonu** | Şimdilik Phase 2 — önce 5+ klinik onboarded olsun |
-| 🟡 | **WhatsApp chatbot** | Phase 2 |
+| FAZ 2 | TR SEO sayfaları (`/scan/pet-ct`, `/scan/gamma-knife`, `/scan/mri-3t`, `/scan/pet-mri`, `/compare/...`, `/destinations/turkey/istanbul`, TR klinik detay sayfaları, UK sayfa arşivleme, sitemap) | 12-20 |
+| FAZ 3 | Navbar/Footer güncelleme, logo finalizasyonu, tasarım tutarlılığı | 21-24 |
+| FAZ 4 | Çoklu para birimi, İyzico, geo-targeting | 25-27 |
+| FAZ 5 | AI triage güncelleme, WhatsApp Business API, rapor özeti agent'ı, hasta takip agent'ı, concierge planner | 28-32 |
+| FAZ 6 | Patient dashboard, klinik portalı genişletme, admin TR klinik yönetimi | 33-35 |
+| FAZ 7 | Vercel deploy & domain, uçtan uca test | 36-37 |
+
+**Sıradaki:** Modül 12 — `/scan/pet-ct` SEO landing sayfası.
 
 ---
 
-## Enes İçin Kurulum — Yalnızca Railway
-
-> Supabase yok. Tüm veri Railway PostgreSQL'de.
-
-### 1. Ortam Değişkenleri (`.env.local`)
+## 🚀 DEPLOY İÇİN GEREKLİ ENV VARIABLES
 
 ```
-DATABASE_URL=postgresql://postgres:SIFRE@HOST.railway.app:PORT/railway
-NEXTAUTH_SECRET=openssl rand -base64 32 ile üret
-NEXTAUTH_URL=https://preview.scanbook.co.uk
+DATABASE_URL=postgresql://...        (Railway)
+NEXTAUTH_SECRET=...
+NEXTAUTH_URL=https://thediagnostic.co.uk
 GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 STRIPE_SECRET_KEY=sk_live_...
@@ -160,75 +85,45 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 RESEND_API_KEY=re_...
 ANTHROPIC_API_KEY=sk-ant-...
-AGENT_SECRET=openssl rand -hex 32 ile üret
-NEXT_PUBLIC_PLATFORM=scanbook
-NEXT_PUBLIC_SITE_URL=https://preview.scanbook.co.uk
+META_WHATSAPP_TOKEN=...
+META_WHATSAPP_PHONE_ID=...
+AGENT_SECRET=...
+NEXT_PUBLIC_SITE_URL=https://thediagnostic.co.uk
 ```
 
-### 2. Railway DB Schema
-
-Railway dashboard → PostgreSQL → Query sırayla çalıştır:
-1. `lib/schema-migrations.sql` — tüm tablolar (bookings, clinics, profiles, partner_leads, vb.)
-2. `lib/seed.sql` — test verisi
-
-### 3. Stripe Webhook
-
-Stripe dashboard → Webhooks → Add endpoint:
-- URL: `https://preview.scanbook.co.uk/api/stripe/webhook`
-- Event: `checkout.session.completed`
-- Signing secret → `STRIPE_WEBHOOK_SECRET`'e yaz
-
-### 4. Google OAuth
-
-Google Cloud Console → OAuth 2.0 Client ID:
-- Authorized redirect URI: `https://preview.scanbook.co.uk/api/auth/callback/google`
-
-### 5. Vercel
-
-Settings → Environment Variables → yukarıdaki tüm değerleri ekle → Redeploy
-
 ---
 
-## TECH STACK (Güncel)
+## TECH STACK
 
-| Katman | Teknoloji | Versiyon |
-|---|---|---|
-| Framework | Next.js (App Router) | 16.1.6 |
-| Dil | TypeScript | 5.x |
-| Stil | Inline styles | CSS değişkenleri |
-| Database | Railway PostgreSQL | `postgres` npm paketi |
-| Auth | NextAuth v5 (Auth.js beta) | JWT strateji |
-| Ödeme | Stripe Checkout | Live mod |
-| Email | Resend | `partnerships@scanbook.co.uk`, `care@scanbook.co.uk` |
-| AI Agents | Anthropic Claude API | claude-sonnet-4-6 |
-| Deploy | Vercel | preview.scanbook.co.uk |
-| Repo | GitHub | Private |
+| Katman | Teknoloji |
+|---|---|
+| Framework | Next.js 16.1.6 (App Router) |
+| Dil | TypeScript 5 |
+| Stil | Tailwind 4 + inline CSS variables |
+| i18n | next-intl (en/tr/ar) |
+| Database | PostgreSQL (Railway) — `postgres` npm paketi |
+| Auth | NextAuth v5 (beta) |
+| Ödeme | Stripe Checkout (İyzico planlanıyor — Modül 26) |
+| Email | Resend |
+| AI | Anthropic Claude API (triage, report summary, follow-up, concierge) |
+| Deploy | Vercel |
 
----
-
-## RENK SİSTEMİ
-
+### Renk sistemi (`app/globals.css`)
 ```css
---ink:    #0F4C81  /* ana navy */
---ink-2:  #0A3A66
---ink-3:  #082A4A  /* koyu navy — CTA, footer */
---ink-05: #E8F0F8  /* açık navy — hover */
---accent: #EF4444  /* kırmızı — sadece pulse dot */
---paper:  #FAFAF7  /* warm white bg */
---paper-2:#F2F1EC  /* ikincil bg */
---line:   #E5E1D8  /* border */
+--primary:    #1B4F72   /* lacivert */
+--primary-2:  #154360
+--primary-3:  #0E2F48
+--accent:     #17A589   /* teal */
+--accent-2:   #0E6655
+--warm:       #E67E22
+--bg:         #F8FFFE
+--line:       #D5E8E4
 ```
 
 ---
 
-## FAZLAR
-
-| Faz | Kapsam | Durum |
-|---|---|---|
-| **Faz 1** | Core platform, booking flow, portaller, SEO sayfaları, partner CRM | ✅ Canlı |
-| **Faz 2** | AI triage widget, WhatsApp chatbot, 5+ klinik onboarding | ⏳ Planlandı |
-| **Faz 3** | Mobile app, GP network genişleme, analytics dashboard | 🔮 İleride |
-
----
-
-*Güncelleme: 19 Mayıs 2026 — Versiyon 5.0*
+*Bu rapor, `thediagnostic-main` lokal klonu (main branch) üzerinde
+Modül 1-11'in tamamlanmasından sonra hazırlandı. v6.0'daki kritik sorunların
+(kırık görseller, yanlış MASTER-PLAN/LINKEDIN içeriği, UK klinik verisi, eksik
+DB şeması) tamamı çözüldü; kalan tek kritik konu PR #1'in durumu ve
+migration'ların production DB'sine uygulanmasıdır.*

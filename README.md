@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# thediagnostic
 
-## Getting Started
+Medical tech brokerage platform — UK hastalarını Türkiye'deki (HSM Radyoloji,
+Acıbadem ve diğer ortak hastane grupları) ileri görüntüleme ve tedavi
+merkezlerine yönlendiren, AI destekli triage, çoklu dil (EN/TR/AR) ve
+booking + ödeme altyapısına sahip bir Next.js uygulaması.
 
-First, run the development server:
+Genel yol haritası ve modül listesi için [MASTER-PLAN.md](MASTER-PLAN.md) ve
+[MODULES.md](MODULES.md)'e bakın.
+
+## Kurulum
+
+```bash
+npm install
+```
+
+## Ortam Değişkenleri
+
+Proje kökünde bir `.env.local` dosyası oluşturup aşağıdaki değişkenleri girin:
+
+```bash
+# Veritabanı (Railway PostgreSQL)
+DATABASE_URL=postgresql://postgres:PASSWORD@HOST.railway.app:PORT/railway
+
+# NextAuth
+NEXTAUTH_SECRET=          # openssl rand -base64 32
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Resend (email)
+RESEND_API_KEY=re_...
+
+# Anthropic (AI agents — triage, report summary, follow-up)
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Meta WhatsApp Business API
+META_WHATSAPP_TOKEN=
+META_WHATSAPP_PHONE_ID=
+
+# Genel
+AGENT_SECRET=             # openssl rand -hex 32
+NEXT_PUBLIC_SITE_URL=https://thediagnostic.co.uk
+```
+
+## Veritabanı Kurulumu
+
+Railway/Postgres üzerinde sırasıyla çalıştırın:
+
+```bash
+psql "$DATABASE_URL" -f lib/schema-vercel.sql
+psql "$DATABASE_URL" -f lib/schema-migrations.sql
+psql "$DATABASE_URL" -f lib/seed.sql
+```
+
+## Geliştirme
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) adresinde açılır. `/en`, `/tr`,
+`/ar` locale'leri `next-intl` ile yönetilir (varsayılan: `en`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## Proje Yapısı
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  page.tsx          → Ana sayfa (hero, triage widget, device catalog, ...)
+  scan/              → Tarama türü landing sayfaları (PET-CT, GammaKnife, ...)
+  clinics/[slug]/    → Klinik detay sayfaları
+  book/              → 7 adımlı booking akışı
+  clinic/            → Klinik partner portalı
+  admin/             → Admin paneli
+  api/               → API route'ları (Stripe, slots, AI agents, WhatsApp)
+lib/
+  agents/            → AI agent'lar (triage, report-summary, follow-up)
+  clinics.data.ts    → Klinik verisi
+  scanTypes.config.ts → Cihaz/tarama tipi kataloğu
+  schema-vercel.sql / schema-migrations.sql / seed.sql → Veritabanı şeması ve örnek veri
+i18n/                → next-intl yapılandırması
+messages/            → en/tr/ar çeviri dosyaları
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js (App Router) · TypeScript · Tailwind · next-intl · PostgreSQL ·
+NextAuth v5 · Stripe · Resend · Anthropic Claude API · Vercel

@@ -1,55 +1,63 @@
-# ScanBook — LinkedIn Company Page Copy
-# Plan B → ScanBook revize için yapıştır
+# thediagnostic — LinkedIn Company Page Copy
 
 ---
 
 ## Company name
-ScanBook
+thediagnostic
 
 ## Tagline (120 chars max)
-Private medical imaging, booked online. MRI, CT, Ultrasound & more — no GP referral needed.
+Don't just scan. Scan with the best. UK patients, world-class diagnostics in Turkey — up to 70% savings.
 
 ## About (2000 chars max)
-ScanBook is the UK's dedicated online booking platform for private medical imaging.
-
-We connect patients with 200+ CQC-registered imaging centres across the UK — so you can book an MRI, CT scan, ultrasound, X-ray, or baby scan without waiting weeks for an NHS appointment or needing a GP referral.
+thediagnostic is a medical technology brokerage connecting UK (and international)
+patients with internationally accredited hospital groups in Turkey — Acıbadem,
+Medicana, Koç Üniversitesi, Memorial, Liv, Florence Nightingale, Anadolu Sağlık,
+Medical Park and HSM Radyoloji — for advanced imaging and treatment that's often
+unavailable, expensive, or has long waiting lists in the UK.
 
 **For patients:**
-Search by scan type and location. Compare prices and availability. Book online in minutes. Receive a consultant radiologist report within 24–48 hours.
+Describe your symptoms or the scan you need. Our AI Triage Advisor recommends the
+right technology — PET-CT, PET-MRI, GammaKnife, 3T MRI, Da Vinci robotic surgery,
+MR-Linac and more. Compare UK vs. Turkey prices (typically 60–70% lower), pick a
+clinic and live appointment slot, and book online. We arrange flights, hotels,
+airport transfers and interpreters as part of our Concierge service. Reports are
+delivered in a UK GP-compatible format, reviewed by a consultant radiologist.
 
-**For imaging centres:**
-List your available scanner slots and fill unused capacity with self-pay patients. No setup cost, no exclusivity, full price control. Go live in 48 hours.
+**For clinics:**
+List your spare scanner and treatment slots and reach a steady flow of
+self-pay international patients. No setup cost, real-time slot management,
+multi-currency pricing (GBP/EUR/USD/TRY/AED).
 
 **For GPs and clinicians:**
-Refer patients directly through our GP portal. Track referrals and receive reports digitally.
+Refer patients directly, track referrals, and receive structured reports digitally.
 
-ScanBook is built and operated by Connective Hub Limited (Company No. 11148446), a UK health technology company focused on improving access to private diagnostic imaging.
+thediagnostic — Medical Tech Broker · UK · Turkey · UAE.
 
-🌐 scanbook.co.uk
-📧 hello@scanbook.co.uk
-📍 United Kingdom
+🌐 thediagnostic.co.uk
+📧 hello@thediagnostic.co.uk
+📍 United Kingdom / Turkey
 
 ---
 
 ## Specialties (LinkedIn allows up to 20)
-- Private medical imaging
+- Medical tourism
+- Diagnostic imaging
+- PET-CT
 - MRI scanning
-- CT scanning
-- Ultrasound
-- Digital health
+- GammaKnife
 - Health technology
 - Medical booking platform
-- Diagnostic imaging
 - Private healthcare
-- Online booking
-- Patient access
+- AI triage
+- Patient concierge
 - Radiology
 - Health screening
-- Women's health imaging
-- Baby scans
+- Second opinion
+- Cross-border healthcare
+- International patient services
 
 ## Website
-https://scanbook.co.uk
+https://thediagnostic.co.uk
 
 ## Industry
 Hospitals and Health Care
@@ -61,64 +69,68 @@ Hospitals and Health Care
 Privately Held
 
 ## Founded
-2024
+2026
 
 ## Logo
-Use the ScanBook logo (dark version on white background)
+Use the thediagnostic logo mark (`public/images/logo-mark.png`)
 Dimensions: 300×300px minimum (square)
 
 ---
 
-## FIRST POST (once you've revamped the page — don't post yet, save for when 3+ clinics are live)
+## FIRST POST (don't post yet — save for when HSM Radyoloji + Acıbadem are live)
 
 ---
 
-🚀 ScanBook is live.
+🚀 thediagnostic is live.
 
-Private medical imaging, booked online — no GP referral, no waiting weeks.
+Don't just scan. Scan with the best.
 
-MRI from £275. CT from £185. Ultrasound from £99.
+PET-CT from £1,200 (vs. £3,500–£5,000 in the UK). MRI 3T from £280. GammaKnife
+from £5,000 (vs. up to £25,000 in the UK).
 
-We're building the easiest way to access private diagnostic imaging in the UK: search, compare, book, and receive your radiologist report — all in one place.
+We connect UK patients with internationally accredited hospital groups in
+Turkey — Acıbadem, Medicana, Memorial, Liv, Koç Üniversitesi and more — for
+advanced diagnostics and treatments, with flights, hotels and transfers
+arranged for you.
 
-200+ CQC-registered imaging centres. 15 cities. Growing every week.
+AI-powered triage. Real-time slot booking. UK GP-compatible reports.
 
-If you're an imaging centre with spare scanner capacity, we'd love to talk:
-👉 scanbook.co.uk/partners
+If you're a hospital group with spare scanner or treatment capacity, let's talk:
+👉 thediagnostic.co.uk/partners
 
-#PrivateHealthcare #MedicalImaging #HealthTech #DiagnosticImaging #MRIScan #ScanBook
+#MedicalTourism #DiagnosticImaging #PETCT #HealthTech #Turkey #GammaKnife
 
 ---
 
-## LINKEDIN STRATEGY (activate at Phase 2 — after 5+ clinics live)
+## LINKEDIN STRATEGY (activate at Phase 2 — after first 2 clinics live)
 
 Content cadence: 2-3 posts/week
 
 Content pillars:
-1. Patient education (what to expect from a scan, MRI vs CT, do I need a referral?)
-2. Clinic partnerships (new centre announcements, city expansions)
-3. Health screening / Full Body MRI awareness
-4. Company/team updates (behind the scenes, hiring)
-5. NHS vs private wait time comparisons (data-driven, non-political)
+1. Patient education (what is PET-CT/GammaKnife/PET-MRI, who needs it)
+2. Clinic partnerships (new hospital group announcements)
+3. UK vs. Turkey price comparisons (data-driven, transparent)
+4. Patient stories / testimonials (with consent)
+5. Company/team updates (behind the scenes, hiring)
 
 Target connections:
-- Radiologists and radiographers (Royal College of Radiologists members)
-- Imaging centre managers and directors
-- Private hospital group executives (InHealth, Alliance Medical, Circle, BMI)
+- Radiologists and oncologists (Royal College of Radiologists members)
+- Turkish hospital group international patient departments
+- Private hospital group executives (UK and Turkey)
 - GP practice managers
 - Health tech founders and investors
-- CQC inspectors and NHS commissioners
+- Medical tourism agencies and facilitators
 
 ---
 
-## INSTAGRAM (planb → scanbook — update profile now, post at Phase 2)
+## INSTAGRAM (Phase 2)
 
-Username: @scanbookuk
+Username: @thediagnostic
 Bio:
-Private medical imaging, booked online 🏥
-MRI · CT · Ultrasound · X-Ray · Baby Scans
-No GP referral needed ⚡
-🔗 scanbook.co.uk
+Don't just scan. Scan with the best. 🩺
+PET-CT · MRI 3T · GammaKnife · PET-MRI
+UK prices vs. Turkey — save up to 70% ⚡
+🔗 thediagnostic.co.uk
 
-Profile photo: ScanBook logo (white on dark blue background, square)
-Highlight covers: Scans | Clinics | Blog | Book Now
+Profile photo: thediagnostic logo mark (navy/teal, square)
+Highlight covers: Scans | Clinics | Savings | Book Now

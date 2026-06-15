@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import TriageWidget from '@/components/TriageWidget';
 import SavingsCalculator from '@/components/SavingsCalculator';
+import { getFeaturedClinics } from '@/lib/tr-clinics.data';
 
 // ─── Data ───────────────────────────────────────────────────
 
@@ -87,38 +88,22 @@ const SCAN_TYPES = [
   },
 ];
 
-const CLINICS = [
-  {
-    slug: 'hsm-radyoloji-istanbul',
-    name: 'HSM Radyoloji',
-    city: 'Istanbul, Turkey',
-    lead: 'Prof. Dr. Mustafa ÖZATEŞ',
-    role: 'Consultant Radiologist',
-    description: 'Two state-of-the-art clinics in central Istanbul led by one of Turkey\'s foremost radiologists. Expert subspecialist reporting — results in English within 24 hours.',
-    scans: ['PET-CT', 'MRI 3T', 'SPECT-CT', 'CT Angio'],
-    jci: false,
-    iso: true,
-    rating: 4.9,
-    priceFrom: 320,
-    currency: 'GBP',
-    accentColor: '#17A589',
-  },
-  {
-    slug: 'acibadem-maslak-istanbul',
-    name: 'Acıbadem Maslak Hospital',
-    city: 'Istanbul, Turkey',
-    lead: 'International Patient Centre',
-    role: 'JCI Accredited · HIMSS Stage 6',
-    description: 'Turkey\'s first JCI-accredited hospital. The most advanced nuclear medicine suite in the region — GammaKnife, PET-MRI, PET-CT and robotic 3T MRI under one roof.',
-    scans: ['PET-CT', 'PET-MRI', 'GammaKnife', 'MRI 3T', 'SPECT-CT'],
-    jci: true,
-    iso: true,
-    rating: 4.8,
-    priceFrom: 380,
-    currency: 'GBP',
-    accentColor: '#1B4F72',
-  },
-];
+// 8 featured Turkish hospital groups, sourced from lib/tr-clinics.data.ts
+const CLINICS = getFeaturedClinics().map((clinic, i) => ({
+  slug: clinic.slug,
+  name: clinic.name,
+  city: `${clinic.city}, Turkey`,
+  lead: clinic.highlightBadge ?? `${clinic.group} Group`,
+  role: clinic.internationalPatientCentre ? 'International Patient Centre' : (clinic.specialties?.[0] ?? clinic.group ?? ''),
+  description: clinic.description,
+  scans: clinic.featuredScans.map(s => s.name),
+  jci: clinic.jciAccredited,
+  iso: clinic.isoAccredited,
+  rating: clinic.rating,
+  priceFrom: clinic.featuredScans.length > 0 ? Math.min(...clinic.featuredScans.map(s => s.priceGbp)) : 0,
+  currency: 'GBP',
+  accentColor: i % 2 === 0 ? '#17A589' : '#1B4F72',
+}));
 
 const HOW_IT_WORKS = [
   {

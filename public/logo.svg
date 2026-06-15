@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Pin outline: D-shape with open gap at top-right, pointed bottom -->
+  <path
+    d="M88 22 C78 10, 62 5, 46 5 C24 5, 6 23, 6 45 C6 62, 16 76, 30 85 L46 100 L62 85 C76 76, 86 62, 86 45 C86 39, 84 34, 82 30"
+    stroke="#3AABDB" stroke-width="5" fill="none"
+    stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Gap arc at top-right -->
+  <path d="M90 18 C94 12, 96 5, 93 1" stroke="#3AABDB" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+  <!-- Top node -->
+  <circle cx="54" cy="26" r="5" fill="#3AABDB"/>
+  <!-- Curved line to large right node -->
+  <path d="M54 31 Q64 46, 66 58" stroke="#3AABDB" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <!-- Large right node -->
+  <circle cx="66" cy="60" r="7" fill="#3AABDB"/>
+  <!-- Diagonal probe line -->
+  <line x1="47" y1="48" x2="28" y2="72" stroke="#3AABDB" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Hollow probe tip -->
+  <circle cx="28" cy="72" r="4" stroke="#3AABDB" stroke-width="3" fill="none"/>
+  <!-- Junction node -->
+  <circle cx="47" cy="48" r="4" fill="#3AABDB"/>
+</svg>

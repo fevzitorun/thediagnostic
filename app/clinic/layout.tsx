@@ -6,6 +6,7 @@ import { sql } from '@/lib/db'
 const NAV = [
   { label: 'Dashboard',    href: '/clinic/dashboard',    icon: '◈' },
   { label: 'Appointments', href: '/clinic/appointments', icon: '📅' },
+  { label: 'Slots',        href: '/clinic/slots',        icon: '🕒' },
   { label: 'Reports',      href: '/clinic/reports',      icon: '📄' },
   { label: 'Packages',     href: '/clinic/packages',     icon: '🔬' },
   { label: 'Messages',     href: '/clinic/messages',     icon: '✉' },
