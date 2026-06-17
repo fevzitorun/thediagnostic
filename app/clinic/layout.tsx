@@ -6,6 +6,7 @@ import { sql } from '@/lib/db'
 const NAV = [
   { label: 'Dashboard',    href: '/clinic/dashboard',    icon: '◈' },
   { label: 'Appointments', href: '/clinic/appointments', icon: '📅' },
+  { label: 'Slots',        href: '/clinic/slots',        icon: '🗓' },
   { label: 'Reports',      href: '/clinic/reports',      icon: '📄' },
   { label: 'Packages',     href: '/clinic/packages',     icon: '🔬' },
   { label: 'Messages',     href: '/clinic/messages',     icon: '✉' },
@@ -32,52 +33,41 @@ export default async function ClinicLayout({ children }: { children: React.React
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', background: '#f4f4f0' }}>
-
-      {/* Sidebar */}
       <aside style={{
         width: 220, flexShrink: 0,
-        background: '#082A4A', color: '#fff',
+        background: 'var(--navy-900)', color: '#fff',
         display: 'flex', flexDirection: 'column',
         position: 'sticky', top: 0, height: '100vh', overflowY: 'auto',
       }}>
-        {/* Logo */}
         <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
           <Link href="/clinic/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: '#00C9A7', display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 700 }}>S</div>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--blue)', display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 700 }}>D</div>
             <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Clinic</span>
           </Link>
           <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(255,255,255,.5)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {clinic?.name ?? 'ScanBook'}
+            {clinic?.name ?? 'The Diagnostic'}
           </div>
           {clinic?.status && clinic.status !== 'active' && (
-            <div style={{ marginTop: 6, padding: '2px 8px', background: '#fef9c3', color: '#854d0e', borderRadius: 4, fontSize: 10, fontWeight: 700, display: 'inline-block' }}>
+            <div style={{ marginTop: 6, padding: '2px 8px', background: 'var(--warning-bg)', color: '#854d0e', borderRadius: 4, fontSize: 10, fontWeight: 700, display: 'inline-block' }}>
               {clinic.status.toUpperCase()}
             </div>
           )}
         </div>
-
-        {/* Nav */}
         <nav style={{ flex: 1, padding: '12px 10px' }}>
           {NAV.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '9px 12px', borderRadius: 8, marginBottom: 2,
-                fontSize: 13, color: 'rgba(255,255,255,.7)', textDecoration: 'none',
-              }}
-            >
+            <Link key={item.href} href={item.href} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '9px 12px', borderRadius: 8, marginBottom: 2,
+              fontSize: 13, color: 'rgba(255,255,255,.7)', textDecoration: 'none',
+            }}>
               <span style={{ fontSize: 14, width: 18, textAlign: 'center', flexShrink: 0 }}>{item.icon}</span>
               {item.label}
             </Link>
           ))}
         </nav>
-
-        {/* User footer */}
         <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#00C9A7', display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+            <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'var(--blue)', display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
               {displayName[0].toUpperCase()}
             </div>
             <div>
@@ -89,8 +79,6 @@ export default async function ClinicLayout({ children }: { children: React.React
           <Link href="/auth/signout" style={{ fontSize: 11, color: 'rgba(255,255,255,.4)', textDecoration: 'none' }}>Sign out</Link>
         </div>
       </aside>
-
-      {/* Main */}
       <main style={{ flex: 1, overflowY: 'auto' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '36px 32px' }}>
           {children}
