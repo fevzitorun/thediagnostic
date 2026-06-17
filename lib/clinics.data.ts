@@ -1,586 +1,534 @@
-// ScanBook — Test Clinic Data (3 launch partners)
-// Last updated: May 2025 — verified against live clinic websites
-//
-// Sources:
-//   Medicana  → https://medicana.co.uk/request-a-scan/
-//   MotherScan → https://motherscan.co.uk/
-//   Unirad    → https://unirad.co.uk/
-//
-// Enes: when Supabase is ready, replace usages with:
-//   import { getClinic, getAllClinics } from '@/lib/db/clinics'
-
-export type CqcRating = 'Outstanding' | 'Good' | 'Requires Improvement' | 'Pending'
-
-export interface ScanPackage {
-  id: string
-  name: string
-  price: number
-  duration: string
-  bodyParts?: string[]
-  tag?: 'popular' | 'fast' | '3t' | 'hd' | 'specialist'
-  reportHours: number
-  note?: string
+export interface ClinicBasic {
+  id: string;
+  slug: string;
+  name: string;
+  shortName: string;
+  country: string;
+  city: string;
+  address: string;
+  lat: number;
+  lng: number;
+  jciAccredited: boolean;
+  isoAccredited: boolean;
+  rating: number;
+  description: string;
+  scanTypes: string[];
+  featuredScans: {
+    code: string;
+    name: string;
+    priceGbp: number;
+    ukPriceGbp: number;
+    deviceName: string;
+  }[];
+  images: string[];
+  isFeatured: boolean;
+  phoneIntl?: string;
+  website?: string;
+  internationalPatientCentre?: boolean;
+  group?: string;
+  beds?: number;
+  foundedYear?: number;
+  languages?: string[];
+  specialties?: string[];
+  highlightBadge?: string;
 }
 
-export interface ClinicLocation {
-  label: string           // "Wimbledon" | "Islington"
-  address: string
-  postcode: string
-  phone: string
-  phoneAlt?: string
-  city: string
-  latitude?: number
-  longitude?: number
-}
+export const CLINICS: ClinicBasic[] = [
 
-export interface ClinicData {
-  id: string
-  slug: string
-  name: string
-  subtitle: string
-  // Primary location
-  city: string
-  address: string
-  postcode: string
-  phone: string
-  email: string
-  website?: string
-  // Multiple locations (if applicable)
-  locations?: ClinicLocation[]
-  // Ratings
-  rating: number
-  reviewCount: number
-  googleRating: number
-  googleReviewCount: number
-  trustpilotRating?: number
-  trustpilotReviewCount?: number
-  // Equipment
-  scannerTesla?: '1.5T' | '2T' | '3T'
-  // Accreditation
-  cqcRating: CqcRating
-  cqcUrl?: string
-  regulatedBy?: string    // "CQC" | "Healthcare Improvement Scotland"
-  // Operations
-  reportHours: number
-  priceFrom: number
-  openNow: boolean
-  hours: { day: string; time: string; isToday?: boolean }[]
-  // Info
-  facilities: string[]
-  transport: { icon: string; text: string }[]
-  insurers: string[]
-  capabilities: string[]
-  // Packages
-  packages: {
-    mri?: ScanPackage[]
-    mri_contrast?: ScanPackage[]
-    ct?: ScanPackage[]
-    ct_contrast?: ScanPackage[]
-    ultrasound?: ScanPackage[]
-    xray?: ScanPackage[]
-    baby?: ScanPackage[]
-    pregnancy?: ScanPackage[]
-    blood_tests?: ScanPackage[]
-  }
-  reviews: {
-    author: string
-    date: string
-    rating: number
-    text: string
-    source: 'google' | 'trustpilot' | 'doctify'
-    scanType?: string
-  }[]
-  featuredOnHomepage: boolean
-  latitude?: number
-  longitude?: number
-}
-
-// ─── 1. MEDICANA WINCHESTER ───────────────────────────────────────────────────
-// Source: https://medicana.co.uk/request-a-scan/
-
-const MEDICANA_WINCHESTER: ClinicData = {
-  id: 'medicana-winchester',
-  slug: 'medicana-winchester',
-  name: 'Medicana Winchester',
-  subtitle: 'Private Diagnostic Imaging Centre · Winchester',
-  city: 'Winchester',
-  address: 'Chilcomb Park, Chilcomb Lane',
-  postcode: 'SO21 1HU',
-  phone: '01962 587821',
-  email: 'info@medicana.co.uk',
-  website: 'https://medicana.co.uk',
-  rating: 4.9,
-  reviewCount: 312,
-  googleRating: 4.8,
-  googleReviewCount: 214,
-  trustpilotRating: 4.9,
-  trustpilotReviewCount: 98,
-  scannerTesla: '3T',
-  cqcRating: 'Outstanding',
-  regulatedBy: 'CQC',
-  cqcUrl: 'https://www.cqc.org.uk',
-  reportHours: 24,
-  priceFrom: 107,            // X-Ray from £107 (cheapest service)
-  openNow: true,
-  capabilities: ['mri', 'ct', 'ultrasound', 'xray'],
-  hours: [
-    { day: 'Monday',    time: '8am – 7pm' },
-    { day: 'Tuesday',   time: '8am – 7pm' },
-    { day: 'Wednesday', time: '8am – 7pm' },
-    { day: 'Thursday',  time: '8am – 7pm' },
-    { day: 'Friday',    time: '8am – 6pm' },
-    { day: 'Saturday',  time: '9am – 4pm' },
-    { day: 'Sunday',    time: 'Closed' },
-  ],
-  facilities: [
-    '3T MRI Scanner',
-    'CT Suite',
-    'Ultrasound Suite (Standard & Doppler)',
-    'Standing CT (weight-bearing)',
-    'Same-day & next-day appointments',
-    'International patients welcome',
-    'No GP referral required',
-    'Fixed pricing — no hidden fees',
-  ],
-  transport: [
-    { icon: '🚗', text: 'Chilcomb Park — free on-site parking' },
-    { icon: '🚉', text: '10 min drive from Winchester station' },
-    { icon: '🚌', text: 'Bus links from Winchester city centre' },
-    { icon: '♿', text: 'Wheelchair accessible' },
-  ],
-  insurers: ['Bupa', 'AXA Health', 'Aviva', 'Vitality', 'WPA', 'Cigna'],
-  packages: {
-    mri: [
-      {
-        id: 'mri-1', name: 'MRI — 1 Body Part', price: 455, duration: '45 min',
-        tag: 'popular', reportHours: 24,
-        bodyParts: [
-          'Brain & Head', 'Pituitary Fossa', 'IAMs', 'Sinuses', 'Face',
-          'Neck', 'Cervical Spine', 'Thoracic Spine', 'Lumbar Spine', 'Sacrum', 'Coccyx',
-          'Shoulder', 'Elbow', 'Wrist', 'Hand', 'Upper Arm', 'Forearm',
-          'Hip', 'Knee', 'Ankle', 'Foot', 'Thigh', 'Calf',
-          'Chest', 'Abdomen', 'Pelvis', 'MRCP',
-        ],
-      },
-      { id: 'mri-2', name: 'MRI — 2 Body Parts', price: 702,  duration: '75 min', reportHours: 24 },
-      { id: 'mri-3', name: 'MRI — 3 Body Parts', price: 975,  duration: '90 min', reportHours: 48 },
-      { id: 'mri-4', name: 'MRI — 4 Body Parts', price: 1190, duration: '2 hrs',  reportHours: 48 },
-      { id: 'mri-wb',       name: 'Whole Body MRI',            price: 1330, duration: '3 hrs',  tag: '3t',        reportHours: 48 },
-      { id: 'mri-prostate', name: 'Prostate MRI (mpMRI)',       price: 1080, duration: '60 min', tag: 'specialist', reportHours: 48, note: 'Multiparametric with contrast' },
-      { id: 'mri-prostate-nc', name: 'Prostate MRI (No Contrast)', price: 950, duration: '60 min', tag: 'specialist', reportHours: 48 },
-      { id: 'mri-liver',   name: 'Liver MRI',                  price: 1080, duration: '60 min', tag: 'specialist', reportHours: 48 },
-      { id: 'mri-arthrogram', name: 'Arthrogram MRI (Joint)',  price: 1030, duration: '90 min', tag: 'specialist', reportHours: 48 },
+  // ── HSM Radyoloji ─────────────────────────────────────────────────────────
+  {
+    id: '11111111-1111-1111-1111-111111111111',
+    slug: 'hsm-radyoloji-istanbul',
+    name: 'HSM Radyoloji',
+    shortName: 'HSM Radyoloji',
+    group: 'HSM',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Nişantaşı, Şişli, İstanbul',
+    lat: 41.0485,
+    lng: 29.0022,
+    jciAccredited: false,
+    isoAccredited: true,
+    rating: 4.9,
+    foundedYear: 2008,
+    languages: ['en', 'tr', 'ar', 'de'],
+    specialties: ['Radiology', 'Nuclear Medicine', 'Interventional Radiology'],
+    highlightBadge: 'Expert Radiologist',
+    description: 'Led by Prof. Dr. Mustafa ÖZATEŞ, one of Turkey\'s foremost radiologists. Specialising in advanced diagnostic imaging — PET-CT, 3T MRI, SPECT-CT. Reports in English within 24 hours. Nişantaşı\'s premier imaging centre.',
+    scanTypes: ['pet_ct', 'mri_3t', 'mri_whole_body', 'spect_ct', 'ct_angio', 'ct_flash', 'mammography_3d'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1200, ukPriceGbp: 4000, deviceName: 'Siemens Biograph mCT Flow' },
+      { code: 'mri_3t', name: 'MRI 3T', priceGbp: 320, ukPriceGbp: 1200, deviceName: 'Siemens MAGNETOM Vida 3T' },
+      { code: 'spect_ct', name: 'SPECT-CT', priceGbp: 650, ukPriceGbp: 2200, deviceName: 'Siemens Symbia Intevo Bold' },
     ],
-    mri_contrast: [
-      { id: 'mric-1', name: 'MRI with Contrast — 1 Part', price: 565,  duration: '60 min', reportHours: 24 },
-      { id: 'mric-2', name: 'MRI with Contrast — 2 Parts', price: 810,  duration: '90 min', reportHours: 24 },
-      { id: 'mric-3', name: 'MRI with Contrast — 3 Parts', price: 1080, duration: '2 hrs',  reportHours: 48 },
-      { id: 'mric-4', name: 'MRI with Contrast — 4 Parts', price: 1300, duration: '2.5 hrs', reportHours: 48 },
-    ],
-    ct: [
-      { id: 'ct-1', name: 'CT Scan — 1 Area', price: 525,  duration: '20 min', tag: 'fast', reportHours: 24 },
-      { id: 'ct-2', name: 'CT Scan — 2 Areas', price: 740,  duration: '30 min', reportHours: 24 },
-      { id: 'ct-3', name: 'CT Scan — 3 Areas', price: 920,  duration: '40 min', reportHours: 48 },
-      { id: 'ct-4', name: 'CT Scan — 4+ Areas', price: 1080, duration: '50 min', reportHours: 48 },
-      { id: 'ct-standing-knee', name: 'Standing CT — Knee (Bilateral)', price: 740, duration: '30 min', tag: 'specialist', reportHours: 24, note: 'Weight-bearing' },
-      { id: 'ct-standing-foot', name: 'Standing CT — Foot & Ankle (Bilateral)', price: 920, duration: '30 min', tag: 'specialist', reportHours: 24, note: 'Weight-bearing' },
-      { id: 'ct-standing-hip', name: 'Standing CT — Hips', price: 740, duration: '30 min', tag: 'specialist', reportHours: 24, note: 'Weight-bearing' },
-    ],
-    ct_contrast: [
-      { id: 'ctc-1', name: 'CT with Contrast — 1 Area',  price: 635,  duration: '30 min', reportHours: 24 },
-      { id: 'ctc-2', name: 'CT with Contrast — 2 Areas', price: 850,  duration: '40 min', reportHours: 24 },
-      { id: 'ctc-3', name: 'CT with Contrast — 3 Areas', price: 1030, duration: '50 min', reportHours: 48 },
-      { id: 'ctc-4', name: 'CT with Contrast — 4+ Areas', price: 1190, duration: '60 min', reportHours: 48 },
-    ],
-    ultrasound: [
-      { id: 'us-1', name: 'Ultrasound — 1 Area',  price: 380, duration: '30 min', tag: 'popular', reportHours: 24 },
-      { id: 'us-2', name: 'Ultrasound — 2 Areas', price: 535, duration: '45 min', reportHours: 24 },
-      { id: 'us-3', name: 'Ultrasound — 3 Areas', price: 705, duration: '60 min', reportHours: 24 },
-      { id: 'us-4', name: 'Ultrasound — 4+ Areas', price: 865, duration: '75 min', reportHours: 24 },
-      { id: 'us-doppler-1', name: 'Doppler Ultrasound — 1 Area',  price: 486, duration: '30 min', tag: 'specialist', reportHours: 24 },
-      { id: 'us-doppler-2', name: 'Doppler Ultrasound — 2 Areas', price: 648, duration: '45 min', tag: 'specialist', reportHours: 24 },
-      { id: 'us-doppler-3', name: 'Doppler Ultrasound — 3 Areas', price: 810, duration: '60 min', tag: 'specialist', reportHours: 24 },
-    ],
-    xray: [
-      { id: 'xray-1', name: 'X-Ray — 1 View', price: 107, duration: '15 min', tag: 'fast', reportHours: 24 },
-      { id: 'xray-2', name: 'X-Ray — 2 Views', price: 130, duration: '20 min', reportHours: 24 },
-      { id: 'xray-3', name: 'X-Ray — 3 Views', price: 163, duration: '25 min', reportHours: 24 },
-      { id: 'xray-4', name: 'X-Ray — 4 Views', price: 195, duration: '30 min', reportHours: 24 },
-      { id: 'xray-5', name: 'X-Ray — 5 Views', price: 220, duration: '35 min', reportHours: 24 },
-      { id: 'xray-6', name: 'X-Ray — 6 Views', price: 250, duration: '40 min', reportHours: 24 },
-      { id: 'xray-leg', name: 'Leg Length X-Ray', price: 270, duration: '30 min', tag: 'specialist', reportHours: 24 },
-    ],
+    images: [],
+    isFeatured: true,
+    internationalPatientCentre: true,
   },
-  reviews: [
-    {
-      author: 'Sarah M.',
-      date: 'March 2025',
-      rating: 5,
-      text: 'Booked a knee MRI on Monday, had results by Tuesday lunchtime. The 3T scanner gives incredible detail and the radiologist report was thorough. My GP was very impressed.',
-      source: 'google',
-      scanType: 'Knee MRI',
-    },
-    {
-      author: 'James T.',
-      date: 'February 2025',
-      rating: 5,
-      text: 'Fantastic experience from start to finish. Staff were professional, facility is spotless. Much better than waiting on the NHS.',
-      source: 'trustpilot',
-      scanType: 'CT Chest',
-    },
-    {
-      author: 'Rebecca K.',
-      date: 'April 2025',
-      rating: 5,
-      text: 'Had a whole body MRI — worth every penny. Comprehensive report, stunning image quality, same-day appointment available.',
-      source: 'google',
-      scanType: 'Whole Body MRI',
-    },
-    {
-      author: 'David L.',
-      date: 'January 2025',
-      rating: 5,
-      text: 'Booked online in 5 minutes. Parking is easy at Chilcomb Park, the scanner was brand new, and I had my results the next morning.',
-      source: 'trustpilot',
-      scanType: 'Lumbar Spine MRI',
-    },
-  ],
-  featuredOnHomepage: true,
-  latitude: 51.0482,
-  longitude: -1.2897,
-}
 
-// ─── 2. UNIRAD GLASGOW ────────────────────────────────────────────────────────
-// Source: https://unirad.co.uk/
-
-const UNIRAD_GLASGOW: ClinicData = {
-  id: 'unirad-glasgow',
-  slug: 'unirad-glasgow',
-  name: 'Unirad Imaging',
-  subtitle: 'Private MRI Scan Clinic · Glasgow',
-  city: 'Glasgow',
-  address: '22 Loanbank Quadrant',
-  postcode: 'G51 3HZ',
-  phone: '0141 846 9116',
-  email: 'info@unirad.co.uk',
-  website: 'https://unirad.co.uk',
-  rating: 4.9,
-  reviewCount: 187,
-  googleRating: 4.9,
-  googleReviewCount: 187,
-  cqcRating: 'Pending',
-  regulatedBy: 'Healthcare Improvement Scotland',
-  reportHours: 72,
-  priceFrom: 290,
-  openNow: true,
-  capabilities: ['mri'],
-  hours: [
-    { day: 'Monday',    time: '8am – 6pm' },
-    { day: 'Tuesday',   time: '8am – 6pm' },
-    { day: 'Wednesday', time: '8am – 6pm' },
-    { day: 'Thursday',  time: '8am – 6pm' },
-    { day: 'Friday',    time: '8am – 5pm' },
-    { day: 'Saturday',  time: '9am – 2pm' },
-    { day: 'Sunday',    time: 'Closed' },
-  ],
-  facilities: [
-    'Hospital-grade MRI technology',
-    'UK-registered consultant radiologists',
-    'Same-week & next-day availability',
-    'Digital radiologist report included',
-    'Health screening packages',
-    'GP referral partner programme',
-    'No GP referral required',
-    'No hidden fees',
-  ],
-  transport: [
-    { icon: '🚇', text: 'Govan Subway station (2 min walk)' },
-    { icon: '🚗', text: 'Street parking on Loanbank Quadrant' },
-    { icon: '🚌', text: 'Bus routes from Glasgow city centre' },
-  ],
-  insurers: ['Bupa', 'AXA Health', 'Aviva'],
-  packages: {
-    mri: [
-      {
-        id: 'mri-1', name: 'MRI Scan', price: 290, duration: '45 min',
-        tag: 'popular', reportHours: 72,
-        note: 'Any single body region',
-        bodyParts: [
-          'Head & Brain', 'Neck',
-          'Cervical Spine', 'Thoracic Spine', 'Lumbar Spine',
-          'Shoulder', 'Elbow', 'Hand & Wrist',
-          'Chest', 'Abdomen', 'Pelvis',
-          'Hip', 'Knee', 'Foot & Ankle',
-          'Cardiac', 'Prostate',
-        ],
-      },
-      {
-        id: 'mri-fb', name: 'Full Body MRI', price: 590, duration: '3 hrs',
-        tag: '3t', reportHours: 72,
-        note: 'Comprehensive head-to-toe screening',
-      },
-      {
-        id: 'gp-consult', name: 'GP Consultation', price: 40, duration: '15 min',
-        reportHours: 0,
-        note: 'Available before or after your scan',
-      },
+  // ── Acıbadem Maslak ───────────────────────────────────────────────────────
+  {
+    id: '22222222-2222-2222-2222-222222222222',
+    slug: 'acibadem-maslak-istanbul',
+    name: 'Acıbadem Maslak Hospital',
+    shortName: 'Acıbadem Maslak',
+    group: 'Acıbadem',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Büyükdere Cad. No:40, Maslak, İstanbul',
+    lat: 41.1074,
+    lng: 29.0240,
+    jciAccredited: true,
+    isoAccredited: true,
+    rating: 4.8,
+    beds: 231,
+    foundedYear: 2010,
+    languages: ['en', 'tr', 'ar', 'ru', 'de', 'fr'],
+    specialties: ['Oncology', 'Neurosurgery', 'Cardiology', 'Nuclear Medicine', 'Radiosurgery'],
+    highlightBadge: 'JCI Accredited',
+    description: 'Turkey\'s first JCI-accredited hospital group flagship. Home to the most advanced nuclear medicine suite in the region — PET-CT, PET-MRI, GammaKnife Esprit, and robotic 3T MRI. Dedicated International Patient Centre with 24/7 concierge.',
+    scanTypes: ['pet_ct', 'pet_mri', 'gamma_knife', 'mri_3t', 'mri_whole_body', 'spect_ct', 'ct_angio', 'ct_flash', 'mr_linac', 'truebeam', 'da_vinci', 'mako_robot', 'mammography_3d', 'eos_imaging'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1350, ukPriceGbp: 4500, deviceName: 'GE Discovery MI PET/CT 4-ring' },
+      { code: 'gamma_knife', name: 'GammaKnife', priceGbp: 6500, ukPriceGbp: 20000, deviceName: 'Leksell Gamma Knife Esprit' },
+      { code: 'pet_mri', name: 'PET-MRI', priceGbp: 1850, ukPriceGbp: 5500, deviceName: 'Siemens Biograph mMR' },
+      { code: 'mako_robot', name: 'MAKO Robotic Surgery', priceGbp: 4800, ukPriceGbp: 14000, deviceName: 'Stryker MAKO' },
     ],
+    images: [],
+    isFeatured: true,
+    internationalPatientCentre: true,
+    website: 'https://www.acibadem.com',
   },
-  reviews: [
-    {
-      author: 'Craig B.',
-      date: 'March 2025',
-      rating: 5,
-      text: 'Booked Saturday, scanned Monday, results by Tuesday. Absolutely superb service. The whole team was professional and the facility is modern and clean.',
-      source: 'google',
-      scanType: 'Knee MRI',
-    },
-    {
-      author: 'Fiona D.',
-      date: 'February 2025',
-      rating: 5,
-      text: "Couldn't recommend Unirad highly enough. Got my brain MRI done quickly and the report was thorough. So much better than waiting on the NHS.",
-      source: 'google',
-      scanType: 'Brain MRI',
-    },
-    {
-      author: 'Andrew M.',
-      date: 'April 2025',
-      rating: 5,
-      text: 'Easy online booking, friendly staff, comprehensive radiologist report delivered on time. Will use again.',
-      source: 'google',
-      scanType: 'Lumbar Spine MRI',
-    },
-    {
-      author: 'Helen S.',
-      date: 'January 2025',
-      rating: 5,
-      text: 'Full body MRI was excellent value. The report was incredibly detailed and everything was explained clearly by the team.',
-      source: 'google',
-      scanType: 'Full Body MRI',
-    },
-  ],
-  featuredOnHomepage: true,
-  latitude: 55.8601,
-  longitude: -4.3138,
-}
 
-// ─── 3A. MOTHERSCAN WIMBLEDON ─────────────────────────────────────────────────
-// Source: https://motherscan.co.uk/
-
-const MOTHERSCAN_WIMBLEDON: ClinicData = {
-  id: 'motherscan-wimbledon',
-  slug: 'motherscan-wimbledon',
-  name: 'MotherScan Wimbledon',
-  subtitle: 'Private Pregnancy & Baby Scan Clinic · Wimbledon',
-  city: 'London SW20',
-  address: '7 Approach Road',
-  postcode: 'SW20 8BA',
-  phone: '0204 537 7811',
-  email: 'wimbledon@motherscan.co.uk',
-  website: 'https://motherscan.co.uk',
-  // Second location listed for reference
-  locations: [
-    {
-      label: 'Wimbledon',
-      address: '7 Approach Road',
-      postcode: 'SW20 8BA',
-      phone: '0204 537 7811',
-      phoneAlt: '07951 600 202',
-      city: 'London SW20',
-      latitude: 51.4102,
-      longitude: -0.2244,
-    },
-    {
-      label: 'Islington',
-      address: '117 Holloway Road',
-      postcode: 'N7 8LT',
-      phone: '0204 631 6636',
-      phoneAlt: '07585 470 000',
-      city: 'London N7',
-      latitude: 51.5521,
-      longitude: -0.1169,
-    },
-  ],
-  rating: 4.9,
-  reviewCount: 840,
-  googleRating: 4.9,
-  googleReviewCount: 620,
-  trustpilotRating: 4.9,
-  trustpilotReviewCount: 220,
-  cqcRating: 'Good',
-  regulatedBy: 'CQC',
-  reportHours: 0,
-  priceFrom: 79,
-  openNow: true,
-  capabilities: ['baby_scan', 'pregnancy_scan', 'ultrasound'],
-  hours: [
-    { day: 'Monday',    time: '9am – 7pm' },
-    { day: 'Tuesday',   time: '9am – 7pm' },
-    { day: 'Wednesday', time: '9am – 7pm' },
-    { day: 'Thursday',  time: '9am – 7pm' },
-    { day: 'Friday',    time: '9am – 7pm' },
-    { day: 'Saturday',  time: '9am – 6pm' },
-    { day: 'Sunday',    time: '10am – 4pm' },
-  ],
-  facilities: [
-    'HD 3D & 4D Live Ultrasound',
-    'Same-day appointments available',
-    'Female sonographers available on request',
-    'Printed photos & digital images included',
-    '4D video recording available',
-    '24/7 emergency scan line',
-    'Two London locations (Wimbledon & Islington)',
-  ],
-  transport: [
-    { icon: '🚉', text: 'Raynes Park station (5 min walk)' },
-    { icon: '🚗', text: 'Street parking on Approach Road' },
-    { icon: '🚌', text: 'Bus routes 57, 131 stop outside' },
-  ],
-  insurers: [],
-  packages: {
-    pregnancy: [
-      { id: 'preg-early',     name: 'Early Pregnancy Scan',              price: 79,  duration: '20 min', tag: 'popular', reportHours: 0, note: '6–14 weeks' },
-      { id: 'preg-hello',     name: 'Hello Baby (2 consecutive scans)',   price: 119, duration: '2 × 20 min', reportHours: 0, note: '6–14 weeks, 7–15 days apart' },
-      { id: 'preg-wellbeing', name: 'Wellbeing Baby Scan',               price: 79,  duration: '20 min', reportHours: 0, note: 'From 14 weeks' },
-      { id: 'preg-gender',    name: 'Gender Reveal Scan',                price: 79,  duration: '20 min', reportHours: 0, note: 'From 16 weeks' },
-      { id: 'preg-wb3d',      name: 'Wellbeing Check + 3D Imaging',      price: 119, duration: '30 min', reportHours: 0, note: 'From 16 weeks' },
-      { id: 'preg-supreme',   name: 'Supreme Package',                   price: 179, duration: '60 min', tag: 'hd',      reportHours: 0, note: 'Wellbeing + 3D prints + 4D video + gender. From 20 weeks' },
-      { id: 'preg-throughout', name: 'Throughout Pregnancy Package',     price: 299, duration: 'Multiple', reportHours: 0, note: '4 scans from 6 weeks to delivery' },
-      { id: 'preg-emergency', name: 'Emergency Pregnancy Scan',          price: 250, duration: '20 min', tag: 'fast',    reportHours: 0, note: 'Available anytime — 24/7 line' },
+  // ── Acıbadem Altunizade ───────────────────────────────────────────────────
+  {
+    id: '22222222-2222-2222-2222-333333333333',
+    slug: 'acibadem-altunizade-istanbul',
+    name: 'Acıbadem Altunizade Hospital',
+    shortName: 'Acıbadem Altunizade',
+    group: 'Acıbadem',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Çamlık Sok. No:20, Altunizade, Üsküdar, İstanbul',
+    lat: 41.0231,
+    lng: 29.0531,
+    jciAccredited: true,
+    isoAccredited: true,
+    rating: 4.8,
+    beds: 189,
+    foundedYear: 2008,
+    languages: ['en', 'tr', 'ar', 'ru'],
+    specialties: ['Orthopaedics', 'Neurology', 'Oncology', 'Cardiology'],
+    highlightBadge: 'JCI Accredited',
+    description: 'JCI-accredited Acıbadem Group hospital on the Asian side of Istanbul. Highly regarded for orthopaedic surgery, neurology, and comprehensive diagnostic imaging. Featuring 3T MRI, PET-CT, and advanced interventional radiology.',
+    scanTypes: ['pet_ct', 'mri_3t', 'mri_whole_body', 'spect_ct', 'ct_angio', 'da_vinci', 'mako_robot', 'mammography_3d'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1300, ukPriceGbp: 4500, deviceName: 'Siemens Biograph Vision 600' },
+      { code: 'mri_3t', name: 'MRI 3T', priceGbp: 330, ukPriceGbp: 1200, deviceName: 'Siemens MAGNETOM Prisma 3T' },
+      { code: 'da_vinci', name: 'Da Vinci Robotic Surgery', priceGbp: 5500, ukPriceGbp: 16000, deviceName: 'Da Vinci Xi' },
     ],
-    ultrasound: [
-      { id: 'us-pelv',  name: 'Pelvic Ultrasound Scan',           price: 149, duration: '30 min', reportHours: 24 },
-      { id: 'us-ivf',   name: 'IVF Stimulation Follow-up (2 scans)', price: 249, duration: '2 × 30 min', reportHours: 0, note: 'Same cycle' },
-    ],
-    blood_tests: [
-      { id: 'bt-gender',     name: 'Early Gender Reveal Blood Test',              price: 120, duration: '—', reportHours: 48, note: 'Non-invasive. From 6 weeks' },
-      { id: 'bt-nipt-std',   name: 'NIPT Standard + Wellbeing Scan',             price: 399, duration: '60 min', reportHours: 72, note: 'From 10 weeks' },
-      { id: 'bt-nipt-adv',   name: 'NIPT Advance + Wellbeing Scan',              price: 499, duration: '60 min', reportHours: 72, note: 'From 10 weeks' },
-      { id: 'bt-nipt-abs',   name: 'NIPT Absolute with Microdeletions + Wellbeing', price: 699, duration: '60 min', tag: 'specialist', reportHours: 72, note: 'From 10 weeks' },
-    ],
+    images: [],
+    isFeatured: false,
+    internationalPatientCentre: true,
+    website: 'https://www.acibadem.com',
   },
-  reviews: [
-    {
-      author: 'Sophie A.',
-      date: 'April 2025',
-      rating: 5,
-      text: 'The most beautiful experience. Our 4D scan was so clear we could see every detail. The sonographer was warm and took her time. Already recommended to three friends.',
-      source: 'google',
-      scanType: '4D Bonding Scan',
-    },
-    {
-      author: 'Priya N.',
-      date: 'March 2025',
-      rating: 5,
-      text: 'Came in for an early reassurance scan at 8 weeks. Staff were so kind and reassuring. Saw the heartbeat straight away. Will be coming back for all my pregnancy scans.',
-      source: 'trustpilot',
-      scanType: 'Early Reassurance Scan',
-    },
-    {
-      author: 'Emma W.',
-      date: 'February 2025',
-      rating: 5,
-      text: 'Same-day appointment, perfect gender reveal — they built up the surprise beautifully. Beautiful video to share with family.',
-      source: 'google',
-      scanType: 'Gender Reveal Scan',
-    },
-    {
-      author: 'Charlotte B.',
-      date: 'January 2025',
-      rating: 5,
-      text: 'Had the Supreme Package — worth every penny. The 4D images were incredible quality and the whole team made us feel so welcome.',
-      source: 'google',
-      scanType: 'Supreme Package',
-    },
-  ],
-  featuredOnHomepage: true,
-  latitude: 51.4102,
-  longitude: -0.2244,
+
+  // ── Medicana International Şişli ─────────────────────────────────────────
+  {
+    id: '33333333-3333-3333-3333-111111111111',
+    slug: 'medicana-international-sisli-istanbul',
+    name: 'Medicana International Istanbul',
+    shortName: 'Medicana Şişli',
+    group: 'Medicana',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Büyükdere Cad. No:171, Şişli, İstanbul',
+    lat: 41.0802,
+    lng: 29.0108,
+    jciAccredited: true,
+    isoAccredited: true,
+    rating: 4.7,
+    beds: 280,
+    foundedYear: 1992,
+    languages: ['en', 'tr', 'ar', 'ru', 'az', 'de'],
+    specialties: ['Oncology', 'Haematology', 'Bone Marrow Transplant', 'Cardiology', 'Neurology'],
+    highlightBadge: 'Bone Marrow Transplant Centre',
+    description: 'Turkey\'s leading bone marrow and stem cell transplant centre. JCI-accredited with a dedicated International Patient Centre. Comprehensive oncology suite including PET-CT, radiotherapy (IMRT, IGRT), and haematology. Over 30 years serving international patients.',
+    scanTypes: ['pet_ct', 'mri_3t', 'spect_ct', 'ct_angio', 'ct_flash', 'truebeam', 'mammography_3d', 'fibroscan'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1250, ukPriceGbp: 4000, deviceName: 'GE Discovery IQ PET/CT' },
+      { code: 'mri_3t', name: 'MRI 3T', priceGbp: 310, ukPriceGbp: 1200, deviceName: 'Philips Ingenia 3T' },
+      { code: 'truebeam', name: 'TrueBeam Radiotherapy', priceGbp: 2800, ukPriceGbp: 8000, deviceName: 'Varian TrueBeam STx' },
+    ],
+    images: [],
+    isFeatured: true,
+    internationalPatientCentre: true,
+    website: 'https://www.medicana.com.tr',
+  },
+
+  // ── Medicana Beylikdüzü ───────────────────────────────────────────────────
+  {
+    id: '33333333-3333-3333-3333-222222222222',
+    slug: 'medicana-beylikduzu-istanbul',
+    name: 'Medicana Beylikdüzü Hospital',
+    shortName: 'Medicana Beylikdüzü',
+    group: 'Medicana',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Beylikdüzü, İstanbul (near Istanbul Airport)',
+    lat: 41.0023,
+    lng: 28.6511,
+    jciAccredited: false,
+    isoAccredited: true,
+    rating: 4.6,
+    beds: 150,
+    foundedYear: 2014,
+    languages: ['en', 'tr', 'ar'],
+    specialties: ['General Surgery', 'Orthopaedics', 'Cardiology', 'IVF'],
+    description: 'Modern Medicana Group hospital near Istanbul Airport. Ideal for patients who prefer minimal transfer time. Full diagnostic suite including 3T MRI and CT. Excellent transport links.',
+    scanTypes: ['mri_3t', 'ct_angio', 'mammography_3d', 'pet_ct'],
+    featuredScans: [
+      { code: 'mri_3t', name: 'MRI 3T', priceGbp: 295, ukPriceGbp: 1200, deviceName: 'Siemens MAGNETOM Altea 1.5T/3T' },
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1220, ukPriceGbp: 4000, deviceName: 'Siemens Biograph mCT' },
+    ],
+    images: [],
+    isFeatured: false,
+    website: 'https://www.medicana.com.tr',
+  },
+
+  // ── Koç University Hospital ───────────────────────────────────────────────
+  {
+    id: '44444444-4444-4444-4444-111111111111',
+    slug: 'koc-university-hospital-istanbul',
+    name: 'Koç University Hospital',
+    shortName: 'Koç Üniversitesi',
+    group: 'Koç',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Davutpaşa Cad. No:4, Topkapı, İstanbul',
+    lat: 41.0207,
+    lng: 28.9249,
+    jciAccredited: true,
+    isoAccredited: true,
+    rating: 4.9,
+    beds: 430,
+    foundedYear: 2014,
+    languages: ['en', 'tr', 'ar', 'de', 'fr', 'es'],
+    specialties: ['Organ Transplant', 'Oncology', 'Cardiovascular Surgery', 'Neurology', 'Haematology'],
+    highlightBadge: 'Academic Medical Centre',
+    description: 'Turkey\'s most prestigious academic medical centre, affiliated with VKV American Hospital. JCI-accredited with world-class faculty physicians trained at Harvard, Johns Hopkins, and Mayo Clinic. State-of-the-art 3T MRI, PET-CT, and robotic surgery. One of the top 3 hospitals in Turkey for complex diagnostics and surgery.',
+    scanTypes: ['pet_ct', 'mri_3t', 'mri_prisma', 'mri_whole_body', 'spect_ct', 'pet_mri', 'ct_angio', 'ct_photon', 'da_vinci', 'gamma_knife', 'truebeam', 'eos_imaging', 'mammography_3d'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1380, ukPriceGbp: 4500, deviceName: 'Siemens Biograph Vision Quadra' },
+      { code: 'mri_prisma', name: 'MRI 3T Prisma', priceGbp: 380, ukPriceGbp: 1500, deviceName: 'Siemens MAGNETOM Prisma 3T' },
+      { code: 'da_vinci', name: 'Da Vinci Xi Robotic Surgery', priceGbp: 5800, ukPriceGbp: 17000, deviceName: 'Da Vinci Xi' },
+      { code: 'gamma_knife', name: 'GammaKnife Radiosurgery', priceGbp: 7000, ukPriceGbp: 22000, deviceName: 'Leksell Gamma Knife Perfexion' },
+    ],
+    images: [],
+    isFeatured: true,
+    internationalPatientCentre: true,
+    website: 'https://hastane.ku.edu.tr',
+  },
+
+  // ── Florence Nightingale Şişli ────────────────────────────────────────────
+  {
+    id: '55555555-5555-5555-5555-111111111111',
+    slug: 'florence-nightingale-sisli-istanbul',
+    name: 'Florence Nightingale Hospital',
+    shortName: 'Florence Nightingale',
+    group: 'Florence Nightingale',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Abide-i Hürriyet Cad. No:290, Şişli, İstanbul',
+    lat: 41.0619,
+    lng: 29.0057,
+    jciAccredited: true,
+    isoAccredited: true,
+    rating: 4.7,
+    beds: 310,
+    foundedYear: 1986,
+    languages: ['en', 'tr', 'ar', 'ru', 'az'],
+    specialties: ['Cardiology', 'Cardiovascular Surgery', 'Oncology', 'Neurosurgery', 'IVF'],
+    highlightBadge: 'Cardiology Centre of Excellence',
+    description: 'Istanbul\'s historic private hospital, JCI-accredited and renowned for cardiovascular surgery and oncology. One of Turkey\'s largest catheterisation laboratories. Full imaging suite including 3T MRI, PET-CT, advanced angiography, and robotic surgery. Serving international patients since 1986.',
+    scanTypes: ['pet_ct', 'mri_3t', 'mri_whole_body', 'spect_ct', 'ct_angio', 'dsa_angiography', 'da_vinci', 'truebeam', 'mammography_3d'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1280, ukPriceGbp: 4200, deviceName: 'GE Discovery MI PET/CT' },
+      { code: 'mri_3t', name: 'MRI 3T', priceGbp: 315, ukPriceGbp: 1200, deviceName: 'Philips Ingenia Ambition 3T' },
+      { code: 'dsa_angiography', name: 'DSA Digital Angiography', priceGbp: 480, ukPriceGbp: 1600, deviceName: 'Philips Azurion 7 B20' },
+    ],
+    images: [],
+    isFeatured: true,
+    internationalPatientCentre: true,
+    website: 'https://www.florence.com.tr',
+  },
+
+  // ── Memorial Şişli ────────────────────────────────────────────────────────
+  {
+    id: '66666666-6666-6666-6666-111111111111',
+    slug: 'memorial-sisli-istanbul',
+    name: 'Memorial Şişli Hospital',
+    shortName: 'Memorial Şişli',
+    group: 'Memorial',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Piyalepaşa Bulvarı, Şişli, İstanbul',
+    lat: 41.0523,
+    lng: 28.9883,
+    jciAccredited: true,
+    isoAccredited: true,
+    rating: 4.7,
+    beds: 240,
+    foundedYear: 2000,
+    languages: ['en', 'tr', 'ar', 'ru', 'az', 'fr'],
+    specialties: ['Oncology', 'Orthopaedics', 'Neurology', 'Organ Transplant', 'Aesthetics'],
+    highlightBadge: 'Oncology Centre',
+    description: 'JCI-accredited Memorial Group flagship hospital in Şişli, Istanbul. Internationally acclaimed for oncology, organ transplant, and orthopaedic surgery. Comprehensive nuclear medicine suite with PET-CT, MR-Linac radiotherapy, Da Vinci robotics, and MAKO orthopaedic robot. Dedicated International Patient Centre.',
+    scanTypes: ['pet_ct', 'mri_3t', 'mri_whole_body', 'spect_ct', 'ct_angio', 'mr_linac', 'da_vinci', 'mako_robot', 'gamma_knife', 'mammography_3d', 'eos_imaging'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1300, ukPriceGbp: 4200, deviceName: 'Siemens Biograph Vision 600' },
+      { code: 'mr_linac', name: 'MR-Linac Radiotherapy', priceGbp: 3200, ukPriceGbp: 9500, deviceName: 'Elekta Unity MR-Linac' },
+      { code: 'mako_robot', name: 'MAKO Robotic Knee/Hip', priceGbp: 4900, ukPriceGbp: 14000, deviceName: 'Stryker MAKO' },
+    ],
+    images: [],
+    isFeatured: true,
+    internationalPatientCentre: true,
+    website: 'https://www.memorial.com.tr',
+  },
+
+  // ── Memorial Ataşehir ─────────────────────────────────────────────────────
+  {
+    id: '66666666-6666-6666-6666-222222222222',
+    slug: 'memorial-atasehir-istanbul',
+    name: 'Memorial Ataşehir Hospital',
+    shortName: 'Memorial Ataşehir',
+    group: 'Memorial',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Meriç Sok. No:7, Ataşehir, İstanbul',
+    lat: 40.9913,
+    lng: 29.1069,
+    jciAccredited: true,
+    isoAccredited: true,
+    rating: 4.7,
+    beds: 186,
+    foundedYear: 2013,
+    languages: ['en', 'tr', 'ar', 'ru'],
+    specialties: ['Oncology', 'IVF', 'Neurology', 'Cardiology'],
+    description: 'JCI-accredited Memorial Group hospital on Istanbul\'s Asian side. Modern, purpose-built facility with comprehensive oncology and diagnostics. Features PET-CT, 3T MRI, and advanced radiotherapy.',
+    scanTypes: ['pet_ct', 'mri_3t', 'ct_angio', 'truebeam', 'mammography_3d'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1280, ukPriceGbp: 4200, deviceName: 'GE Discovery MI PET/CT' },
+      { code: 'mri_3t', name: 'MRI 3T', priceGbp: 320, ukPriceGbp: 1200, deviceName: 'Siemens MAGNETOM Vida 3T' },
+    ],
+    images: [],
+    isFeatured: false,
+    website: 'https://www.memorial.com.tr',
+  },
+
+  // ── Liv Hospital Ulus ─────────────────────────────────────────────────────
+  {
+    id: '77777777-7777-7777-7777-111111111111',
+    slug: 'liv-hospital-ulus-istanbul',
+    name: 'Liv Hospital Ulus',
+    shortName: 'Liv Hospital',
+    group: 'Liv',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Çırağan Cad. No:7, Beşiktaş/Ulus, İstanbul',
+    lat: 41.0700,
+    lng: 29.0350,
+    jciAccredited: true,
+    isoAccredited: true,
+    rating: 4.8,
+    beds: 210,
+    foundedYear: 2015,
+    languages: ['en', 'tr', 'ar', 'ru', 'de', 'fr'],
+    specialties: ['Oncology', 'Robotic Surgery', 'Cardiology', 'Neurosurgery', 'Spine Surgery'],
+    highlightBadge: 'Luxury Medical',
+    description: 'Istanbul\'s most luxurious JCI-accredited hospital, located in the prestigious Ulus neighbourhood with Bosphorus views. Partner with Johns Hopkins Medicine International. Renowned for cancer care, robotic surgery, and complex neurosurgery. Cutting-edge imaging including photon-counting CT, PET-CT, and 3T MRI.',
+    scanTypes: ['pet_ct', 'mri_3t', 'mri_whole_body', 'ct_angio', 'ct_photon', 'da_vinci', 'truebeam', 'gamma_knife', 'mammography_3d', 'eos_imaging', 'spect_ct'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1400, ukPriceGbp: 4500, deviceName: 'Siemens Biograph Vision Quadra' },
+      { code: 'ct_photon', name: 'Photon Counting CT', priceGbp: 420, ukPriceGbp: 1800, deviceName: 'Siemens NAEOTOM Alpha' },
+      { code: 'da_vinci', name: 'Da Vinci Robotic Surgery', priceGbp: 5500, ukPriceGbp: 16000, deviceName: 'Da Vinci Xi' },
+    ],
+    images: [],
+    isFeatured: true,
+    internationalPatientCentre: true,
+    website: 'https://www.livhospital.com',
+  },
+
+  // ── Medical Park Florya ───────────────────────────────────────────────────
+  {
+    id: '88888888-8888-8888-8888-111111111111',
+    slug: 'medical-park-florya-istanbul',
+    name: 'Medical Park Florya Hospital',
+    shortName: 'Medical Park Florya',
+    group: 'Medical Park',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Yeşilköy Mah., Florya, Bakırköy, İstanbul',
+    lat: 40.9786,
+    lng: 28.7901,
+    jciAccredited: false,
+    isoAccredited: true,
+    rating: 4.6,
+    beds: 300,
+    foundedYear: 2002,
+    languages: ['en', 'tr', 'ar', 'ru'],
+    specialties: ['Oncology', 'Cardiology', 'Orthopaedics', 'Paediatrics', 'Neurology'],
+    description: 'Large Medical Park Group hospital near Istanbul Airport and Atatürk coastal road. Part of Turkey\'s largest private hospital chain (50+ hospitals). Comprehensive diagnostic and surgical facilities. Ideal for patients arriving at Istanbul Airport (ISL). Full imaging suite with PET-CT, 3T MRI, and advanced radiotherapy.',
+    scanTypes: ['pet_ct', 'mri_3t', 'ct_angio', 'spect_ct', 'truebeam', 'mammography_3d', 'da_vinci'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1200, ukPriceGbp: 4000, deviceName: 'GE Discovery IQ PET/CT' },
+      { code: 'mri_3t', name: 'MRI 3T', priceGbp: 290, ukPriceGbp: 1200, deviceName: 'GE Signa Pioneer 3T' },
+      { code: 'da_vinci', name: 'Da Vinci Robotic Surgery', priceGbp: 5200, ukPriceGbp: 15000, deviceName: 'Da Vinci Si' },
+    ],
+    images: [],
+    isFeatured: false,
+    website: 'https://www.medicalpark.com.tr',
+  },
+
+  // ── Medical Park Göztepe ──────────────────────────────────────────────────
+  {
+    id: '88888888-8888-8888-8888-222222222222',
+    slug: 'medical-park-goztepe-istanbul',
+    name: 'Medical Park Göztepe Hospital',
+    shortName: 'Medical Park Göztepe',
+    group: 'Medical Park',
+    country: 'TR',
+    city: 'Istanbul',
+    address: 'Eğitim Mah., Göztepe, Kadıköy, İstanbul',
+    lat: 40.9806,
+    lng: 29.0698,
+    jciAccredited: false,
+    isoAccredited: true,
+    rating: 4.6,
+    beds: 260,
+    foundedYear: 2005,
+    languages: ['en', 'tr', 'ar'],
+    specialties: ['Orthopaedics', 'Cardiology', 'General Surgery', 'Neurology'],
+    description: 'Medical Park Group hospital on the Asian side, serving Kadıköy and surroundings. Comprehensive diagnostics and surgical care. Good transport links from Sabiha Gökçen Airport. 3T MRI and advanced CT suite.',
+    scanTypes: ['mri_3t', 'ct_angio', 'pet_ct', 'mammography_3d', 'spect_ct'],
+    featuredScans: [
+      { code: 'mri_3t', name: 'MRI 3T', priceGbp: 285, ukPriceGbp: 1200, deviceName: 'Philips Ingenia 3T' },
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1200, ukPriceGbp: 4000, deviceName: 'Siemens Biograph mCT' },
+    ],
+    images: [],
+    isFeatured: false,
+    website: 'https://www.medicalpark.com.tr',
+  },
+
+  // ── Anadolu Medical Center ────────────────────────────────────────────────
+  {
+    id: '99999999-9999-9999-9999-111111111111',
+    slug: 'anadolu-medical-center-kocaeli',
+    name: 'Anadolu Medical Center',
+    shortName: 'Anadolu Sağlık',
+    group: 'Anadolu',
+    country: 'TR',
+    city: 'Kocaeli',
+    address: 'Cumhuriyet Mah. 2255 Sokak No:3, Gebze, Kocaeli',
+    lat: 40.7988,
+    lng: 29.4266,
+    jciAccredited: true,
+    isoAccredited: true,
+    rating: 4.9,
+    beds: 346,
+    foundedYear: 2005,
+    languages: ['en', 'tr', 'ar', 'ru', 'de'],
+    specialties: ['Oncology', 'Haematology', 'Bone Marrow Transplant', 'Cardiology', 'Robotic Surgery'],
+    highlightBadge: 'Johns Hopkins Affiliate',
+    description: 'Turkey\'s only Johns Hopkins Medicine International affiliate hospital. JCI-accredited with the highest clinical standards in the country. Home to a world-class bone marrow transplant centre, proton therapy facility, and the most comprehensive oncology programme in Turkey. Located in Gebze, 45 minutes from Istanbul by car.',
+    scanTypes: ['pet_ct', 'mri_3t', 'mri_prisma', 'mri_whole_body', 'pet_mri', 'spect_ct', 'ct_angio', 'ct_photon', 'da_vinci', 'mako_robot', 'truebeam', 'gamma_knife', 'mr_linac', 'mammography_3d', 'eos_imaging', 'fibroscan'],
+    featuredScans: [
+      { code: 'pet_ct', name: 'PET-CT', priceGbp: 1380, ukPriceGbp: 4800, deviceName: 'GE Discovery MI DR PET/CT' },
+      { code: 'mri_prisma', name: 'MRI 3T Prisma', priceGbp: 370, ukPriceGbp: 1500, deviceName: 'Siemens MAGNETOM Prisma 3T' },
+      { code: 'pet_mri', name: 'PET-MRI', priceGbp: 1850, ukPriceGbp: 5500, deviceName: 'Siemens Biograph mMR' },
+      { code: 'mr_linac', name: 'MR-Linac Radiotherapy', priceGbp: 3000, ukPriceGbp: 9000, deviceName: 'Elekta Unity MR-Linac' },
+    ],
+    images: [],
+    isFeatured: true,
+    internationalPatientCentre: true,
+    website: 'https://www.anadolusaglik.org',
+  },
+];
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+
+export const SCAN_TYPES = [
+  { code: 'pet_ct',          nameEn: 'PET-CT Scan',               nameTr: 'PET-BT',              nameAr: 'فحص PET-CT',                     icon: '🔬', durationMin: 90,  category: 'nuclear' },
+  { code: 'mri_3t',          nameEn: 'MRI 3T',                    nameTr: '3T MRI',               nameAr: 'الرنين المغناطيسي 3T',            icon: '🧲', durationMin: 60,  category: 'mri' },
+  { code: 'mri_prisma',      nameEn: 'MRI 3T Prisma',             nameTr: '3T Prisma MRI',        nameAr: 'الرنين المغناطيسي 3T بريزما',    icon: '🧲', durationMin: 60,  category: 'mri' },
+  { code: 'mri_whole_body',  nameEn: 'Whole Body MRI',            nameTr: 'Tüm Vücut MRI',        nameAr: 'رنين مغناطيسي للجسم كله',        icon: '🫁', durationMin: 90,  category: 'mri' },
+  { code: 'gamma_knife',     nameEn: 'GammaKnife',                nameTr: 'GammaKnife',           nameAr: 'سكين جاما',                       icon: '⚡', durationMin: 180, category: 'radiosurgery' },
+  { code: 'spect_ct',        nameEn: 'SPECT-CT',                  nameTr: 'SPECT-BT',             nameAr: 'SPECT-CT',                        icon: '💫', durationMin: 90,  category: 'nuclear' },
+  { code: 'pet_mri',         nameEn: 'PET-MRI',                   nameTr: 'PET-MRI',              nameAr: 'PET-MRI',                         icon: '🔮', durationMin: 90,  category: 'nuclear' },
+  { code: 'ct_angio',        nameEn: 'CT Angiography',            nameTr: 'BT Anjiyografi',       nameAr: 'تصوير الأوعية بالأشعة',          icon: '🫀', durationMin: 45,  category: 'ct' },
+  { code: 'ct_flash',        nameEn: 'Flash CT',                  nameTr: 'Flash BT',             nameAr: 'فلاش CT',                        icon: '⚡', durationMin: 30,  category: 'ct' },
+  { code: 'ct_photon',       nameEn: 'Photon Counting CT',        nameTr: 'Foton Sayıcı BT',      nameAr: 'CT عد الفوتون',                  icon: '🔬', durationMin: 35,  category: 'ct' },
+  { code: 'da_vinci',        nameEn: 'Da Vinci Robotic Surgery',  nameTr: 'Da Vinci Robotik',     nameAr: 'الجراحة الروبوتية دا فينشي',     icon: '🤖', durationMin: 240, category: 'robotic' },
+  { code: 'mako_robot',      nameEn: 'MAKO Robotic Surgery',      nameTr: 'MAKO Robotik Cerrahi', nameAr: 'جراحة MAKO الروبوتية',           icon: '🦿', durationMin: 120, category: 'robotic' },
+  { code: 'truebeam',        nameEn: 'TrueBeam Radiotherapy',     nameTr: 'TrueBeam Radyoterapi', nameAr: 'علاج إشعاعي TrueBeam',           icon: '🎯', durationMin: 30,  category: 'radiotherapy' },
+  { code: 'mr_linac',        nameEn: 'MR-Linac Radiotherapy',     nameTr: 'MR-Linac Radyoterapi', nameAr: 'علاج MR-Linac الإشعاعي',         icon: '🎯', durationMin: 60,  category: 'radiotherapy' },
+  { code: 'dsa_angiography', nameEn: 'DSA Digital Angiography',   nameTr: 'DSA Dijital Anjiyo',   nameAr: 'تصوير الأوعية الرقمي DSA',       icon: '🩸', durationMin: 60,  category: 'interventional' },
+  { code: 'mammography_3d',  nameEn: '3D Tomosynthesis Mammography', nameTr: '3D Mamografi',     nameAr: 'تصوير الثدي الشعاعي 3D',          icon: '🩺', durationMin: 20,  category: 'imaging' },
+  { code: 'eos_imaging',     nameEn: 'EOS Skeletal Imaging',      nameTr: 'EOS Görüntüleme',      nameAr: 'تصوير الهيكل العظمي EOS',        icon: '🦴', durationMin: 10,  category: 'imaging' },
+  { code: 'fibroscan',       nameEn: 'FibroScan (Liver)',         nameTr: 'FibroScan',            nameAr: 'فيبروسكان الكبد',                icon: '🫀', durationMin: 20,  category: 'imaging' },
+];
+
+export function getClinicsByGroup(group: string): ClinicBasic[] {
+  return CLINICS.filter(c => c.group === group);
 }
 
-// ─── 3B. MOTHERSCAN ISLINGTON ─────────────────────────────────────────────────
-// Same packages as Wimbledon — separate clinic entry for /centres filtering
-
-const MOTHERSCAN_ISLINGTON: ClinicData = {
-  ...MOTHERSCAN_WIMBLEDON,
-  id: 'motherscan-islington',
-  slug: 'motherscan-islington',
-  name: 'MotherScan Islington',
-  subtitle: 'Private Pregnancy & Baby Scan Clinic · Islington',
-  city: 'London N7',
-  address: '117 Holloway Road',
-  postcode: 'N7 8LT',
-  phone: '0204 631 6636',
-  email: 'islington@motherscan.co.uk',
-  featuredOnHomepage: false,
-  latitude: 51.5521,
-  longitude: -0.1169,
+export function getFeaturedClinics(): ClinicBasic[] {
+  return CLINICS.filter(c => c.isFeatured);
 }
 
-// ─── EXPORTS ──────────────────────────────────────────────────────────────────
-
-export const TEST_CLINICS: ClinicData[] = [
-  MEDICANA_WINCHESTER,
-  UNIRAD_GLASGOW,
-  MOTHERSCAN_WIMBLEDON,
-  MOTHERSCAN_ISLINGTON,
-]
-
-export function getClinicBySlug(slug: string): ClinicData | undefined {
-  return TEST_CLINICS.find(c => c.slug === slug)
+export function getClinicBySlug(slug: string): ClinicBasic | undefined {
+  return CLINICS.find(c => c.slug === slug);
 }
 
-export function getFeaturedClinics(): ClinicData[] {
-  return TEST_CLINICS.filter(c => c.featuredOnHomepage)
+export function getClinicsWithScan(scanCode: string): ClinicBasic[] {
+  return CLINICS.filter(c => c.scanTypes.includes(scanCode));
 }
 
-export function getClinicsByCapability(capability: string): ClinicData[] {
-  return TEST_CLINICS.filter(c => c.capabilities.includes(capability))
-}
+export const CLINIC_GROUPS = ['Acıbadem', 'Medicana', 'Koç', 'Florence Nightingale', 'Memorial', 'Liv', 'Medical Park', 'Anadolu', 'HSM'];
 
-// ─── CLINIC CARD (used by /search and /centres) ───────────────────────────────
+// Legacy alias used by search page
+export const TEST_CLINICS = CLINICS;
 
 export interface ClinicCard {
-  id: string
-  slug: string
-  name: string
-  address: string
-  city: string
-  rating: number
-  reviewCount: number
-  scannerType: string
-  reportHours: number
-  priceFrom: number
-  nextSlot: string
-  cqcRating: CqcRating
-  regulatedBy: string
-  tags: string[]
-  capabilities: string[]
-  insurers: string[]
-  featured: boolean
-  locationsCount: number
+  id: string;
+  slug: string;
+  name: string;
+  shortName: string;
+  city: string;
+  country: string;
+  rating: number;
+  priceFrom: number;
+  scanTypes: string[];
+  jciAccredited: boolean;
+  isFeatured: boolean;
+  description: string;
 }
 
-export function toClinicCard(c: ClinicData): ClinicCard {
+export function toClinicCard(clinic: ClinicBasic): ClinicCard {
   return {
-    id: c.id,
-    slug: c.slug,
-    name: c.name,
-    address: `${c.address}, ${c.postcode}`,
-    city: c.city,
-    rating: c.rating,
-    reviewCount: c.reviewCount,
-    scannerType: c.scannerTesla ?? (c.capabilities.includes('mri') ? 'MRI' : 'Ultrasound'),
-    reportHours: c.reportHours,
-    priceFrom: c.priceFrom,
-    nextSlot: 'Today',
-    cqcRating: c.cqcRating,
-    regulatedBy: c.regulatedBy ?? 'CQC',
-    tags: c.capabilities,
-    capabilities: c.capabilities,
-    insurers: c.insurers,
-    featured: c.featuredOnHomepage,
-    locationsCount: c.locations?.length ?? 1,
-  }
+    id: clinic.id,
+    slug: clinic.slug,
+    name: clinic.name,
+    shortName: clinic.shortName,
+    city: clinic.city,
+    country: clinic.country,
+    rating: clinic.rating,
+    priceFrom: clinic.featuredScans.length > 0
+      ? Math.min(...clinic.featuredScans.map(s => s.priceGbp))
+      : 0,
+    scanTypes: clinic.scanTypes,
+    jciAccredited: clinic.jciAccredited,
+    isFeatured: clinic.isFeatured,
+    description: clinic.description,
+  };
 }
