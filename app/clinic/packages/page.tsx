@@ -1,97 +1,115 @@
-// @ts-nocheck
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import PackageManager from './PackageManager'
+import { auth } from '@/lib/auth'
+import { sql } from '@/lib/db'
 
-export const metadata = { title: 'Packages — Clinic' }
+export const metadata = { title: 'Scan Packages — Clinic Portal' }
+export const dynamic = 'force-dynamic'
 
 export default async function ClinicPackagesPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const session = await auth()
+  const user = session?.user
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('clinic_id, role')
-    .eq('id', user.id)
-    .single()
+  const clinicRows = await sql`
+    SELECT tc.id, tc.name, tc.commission_pct FROM clinic_admins ca
+    JOIN tr_clinics tc ON tc.id = ca.clinic_id
+    WHERE ca.user_id = ${user.id} LIMIT 1
+  `
+  if (!clinicRows[0]) redirect('/clinic/dashboard')
+  const clinic = clinicRows[0] as { id: string; name: string; commission_pct: number }
 
-  const clinicId = profile?.clinic_id
-  if (!clinicId) redirect('/clinic/dashboard')
+  // Scans offered by this clinic with pricing
+  const rows = await sql`
+    SELECT cst.id, cst.scan_type_code, cst.device_name, cst.device_year,
+           cst.price_gbp, cst.price_eur, cst.price_usd, cst.uk_price_gbp,
+           cst.is_available, cst.notes,
+           tst.name_en, tst.category, tst.duration_minutes
+    FROM clinic_scan_types cst
+    JOIN tr_scan_types tst ON tst.code = cst.scan_type_code
+    WHERE cst.clinic_id = ${clinic.id}
+    ORDER BY tst.category ASC, tst.name_en ASC
+  `
 
-  const { data: packages } = await supabase
-    .from('packages')
-    .select('id, name, scan_type, price, duration_minutes, description, is_active, body_parts')
-    .eq('clinic_id', clinicId)
-    .order('scan_type', { ascending: true })
-    .order('price', { ascending: true })
+  const scans = rows as {
+    id: string; scan_type_code: string; device_name: string | null; device_year: number | null;
+    price_gbp: number | null; price_eur: number | null; price_usd: number | null; uk_price_gbp: number | null;
+    is_available: boolean; notes: string | null;
+    name_en: string; category: string | null; duration_minutes: number | null;
+  }[]
 
-  const isAdmin = profile?.role === 'clinic_admin' || profile?.role === 'super_admin' || profile?.role === 'admin'
-
-  const scanTypeGroups: Record<string, typeof packages> = {}
-  for (const pkg of packages ?? []) {
-    const key = pkg.scan_type ?? 'Other'
-    if (!scanTypeGroups[key]) scanTypeGroups[key] = []
-    scanTypeGroups[key]!.push(pkg)
+  const groups: Record<string, typeof scans> = {}
+  for (const s of scans) {
+    const key = s.category ?? 'Other'
+    if (!groups[key]) groups[key] = []
+    groups[key].push(s)
   }
 
   return (
     <>
-      <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111', marginBottom: 4 }}>Packages</h1>
-          <p style={{ fontSize: 14, color: '#888' }}>{packages?.length ?? 0} scan packages</p>
-        </div>
-        {isAdmin && <PackageManager clinicId={clinicId} mode="add" />}
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>Scan packages</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>{scans.length} scan type{scans.length !== 1 ? 's' : ''} offered by {clinic.name}</p>
       </div>
 
-      {Object.keys(scanTypeGroups).length === 0 ? (
-        <div style={{ background: '#fff', border: '1px dashed #ddd', borderRadius: 14, padding: '64px', textAlign: 'center', color: '#bbb', fontSize: 14 }}>
-          No packages yet — add your first scan package
+      <div style={{ padding: '14px 18px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, marginBottom: 24, fontSize: 13, color: '#1e40af' }}>
+        ℹ To add or remove scan types, or update pricing, contact thediagnostic admin at <strong>info@thediagnostic.co.uk</strong>
+      </div>
+
+      {scans.length === 0 ? (
+        <div style={{ background: '#fff', border: '1px dashed var(--line)', borderRadius: 14, padding: '64px', textAlign: 'center', color: '#bbb', fontSize: 14 }}>
+          No scan packages configured yet
         </div>
       ) : (
-        Object.entries(scanTypeGroups).map(([scanType, pkgs]) => (
-          <div key={scanType} style={{ marginBottom: 28 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#aaa', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 }}>
-              {scanType}
-            </div>
+        Object.entries(groups).map(([category, items]) => (
+          <div key={category} style={{ marginBottom: 28 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#aaa', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 }}>{category}</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
-              {pkgs?.map(pkg => (
-                <div key={pkg.id} style={{
-                  background: '#fff', border: `1px solid ${pkg.is_active ? '#ebebeb' : '#f5f5f5'}`,
-                  borderRadius: 12, padding: '18px 20px', opacity: pkg.is_active ? 1 : 0.55,
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 14, color: '#111' }}>{pkg.name}</div>
-                      {pkg.duration_minutes && (
-                        <div style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>{pkg.duration_minutes} min</div>
+              {items.map(pkg => {
+                const saving = pkg.uk_price_gbp && pkg.price_gbp ? Math.round((1 - pkg.price_gbp / pkg.uk_price_gbp) * 100) : null
+                return (
+                  <div key={pkg.id} style={{ background: '#fff', border: `1px solid ${pkg.is_available ? 'var(--line)' : '#f0f0f0'}`, borderRadius: 12, padding: '18px 20px', opacity: pkg.is_available ? 1 : 0.55 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--primary)' }}>{pkg.name_en}</div>
+                        {pkg.device_name && <div style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>{pkg.device_name}{pkg.device_year ? ` (${pkg.device_year})` : ''}</div>}
+                        {pkg.duration_minutes && <div style={{ fontSize: 11, color: '#bbb', marginTop: 2 }}>{pkg.duration_minutes} min</div>}
+                      </div>
+                      <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700, background: pkg.is_available ? '#dcfce7' : '#f3f4f6', color: pkg.is_available ? '#166534' : '#888' }}>
+                        {pkg.is_available ? 'Available' : 'Unavailable'}
+                      </span>
+                    </div>
+                    {/* Pricing row */}
+                    <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
+                      {pkg.price_gbp && (
+                        <div style={{ padding: '6px 12px', background: 'var(--bg-2)', borderRadius: 8 }}>
+                          <div style={{ fontSize: 10, color: '#aaa', fontWeight: 600 }}>GBP</div>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--primary)' }}>£{Number(pkg.price_gbp).toLocaleString()}</div>
+                        </div>
+                      )}
+                      {pkg.price_eur && (
+                        <div style={{ padding: '6px 12px', background: 'var(--bg-2)', borderRadius: 8 }}>
+                          <div style={{ fontSize: 10, color: '#aaa', fontWeight: 600 }}>EUR</div>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--primary)' }}>€{Number(pkg.price_eur).toLocaleString()}</div>
+                        </div>
                       )}
                     </div>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: '#111' }}>£{pkg.price}</div>
+                    {saving && saving > 0 && (
+                      <div style={{ marginTop: 10, fontSize: 12, color: '#17A589', fontWeight: 600 }}>
+                        {saving}% less than UK average (£{Number(pkg.uk_price_gbp).toLocaleString()})
+                      </div>
+                    )}
+                    {pkg.notes && (
+                      <div style={{ marginTop: 8, fontSize: 12, color: '#888', lineHeight: 1.5, borderTop: '1px solid #f5f5f5', paddingTop: 8 }}>{pkg.notes}</div>
+                    )}
+                    {/* Clinic's net after platform fee */}
+                    {pkg.price_gbp && (
+                      <div style={{ marginTop: 8, fontSize: 11, color: '#bbb' }}>
+                        Your net: £{Math.round(Number(pkg.price_gbp) * (1 - (clinic.commission_pct ?? 15) / 100)).toLocaleString()} after {clinic.commission_pct ?? 15}% fee
+                      </div>
+                    )}
                   </div>
-                  {pkg.description && (
-                    <div style={{ fontSize: 12, color: '#888', marginBottom: 10, lineHeight: 1.5 }}>{pkg.description}</div>
-                  )}
-                  {pkg.body_parts && Array.isArray(pkg.body_parts) && pkg.body_parts.length > 0 && (
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 10 }}>
-                      {(pkg.body_parts as string[]).map((part: string) => (
-                        <span key={part} style={{ padding: '2px 8px', background: '#f0f9ff', color: '#0369a1', borderRadius: 4, fontSize: 10, fontWeight: 600 }}>{part}</span>
-                      ))}
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{
-                      padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700,
-                      background: pkg.is_active ? '#dcfce7' : '#f3f4f6',
-                      color: pkg.is_active ? '#166534' : '#6b7280',
-                    }}>
-                      {pkg.is_active ? 'Active' : 'Hidden'}
-                    </span>
-                    {isAdmin && <PackageManager clinicId={clinicId} mode="edit" pkg={pkg} />}
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         ))
