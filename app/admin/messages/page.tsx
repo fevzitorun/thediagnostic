@@ -1,66 +1,57 @@
-// @ts-nocheck
-import { createClient } from '@/lib/supabase/server'
+import { sql } from '@/lib/db'
 
 export const metadata = { title: 'Messages — Admin' }
+export const dynamic = 'force-dynamic'
 
 export default async function AdminMessagesPage() {
-  const supabase = await createClient()
-
-  const { data: messages } = await supabase
-    .from('messages')
-    .select('id, subject, body, from_name, from_email, clinic_name, created_at, read_at, booking_ref')
-    .order('created_at', { ascending: false })
-    .limit(50)
-
-  const unreadCount = messages?.filter(m => !m.read_at).length ?? 0
+  let messages: { id: string; name: string | null; email: string | null; phone: string | null; subject: string | null; message: string; created_at: string }[] = []
+  try {
+    const rows = await sql`
+      SELECT id, name, email, phone, subject, message, created_at
+      FROM contact_messages
+      ORDER BY created_at DESC
+      LIMIT 50
+    `
+    messages = rows as typeof messages
+  } catch {
+    // contact_messages table not yet created — show empty state
+  }
 
   return (
     <>
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111', marginBottom: 4 }}>
-          Messages
-          {unreadCount > 0 && (
-            <span style={{ marginLeft: 10, padding: '2px 10px', background: '#dc2626', color: '#fff', borderRadius: 12, fontSize: 14 }}>{unreadCount}</span>
-          )}
-        </h1>
-        <p style={{ fontSize: 14, color: '#888' }}>All platform messages</p>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>Messages</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Contact form submissions from thediagnostic.co.uk/contact</p>
       </div>
 
-      {!messages || messages.length === 0 ? (
-        <div style={{ background: '#fff', border: '1px dashed #ddd', borderRadius: 14, padding: '64px', textAlign: 'center', color: '#bbb', fontSize: 14 }}>
+      {messages.length === 0 ? (
+        <div style={{ background: '#fff', border: '1px dashed var(--line)', borderRadius: 14, padding: '64px', textAlign: 'center', color: '#bbb', fontSize: 14 }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>✉</div>
-          <div>No messages yet</div>
+          <div style={{ marginBottom: 8 }}>No messages yet</div>
+          <div style={{ fontSize: 12 }}>Messages submitted via /contact will appear here</div>
         </div>
       ) : (
-        <div style={{ background: '#fff', border: '1px solid #ebebeb', borderRadius: 14, overflow: 'hidden' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden' }}>
           {messages.map((msg, i) => (
-            <div
-              key={msg.id}
-              style={{
-                padding: '16px 22px', borderBottom: i < messages.length - 1 ? '1px solid #f5f5f5' : 'none',
-                background: msg.read_at ? '#fff' : '#f0f9ff',
-                display: 'flex', alignItems: 'center', gap: 16,
-              }}
-            >
-              {!msg.read_at && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />}
+            <div key={msg.id} style={{ padding: '16px 22px', borderBottom: i < messages.length - 1 ? '1px solid #f5f5f5' : 'none', display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#EBF4FA', display: 'grid', placeItems: 'center', fontSize: 15, flexShrink: 0 }}>✉</div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: msg.read_at ? 500 : 700, fontSize: 14, color: '#111', marginBottom: 2 }}>
+                <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--primary)', marginBottom: 2 }}>
                   {msg.subject ?? '(No subject)'}
                 </div>
-                <div style={{ fontSize: 12, color: '#888' }}>
-                  {msg.from_name ?? msg.from_email ?? 'Unknown'}
-                  {msg.clinic_name ? ` · ${msg.clinic_name}` : ''}
+                <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
+                  {msg.name ?? 'Unknown'} · {msg.email}{msg.phone ? ` · ${msg.phone}` : ''}
                 </div>
-                <div style={{ fontSize: 12, color: '#aaa', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {msg.body}
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                  {msg.message}
                 </div>
               </div>
               <div style={{ flexShrink: 0, textAlign: 'right' }}>
                 <div style={{ fontSize: 12, color: '#aaa' }}>
-                  {new Date(msg.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                  {new Date(msg.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                 </div>
-                {msg.booking_ref && (
-                  <div style={{ fontSize: 10, fontFamily: 'monospace', color: '#bbb', marginTop: 2 }}>{msg.booking_ref}</div>
+                {msg.email && (
+                  <a href={`mailto:${msg.email}`} style={{ fontSize: 11, color: '#3AABDB', textDecoration: 'none', marginTop: 4, display: 'block' }}>Reply →</a>
                 )}
               </div>
             </div>

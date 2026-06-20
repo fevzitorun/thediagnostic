@@ -1,157 +1,110 @@
-// @ts-nocheck
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { sql } from '@/lib/db'
 
-export const metadata = { title: 'Clinics — Admin' }
+export const metadata = { title: 'TR Clinics — Admin' }
+export const dynamic = 'force-dynamic'
 
 interface PageProps {
-  searchParams: Promise<{ search?: string; status?: string }>
+  searchParams: Promise<{ search?: string; group?: string }>
 }
 
 export default async function AdminClinicsPage({ searchParams }: PageProps) {
   const params = await searchParams
   const search = params.search ?? ''
-  const statusFilter = params.status ?? ''
+  const groupFilter = params.group ?? ''
+  const searchWild = `%${search}%`
 
-  const supabase = await createClient()
+  const [clinicRows, groupRows] = await Promise.all([
+    sql`
+      SELECT
+        tc.id, tc.slug, tc.name, tc.short_name, tc.city, tc.hospital_group,
+        tc.jci_accredited, tc.iso_certified, tc.is_active, tc.commission_pct,
+        tc.rating, tc.beds, tc.created_at,
+        COUNT(b.id)::int AS booking_count
+      FROM tr_clinics tc
+      LEFT JOIN bookings b ON b.tr_clinic_id = tc.id AND b.status IN ('confirmed','completed')
+      WHERE 1=1
+        ${search ? sql`AND (tc.name ILIKE ${searchWild} OR tc.hospital_group ILIKE ${searchWild} OR tc.city ILIKE ${searchWild})` : sql``}
+        ${groupFilter ? sql`AND tc.hospital_group = ${groupFilter}` : sql``}
+      GROUP BY tc.id
+      ORDER BY tc.is_featured DESC, tc.name ASC
+    `,
+    sql`SELECT DISTINCT hospital_group FROM tr_clinics WHERE hospital_group IS NOT NULL ORDER BY hospital_group`,
+  ])
 
-  let query = supabase
-    .from('clinics')
-    .select('id, name, city, address, postcode, status, commission_rate, stripe_account_id, created_at, cqc_rating')
-    .order('created_at', { ascending: false })
-
-  if (search) query = query.ilike('name', `%${search}%`)
-  if (statusFilter) query = query.eq('status', statusFilter)
-
-  const { data: clinics } = await query
-
-  // Booking counts per clinic
-  const { data: bookingCounts } = await supabase
-    .from('bookings')
-    .select('clinic_slug')
-    .in('status', ['confirmed', 'completed'])
-
-  const countMap: Record<string, number> = {}
-  for (const b of bookingCounts ?? []) {
-    if (b.clinic_slug) countMap[b.clinic_slug] = (countMap[b.clinic_slug] ?? 0) + 1
-  }
-
-  const statusStyle: Record<string, { bg: string; color: string }> = {
-    active:   { bg: '#dcfce7', color: '#166534' },
-    pending:  { bg: '#fef9c3', color: '#854d0e' },
-    inactive: { bg: '#f3f4f6', color: '#6b7280' },
-    suspended:{ bg: '#fef2f2', color: '#991b1b' },
-  }
+  const clinics = clinicRows as { id: string; slug: string; name: string; short_name: string | null; city: string; hospital_group: string | null; jci_accredited: boolean; iso_certified: boolean; is_active: boolean; commission_pct: number; rating: number | null; beds: number | null; created_at: string; booking_count: number }[]
+  const groups = groupRows.map(r => (r as { hospital_group: string }).hospital_group)
 
   return (
     <>
-      <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111', marginBottom: 4 }}>Clinics</h1>
-          <p style={{ fontSize: 14, color: '#888' }}>{clinics?.length ?? 0} on platform</p>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>TR Partner Clinics</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>{clinics.length} Istanbul hospitals</p>
         </div>
-        <Link
-          href="/admin/clinics/new"
-          style={{ padding: '10px 20px', background: '#111', color: '#fff', borderRadius: 9, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}
-        >
-          + Add clinic
+        <Link href="/destinations/turkey/istanbul" target="_blank" style={{ padding: '9px 18px', background: 'var(--primary)', color: '#fff', borderRadius: 9, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
+          View public page ↗
         </Link>
       </div>
 
       {/* Filters */}
-      <div style={{ background: '#fff', border: '1px solid #ebebeb', borderRadius: 12, padding: '14px 18px', marginBottom: 20, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-        {['', 'active', 'pending', 'inactive', 'suspended'].map(s => (
-          <Link
-            key={s}
-            href={`/admin/clinics${s ? `?status=${s}` : ''}`}
-            style={{
-              padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-              textDecoration: 'none',
-              background: statusFilter === s ? '#111' : '#f4f4f4',
-              color: statusFilter === s ? '#fff' : '#555',
-            }}
-          >
-            {s ? s.charAt(0).toUpperCase() + s.slice(1) : 'All'}
+      <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: '14px 18px', marginBottom: 16, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Link href="/admin/clinics" style={{ padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, textDecoration: 'none', background: !groupFilter ? 'var(--primary)' : '#f4f4f4', color: !groupFilter ? '#fff' : '#555' }}>
+          All groups
+        </Link>
+        {groups.map(g => (
+          <Link key={g} href={`/admin/clinics?group=${g}`} style={{ padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, textDecoration: 'none', background: groupFilter === g ? 'var(--primary)' : '#f4f4f4', color: groupFilter === g ? '#fff' : '#555' }}>
+            {g}
           </Link>
         ))}
-
         <form method="get" action="/admin/clinics" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          {statusFilter && <input type="hidden" name="status" value={statusFilter} />}
-          <input
-            name="search"
-            defaultValue={search}
-            placeholder="Search clinic name…"
-            style={{ padding: '7px 13px', border: '1.5px solid #e8e8e8', borderRadius: 8, fontSize: 13, outline: 'none', width: 220, fontFamily: 'inherit' }}
-          />
-          <button type="submit" style={{ padding: '7px 16px', background: '#111', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Search</button>
+          {groupFilter && <input type="hidden" name="group" value={groupFilter} />}
+          <input name="search" defaultValue={search} placeholder="Search clinic or group…"
+            style={{ padding: '7px 13px', border: '1.5px solid var(--line)', borderRadius: 8, fontSize: 13, outline: 'none', width: 220, fontFamily: 'inherit' }} />
+          <button type="submit" style={{ padding: '7px 16px', background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Search</button>
         </form>
       </div>
 
-      {/* Clinic cards */}
-      {!clinics || clinics.length === 0 ? (
-        <div style={{ background: '#fff', border: '1px dashed #ddd', borderRadius: 14, padding: '64px', textAlign: 'center', color: '#bbb', fontSize: 14 }}>
-          No clinics found
-        </div>
+      {/* Clinic list */}
+      {clinics.length === 0 ? (
+        <div style={{ background: '#fff', border: '1px dashed var(--line)', borderRadius: 14, padding: '64px', textAlign: 'center', color: '#bbb', fontSize: 14 }}>No clinics found</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {clinics.map(clinic => {
-            const s = statusStyle[clinic.status ?? 'pending'] ?? statusStyle.pending
-            const bookings = countMap[clinic.id] ?? 0
-            const hasStripe = !!clinic.stripe_account_id
-
-            return (
-              <div key={clinic.id} style={{ background: '#fff', border: '1px solid #ebebeb', borderRadius: 14, padding: '18px 22px', display: 'flex', alignItems: 'center', gap: 20 }}>
-                {/* Clinic avatar */}
-                <div style={{ width: 46, height: 46, borderRadius: 12, background: 'linear-gradient(135deg, #0F4C81, #082A4A)', display: 'grid', placeItems: 'center', fontSize: 18, flexShrink: 0 }}>
-                  🏥
+          {clinics.map(c => (
+            <div key={c.id} style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 18 }}>
+              {/* Avatar */}
+              <div style={{ width: 46, height: 46, borderRadius: 12, background: 'linear-gradient(135deg, #082A4A, #0B3565)', display: 'grid', placeItems: 'center', fontSize: 18, flexShrink: 0 }}>🏥</div>
+              {/* Info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--primary)' }}>{c.name}</span>
+                  {c.jci_accredited && <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700, background: '#EBF4FA', color: '#3AABDB' }}>JCI</span>}
+                  {c.iso_certified && <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700, background: '#D1F2EB', color: '#0E6655' }}>ISO</span>}
+                  <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700, background: c.is_active ? '#dcfce7' : '#f3f4f6', color: c.is_active ? '#166534' : '#6b7280' }}>
+                    {c.is_active ? 'Active' : 'Inactive'}
+                  </span>
                 </div>
-
-                {/* Info */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: '#111' }}>{clinic.name}</span>
-                    <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', background: s.bg, color: s.color }}>
-                      {clinic.status ?? 'pending'}
-                    </span>
-                    {!hasStripe && (
-                      <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700, background: '#fef9c3', color: '#854d0e' }}>
-                        No Stripe
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ fontSize: 12, color: '#888' }}>{clinic.address}, {clinic.city} {clinic.postcode}</div>
-                </div>
-
-                {/* Stats */}
-                <div style={{ display: 'flex', gap: 28, flexShrink: 0 }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: '#111' }}>{bookings}</div>
-                    <div style={{ fontSize: 10, color: '#aaa', textTransform: 'uppercase', letterSpacing: 0.8 }}>Bookings</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: '#111' }}>{clinic.commission_rate ? `${Math.round(clinic.commission_rate * 100)}%` : '12%'}</div>
-                    <div style={{ fontSize: 10, color: '#aaa', textTransform: 'uppercase', letterSpacing: 0.8 }}>Commission</div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                  <Link
-                    href={`/clinics/${clinic.id}`}
-                    style={{ padding: '7px 12px', border: '1px solid #e8e8e8', borderRadius: 8, fontSize: 12, color: '#555', textDecoration: 'none' }}
-                  >
-                    View page
-                  </Link>
-                  <Link
-                    href={`/admin/clinics/${clinic.id}`}
-                    style={{ padding: '7px 14px', background: '#111', color: '#fff', borderRadius: 8, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}
-                  >
-                    Manage
-                  </Link>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  {c.hospital_group ? `${c.hospital_group} · ` : ''}{c.city}{c.beds ? ` · ${c.beds} beds` : ''}{c.rating ? ` · ★ ${c.rating}` : ''}
                 </div>
               </div>
-            )
-          })}
+              {/* Stats */}
+              <div style={{ display: 'flex', gap: 24, flexShrink: 0 }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--primary)' }}>{c.booking_count}</div>
+                  <div style={{ fontSize: 10, color: '#aaa', textTransform: 'uppercase', letterSpacing: 0.8 }}>Bookings</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--primary)' }}>{c.commission_pct ?? 15}%</div>
+                  <div style={{ fontSize: 10, color: '#aaa', textTransform: 'uppercase', letterSpacing: 0.8 }}>Commission</div>
+                </div>
+              </div>
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                <Link href={`/clinics/${c.slug}`} target="_blank" style={{ padding: '7px 12px', border: '1px solid var(--line)', borderRadius: 8, fontSize: 12, color: '#555', textDecoration: 'none' }}>View page</Link>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </>

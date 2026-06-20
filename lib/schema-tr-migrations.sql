@@ -342,6 +342,19 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS platform_fee NUMERIC(10,2);
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_provider VARCHAR(20);  -- 'stripe' | 'iyzico'
 
 -- ---------------------------------------------------------
+-- İletişim formu mesajları (/contact sayfasından)
+-- ---------------------------------------------------------
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name       TEXT,
+  email      TEXT,
+  phone      TEXT,
+  subject    TEXT,
+  message    TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ---------------------------------------------------------
 -- İndeksler
 -- ---------------------------------------------------------
 CREATE INDEX IF NOT EXISTS idx_scan_slots_clinic_date ON scan_slots(clinic_id, slot_date);
