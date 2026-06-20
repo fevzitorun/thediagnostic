@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/patient/', '/clinic/', '/gp/', '/api/', '/book/'],
       },
     ],
-    sitemap: 'https://scanbook.co.uk/sitemap.xml',
+    sitemap: 'https://thediagnostic.co.uk/sitemap.xml',
   }
 }
