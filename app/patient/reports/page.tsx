@@ -20,7 +20,7 @@ export default async function ReportsPage() {
     ORDER BY appointment_date DESC NULLS LAST
   `
 
-  const bookings = rows as { id: string; booking_ref: string; package_name: string | null; body_part: string | null; clinic_name: string | null; appointment_date: string | null; report_url: string | null; status: string; created_at: string }[]
+  const bookings = rows  as unknown as { id: string; booking_ref: string; package_name: string | null; body_part: string | null; clinic_name: string | null; appointment_date: string | null; report_url: string | null; status: string; created_at: string }[]
   const withReport = bookings.filter(b => b.report_url)
   const pending    = bookings.filter(b => !b.report_url && b.status === 'completed')
   const upcoming   = bookings.filter(b => b.status === 'confirmed')

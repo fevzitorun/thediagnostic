@@ -11,14 +11,14 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const clinicId = session.user.clinicId
+  const clinicId = session.user.clinicId ?? null
   if (!clinicId) {
     return NextResponse.json({ error: 'No clinic associated with this account' }, { status: 403 })
   }
 
   const body = await req.json()
   const { name, address, city, postcode, phone, email, website, description, capabilities } =
-    body as Record<string, unknown>
+    body  as unknown as { name?: string; address?: string; city?: string; postcode?: string; phone?: string; email?: string; website?: string; description?: string; capabilities?: string[] }
 
   await sql`
     UPDATE clinics SET

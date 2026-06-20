@@ -32,7 +32,7 @@ export default async function AdminPatientsPage({ searchParams }: PageProps) {
     LIMIT ${perPage} OFFSET ${offset}
   `
 
-  const patients = rows as { id: string; first_name: string | null; last_name: string | null; phone: string | null; nationality: string | null; created_at: string; email: string; booking_count: number; total_count: string }[]
+  const patients = rows as unknown as { id: string; first_name: string | null; last_name: string | null; phone: string | null; nationality: string | null; created_at: string; email: string; booking_count: number; total_count: string }[]
   const total = Number(patients[0]?.total_count ?? 0)
   const totalPages = Math.ceil(total / perPage)
 

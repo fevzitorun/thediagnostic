@@ -3,7 +3,7 @@ import { sql } from '@/lib/db'
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as { name?: string; email?: string; phone?: string; subject?: string; message?: string }
+    const body = await req.json()  as unknown as { name?: string; email?: string; phone?: string; subject?: string; message?: string }
 
     if (!body.name?.trim() || !body.email?.trim() || !body.message?.trim()) {
       return NextResponse.json({ error: 'Name, email and message are required.' }, { status: 400 })

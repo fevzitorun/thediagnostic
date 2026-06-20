@@ -40,15 +40,15 @@ export default async function AdminFinancePage() {
     `,
   ])
 
-  const top = topRows[0] as { total_revenue: string; platform_revenue: string; clinic_payouts: string; total_transactions: string; avg_order: string }
+  const top = topRows[0] as unknown as { total_revenue: string; platform_revenue: string; clinic_payouts: string; total_transactions: string; avg_order: string }
   const totalRevenue   = Number(top.total_revenue)
   const platformRevenue = Number(top.platform_revenue)
   const clinicPayouts  = Number(top.clinic_payouts)
   const avgOrder       = Number(top.avg_order)
   const totalTx        = Number(top.total_transactions)
 
-  const clinics = clinicRows as { clinic_name: string; booking_count: number; revenue: string; platform_fee: string }[]
-  const monthly = monthlyRows as { month: string; revenue: string }[]
+  const clinics = clinicRows as unknown as { clinic_name: string; booking_count: number; revenue: string; platform_fee: string }[]
+  const monthly = monthlyRows as unknown as { month: string; revenue: string }[]
   const maxMonthly = Math.max(...monthly.map(m => Number(m.revenue)), 1)
 
   return (

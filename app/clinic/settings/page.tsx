@@ -24,7 +24,7 @@ export default async function ClinicSettingsPage() {
   `
   if (!clinicRows[0]) redirect('/clinic/dashboard')
 
-  const clinic = clinicRows[0] as {
+  const clinic = clinicRows[0]  as unknown as {
     id: string; name: string; short_name: string | null; city: string; address: string | null;
     phone: string | null; email: string | null; website: string | null;
     hospital_group: string | null; jci_accredited: boolean; iso_certified: boolean;

@@ -14,7 +14,7 @@ export default async function GPSettingsPage() {
   let gp: GPRow | null = null
   try {
     const rows = await sql`SELECT id, name, practice_name, practice_address, gmc_number, phone, email, referral_code, commission_rate, bank_account_last4 FROM gps WHERE user_id = ${user.id} LIMIT 1`
-    gp = (rows[0] as GPRow) ?? null
+    gp = (rows[0] as unknown as GPRow) ?? null
   } catch { /* table may not exist */ }
   if (!gp) redirect('/gp/dashboard')
 
@@ -23,7 +23,7 @@ export default async function GPSettingsPage() {
     FROM profiles p LEFT JOIN users u ON u.id = p.id
     WHERE p.id = ${user.id} LIMIT 1
   `
-  const profile = profileRows[0] as { first_name: string | null; last_name: string | null; user_email: string | null } | undefined
+  const profile = profileRows[0]  as unknown as { first_name: string | null; last_name: string | null; user_email: string | null } | undefined
 
   const infoRows = [
     { label: 'Full name',      value: gp.name },

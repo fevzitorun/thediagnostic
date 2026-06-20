@@ -15,7 +15,7 @@ export default async function ClinicMessagesPage() {
     WHERE ca.user_id = ${user.id} LIMIT 1
   `
   if (!clinicRows[0]) redirect('/clinic/dashboard')
-  const clinicId = (clinicRows[0] as { id: string }).id
+  const clinicId = (clinicRows[0]  as unknown as { id: string }).id
 
   // WhatsApp conversations linked to this clinic's bookings
   let conversations: { id: string; patient_name: string | null; patient_phone: string; last_message_at: string | null; status: string; locale: string | null; booking_id: string | null }[] = []
@@ -27,7 +27,7 @@ export default async function ClinicMessagesPage() {
       ORDER BY wc.last_message_at DESC NULLS LAST
       LIMIT 50
     `
-    conversations = rows as typeof conversations
+    conversations = rows as unknown as typeof conversations
   } catch {
     // table may not exist yet
   }
@@ -40,7 +40,7 @@ export default async function ClinicMessagesPage() {
     ORDER BY created_at DESC
     LIMIT 20
   `
-  const bookings = bookingRows as { id: string; booking_ref: string; patient_name: string | null; patient_email: string | null; patient_phone: string | null; status: string; created_at: string }[]
+  const bookings = bookingRows  as unknown as { id: string; booking_ref: string; patient_name: string | null; patient_email: string | null; patient_phone: string | null; status: string; created_at: string }[]
 
   return (
     <>

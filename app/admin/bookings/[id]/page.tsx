@@ -33,7 +33,20 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
   `
   if (!rows[0]) notFound()
 
-  const b = rows[0] as Record<string, unknown> & { patient_email_addr: string | null }
+  const b = rows[0] as Record<string, unknown> & {
+    patient_email_addr: string | null
+    has_metal_implants: boolean | null
+    is_claustrophobic: boolean | null
+    is_pregnant: boolean | null
+    contrast_required: boolean | null
+    stripe_session_id: string | null
+    amount_paid: number | null
+    report_url: string | null
+    booking_ref: string | null
+    status: string
+    patient_phone: string | null
+    created_at: string | null
+  }
   const s = STATUS_STYLE[(b.status as string) ?? 'pending'] ?? STATUS_STYLE.pending
 
   const field = (label: string, value: unknown) => value ? (

@@ -14,7 +14,7 @@ export default async function GPEarningsPage() {
   let gp: GPRow | null = null
   try {
     const rows = await sql`SELECT id, commission_rate, total_earned, pending_payout, bank_account_last4 FROM gps WHERE user_id = ${user.id} LIMIT 1`
-    gp = (rows[0] as GPRow) ?? null
+    gp = (rows[0] as unknown as GPRow) ?? null
   } catch { /* table may not exist */ }
   if (!gp) redirect('/gp/dashboard')
 
@@ -28,14 +28,14 @@ export default async function GPEarningsPage() {
       WHERE gp_id = ${gp.id} AND status = 'completed'
       ORDER BY created_at DESC
     `
-    completedBookings = rows as CompletedRow[]
+    completedBookings = rows as unknown as CompletedRow[]
   } catch { /* gp_id col may not exist */ }
 
   type PayoutRow = { id: string; amount: number; period_start: string; period_end: string; status: string; paid_at: string | null; booking_count: number | null }
   let payouts: PayoutRow[] = []
   try {
     const rows = await sql`SELECT id, amount, period_start, period_end, status, paid_at, booking_count FROM gp_earnings WHERE gp_id = ${gp.id} ORDER BY period_start DESC`
-    payouts = rows as PayoutRow[]
+    payouts = rows as unknown as PayoutRow[]
   } catch { /* table may not exist */ }
 
   // Monthly breakdown

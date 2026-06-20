@@ -15,7 +15,7 @@ export default async function GPReferPage() {
   let gp: GPRow | null = null
   try {
     const rows = await sql`SELECT id, name, referral_code, commission_rate FROM gps WHERE user_id = ${user.id} LIMIT 1`
-    gp = (rows[0] as GPRow) ?? null
+    gp = (rows[0] as unknown as GPRow) ?? null
   } catch { /* table may not exist */ }
   if (!gp) redirect('/gp/dashboard')
 

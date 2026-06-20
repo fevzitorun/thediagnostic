@@ -5,10 +5,11 @@ export const metadata = { title: 'Clinic Outreach CRM — Admin' }
 export const dynamic = 'force-dynamic'
 
 export default async function OutreachPage() {
-  let leads: Record<string, unknown>[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let leads: any[] = []
   try {
     const rows = await sql`SELECT * FROM partner_leads ORDER BY created_at DESC`
-    leads = rows as typeof leads
+    leads = rows as unknown as typeof leads
   } catch {
     // Table may not exist yet
   }

@@ -12,7 +12,7 @@ export default async function AdminMessagesPage() {
       ORDER BY created_at DESC
       LIMIT 50
     `
-    messages = rows as typeof messages
+    messages = rows as unknown as typeof messages
   } catch {
     // contact_messages table not yet created — show empty state
   }

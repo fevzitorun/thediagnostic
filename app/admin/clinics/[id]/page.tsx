@@ -32,7 +32,7 @@ export default async function AdminClinicDetailPage({ params }: PageProps) {
     LIMIT 1
   `
   if (!clinicRows[0]) notFound()
-  const clinic = clinicRows[0] as {
+  const clinic = clinicRows[0]  as unknown as {
     id: string; slug: string; name: string; short_name: string | null; city: string;
     address: string | null; phone: string | null; email: string | null; website: string | null;
     hospital_group: string | null; jci_accredited: boolean; iso_certified: boolean;
@@ -71,14 +71,14 @@ export default async function AdminClinicDetailPage({ params }: PageProps) {
     `,
   ])
 
-  const stats = statsRows[0] as { total_bookings: string; pending_count: string; total_revenue: string }
+  const stats = statsRows[0]  as unknown as { total_bookings: string; pending_count: string; total_revenue: string }
   const revenue = Number(stats.total_revenue)
   const platformEarnings = revenue * commissionRate
   const clinicEarnings = revenue * (1 - commissionRate)
 
-  const recent = recentRows as { id: string; booking_ref: string; patient_name: string | null; package_name: string | null; appointment_date: string | null; status: string; amount_paid: number | null }[]
-  const staff  = staffRows as { id: string; first_name: string | null; last_name: string | null; role: string | null; email: string }[]
-  const scans  = scansRows as { scan_type_code: string; price_gbp: number | null; is_available: boolean; name_en: string }[]
+  const recent = recentRows as unknown as { id: string; booking_ref: string; patient_name: string | null; package_name: string | null; appointment_date: string | null; status: string; amount_paid: number | null }[]
+  const staff  = staffRows as unknown as { id: string; first_name: string | null; last_name: string | null; role: string | null; email: string }[]
+  const scans  = scansRows as unknown as { scan_type_code: string; price_gbp: number | null; is_available: boolean; name_en: string }[]
 
   return (
     <>

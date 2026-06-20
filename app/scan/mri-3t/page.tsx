@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { getClinicsByScan } from '@/lib/tr-clinics.data';
+import { getClinicsWithScan } from '@/lib/tr-clinics.data';
 
 export const metadata: Metadata = {
   title: 'MRI 3T Scan in Turkey — From £285 | thediagnostic',
@@ -15,10 +15,11 @@ export const metadata: Metadata = {
   },
 };
 
-const MRI_CLINICS = getClinicsByScan('mri_3t').slice(0, 6).map(c => {
-  const scan = c.featuredScans.find(s => s.code === 'mri_3t')!;
-  return { slug: c.slug, name: c.name, city: c.city, group: c.group, jci: c.jciAccredited, iso: c.isoAccredited, device: scan.deviceName, priceGbp: scan.priceGbp, ukPriceGbp: scan.ukPriceGbp, rating: c.rating };
-});
+const MRI_CLINICS = getClinicsWithScan('mri_3t').flatMap(c => {
+  const scan = c.featuredScans.find(s => s.code === 'mri_3t');
+  if (!scan) return [];
+  return [{ slug: c.slug, name: c.name, city: c.city, group: c.group, jci: c.jciAccredited, iso: c.isoAccredited, device: scan.deviceName, priceGbp: scan.priceGbp, ukPriceGbp: scan.ukPriceGbp, rating: c.rating }];
+}).slice(0, 6);
 
 const UK_VS_TR = [
   { label: 'Price (single body part)', uk: '£900 – £1,500', tr: 'From £285', winner: 'tr' },

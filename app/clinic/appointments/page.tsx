@@ -36,7 +36,7 @@ export default async function ClinicAppointmentsPage({ searchParams }: PageProps
     WHERE ca.user_id = ${user.id} LIMIT 1
   `
   if (!clinicRows[0]) redirect('/clinic/dashboard')
-  const clinicId = (clinicRows[0] as { id: string }).id
+  const clinicId = (clinicRows[0]  as unknown as { id: string }).id
 
   const params = await searchParams
   const statusFilter = params.status ?? ''
@@ -59,7 +59,7 @@ export default async function ClinicAppointmentsPage({ searchParams }: PageProps
       created_at DESC
   `
 
-  const bookings = rows as {
+  const bookings = rows  as unknown as {
     id: string; booking_ref: string; patient_name: string | null;
     patient_email: string | null; patient_phone: string | null;
     package_name: string | null; body_part: string | null;

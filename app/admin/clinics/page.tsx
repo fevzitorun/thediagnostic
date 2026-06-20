@@ -32,8 +32,8 @@ export default async function AdminClinicsPage({ searchParams }: PageProps) {
     sql`SELECT DISTINCT hospital_group FROM tr_clinics WHERE hospital_group IS NOT NULL ORDER BY hospital_group`,
   ])
 
-  const clinics = clinicRows as { id: string; slug: string; name: string; short_name: string | null; city: string; hospital_group: string | null; jci_accredited: boolean; iso_certified: boolean; is_active: boolean; commission_pct: number; rating: number | null; beds: number | null; created_at: string; booking_count: number }[]
-  const groups = groupRows.map(r => (r as { hospital_group: string }).hospital_group)
+  const clinics = clinicRows as unknown as { id: string; slug: string; name: string; short_name: string | null; city: string; hospital_group: string | null; jci_accredited: boolean; iso_certified: boolean; is_active: boolean; commission_pct: number; rating: number | null; beds: number | null; created_at: string; booking_count: number }[]
+  const groups = groupRows.map(r => (r as unknown as { hospital_group: string }).hospital_group)
 
   return (
     <>

@@ -25,7 +25,7 @@ export async function PATCH(req: NextRequest) {
   const user = session?.user
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json() as {
+  const body = await req.json()  as unknown as {
     first_name?: string; last_name?: string; phone?: string; nationality?: string;
     passport_number?: string; passport_expiry?: string; preferred_currency?: string;
     emergency_contact_name?: string; emergency_contact_phone?: string; medical_notes?: string;

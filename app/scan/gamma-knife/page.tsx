@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { getClinicsByScan } from '@/lib/tr-clinics.data';
+import { getClinicsWithScan } from '@/lib/tr-clinics.data';
 
 export const metadata: Metadata = {
   title: 'GammaKnife Radiosurgery in Turkey — From £6,500 | thediagnostic',
@@ -15,9 +15,10 @@ export const metadata: Metadata = {
   },
 };
 
-const GK_CLINICS = getClinicsByScan('gamma_knife').map(c => {
-  const scan = c.featuredScans.find(s => s.code === 'gamma_knife')!;
-  return { slug: c.slug, name: c.name, city: c.city, group: c.group, jci: c.jciAccredited, iso: c.isoAccredited, device: scan.deviceName, priceGbp: scan.priceGbp, ukPriceGbp: scan.ukPriceGbp, rating: c.rating };
+const GK_CLINICS = getClinicsWithScan('gamma_knife').flatMap(c => {
+  const scan = c.featuredScans.find(s => s.code === 'gamma_knife');
+  if (!scan) return [];
+  return [{ slug: c.slug, name: c.name, city: c.city, group: c.group, jci: c.jciAccredited, iso: c.isoAccredited, device: scan.deviceName, priceGbp: scan.priceGbp, ukPriceGbp: scan.ukPriceGbp, rating: c.rating }];
 });
 
 const UK_VS_TR = [

@@ -33,7 +33,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
   `
   if (!rows[0]) notFound()
 
-  const b = rows[0] as {
+  const b = rows[0]  as unknown as {
     id: string; booking_ref: string; status: string; clinic_name: string | null;
     package_name: string | null; body_part: string | null; appointment_date: string | null;
     appointment_time: string | null; patient_name: string | null; patient_dob: string | null;

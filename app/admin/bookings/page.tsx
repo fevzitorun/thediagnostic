@@ -47,7 +47,13 @@ export default async function AdminBookingsPage({ searchParams }: PageProps) {
     LIMIT ${perPage} OFFSET ${offset}
   `
 
-  const bookings = rows as (typeof rows[0] & { total_count: string })[]
+  type Booking = {
+    id: string; total_count: string; booking_ref: string | null; status: string
+    patient_name: string | null; patient_email: string | null; clinic_name: string | null
+    package_name: string | null; body_part: string | null; appointment_date: string | null
+    created_at: string | null; amount_paid: number | null
+  }
+  const bookings = rows as unknown as Booking[]
   const total = Number(bookings[0]?.total_count ?? 0)
   const totalPages = Math.ceil(total / perPage)
 
@@ -94,9 +100,9 @@ export default async function AdminBookingsPage({ searchParams }: PageProps) {
             </thead>
             <tbody>
               {bookings.map((b, i) => {
-                const s = STATUS_STYLE[b.status] ?? STATUS_STYLE.pending
+                const s = STATUS_STYLE[b.status as string] ?? STATUS_STYLE.pending
                 return (
-                  <tr key={b.id} style={{ borderBottom: i < bookings.length - 1 ? '1px solid #f5f5f5' : 'none' }}>
+                  <tr key={b.id as string} style={{ borderBottom: i < bookings.length - 1 ? '1px solid #f5f5f5' : 'none' }}>
                     <td style={{ padding: '12px 14px', fontFamily: 'monospace', fontSize: 11, color: '#888' }}>{b.booking_ref}</td>
                     <td style={{ padding: '12px 14px' }}>
                       <div style={{ fontWeight: 500, color: 'var(--primary)' }}>{b.patient_name ?? '—'}</div>

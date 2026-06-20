@@ -16,7 +16,7 @@ export default async function ClinicPackagesPage() {
     WHERE ca.user_id = ${user.id} LIMIT 1
   `
   if (!clinicRows[0]) redirect('/clinic/dashboard')
-  const clinic = clinicRows[0] as { id: string; name: string; commission_pct: number }
+  const clinic = clinicRows[0]  as unknown as { id: string; name: string; commission_pct: number }
 
   // Scans offered by this clinic with pricing
   const rows = await sql`
@@ -30,7 +30,7 @@ export default async function ClinicPackagesPage() {
     ORDER BY tst.category ASC, tst.name_en ASC
   `
 
-  const scans = rows as {
+  const scans = rows  as unknown as {
     id: string; scan_type_code: string; device_name: string | null; device_year: number | null;
     price_gbp: number | null; price_eur: number | null; price_usd: number | null; uk_price_gbp: number | null;
     is_available: boolean; notes: string | null;

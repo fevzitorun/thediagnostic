@@ -36,7 +36,7 @@ export default async function AdminDashboard() {
     `,
   ])
 
-  const stats = statsRows[0] as {
+  const stats = statsRows[0] as unknown as {
     total_bookings: string; pending_count: string; total_revenue: string;
     total_patients: string; total_tr_clinics: string;
   }
@@ -46,7 +46,7 @@ export default async function AdminDashboard() {
   const totalPatients  = Number(stats.total_patients) ?? 0
   const totalTrClinics = Number(stats.total_tr_clinics) ?? 0
 
-  const recentBookings = recentRows as { id: string; booking_ref: string; patient_name: string | null; clinic_name: string | null; package_name: string | null; status: string; amount_paid: number | null; created_at: string }[]
+  const recentBookings = recentRows as unknown as { id: string; booking_ref: string; patient_name: string | null; clinic_name: string | null; package_name: string | null; status: string; amount_paid: number | null; created_at: string }[]
 
   return (
     <>

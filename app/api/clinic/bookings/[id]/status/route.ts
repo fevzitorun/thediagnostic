@@ -22,7 +22,7 @@ export async function POST(
   }
 
   try {
-    const clinicId = session.user.clinicId
+    const clinicId = session.user.clinicId ?? null
     if (clinicId) {
       await sql`UPDATE bookings SET status = ${status}, updated_at = NOW() WHERE id = ${id} AND clinic_id = ${clinicId}`
     } else {

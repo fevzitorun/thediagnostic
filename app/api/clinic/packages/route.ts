@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
   const body = await req.json()
   const { name, scan_type, price, duration_minutes, description, is_active } =
-    body as Record<string, unknown>
+    body  as unknown as { name: string; scan_type?: string; price: number; duration_minutes?: number; description?: string; is_active?: boolean }
 
   if (!name || !price) {
     return NextResponse.json({ error: 'Name and price are required' }, { status: 400 })

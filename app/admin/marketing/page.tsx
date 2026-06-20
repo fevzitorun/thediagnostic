@@ -32,7 +32,7 @@ export default async function AdminMarketingPage() {
     `,
   ])
 
-  const m = metricsRows[0] as { total_patients: string; total_bookings: string; completed: string; cancelled: string; avg_value: string }
+  const m = metricsRows[0] as unknown as { total_patients: string; total_bookings: string; completed: string; cancelled: string; avg_value: string }
   const totalPatients  = Number(m.total_patients)
   const totalBookings  = Number(m.total_bookings)
   const avgValue       = Number(m.avg_value)
@@ -42,10 +42,10 @@ export default async function AdminMarketingPage() {
   const cancellationRate = totalBookings > 0 ? ((cancelled / totalBookings) * 100).toFixed(1) : '0'
   const completionRate   = totalBookings > 0 ? ((completed / totalBookings) * 100).toFixed(1) : '0'
 
-  const monthly = monthlyRegRows as { month: string; count: number }[]
+  const monthly = monthlyRegRows as unknown as { month: string; count: number }[]
   const maxMonthly = Math.max(...monthly.map(r => r.count), 1)
 
-  const statuses = statusRows as { status: string; count: number }[]
+  const statuses = statusRows as unknown as { status: string; count: number }[]
   const statusColors: Record<string, string> = { confirmed: '#17A589', completed: '#3AABDB', pending: '#f59e0b', cancelled: '#ef4444' }
 
   return (

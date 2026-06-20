@@ -11,11 +11,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const body = await req.json()
-  const {
-    name, address, city, postcode, phone, email, website,
-    description, commission_rate, capabilities, status,
-  } = body as Record<string, unknown>
+  const body = await req.json()  as unknown as {
+    name?: string; address?: string; city?: string; postcode?: string
+    phone?: string; email?: string; website?: string; description?: string
+    commission_rate?: number; capabilities?: string[]; status?: string
+  }
+  const { name, address, city, postcode, phone, email, website, description, commission_rate, capabilities, status } = body
 
   if (!name || !city || !postcode) {
     return NextResponse.json({ error: 'Name, city and postcode are required' }, { status: 400 })

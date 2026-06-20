@@ -16,10 +16,10 @@ export async function PATCH(
   }
 
   const { id } = await params
-  const clinicId = session.user.clinicId
+  const clinicId = session.user.clinicId ?? null
   const body = await req.json()
   const { name, scan_type, price, duration_minutes, description, is_active } =
-    body as Record<string, unknown>
+    body  as unknown as { name: string; scan_type?: string; price: number; duration_minutes?: number; description?: string; is_active?: boolean }
 
   await sql`
     UPDATE packages SET
@@ -45,7 +45,7 @@ export async function DELETE(
   }
 
   const { id } = await params
-  const clinicId = session.user.clinicId
+  const clinicId = session.user.clinicId ?? null
 
   await sql`DELETE FROM packages WHERE id = ${id} AND clinic_id = ${clinicId}`
 

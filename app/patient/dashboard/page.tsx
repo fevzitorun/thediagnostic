@@ -27,7 +27,7 @@ export default async function PatientDashboard() {
 
   const profile = profileRows[0] ?? {}
   const firstName = (profile.first_name as string | null) || user.email?.split('@')[0] || 'there'
-  const bookings = bookingRows as {
+  const bookings = bookingRows  as unknown as {
     id: string; booking_ref: string; status: string; clinic_name: string | null;
     package_name: string | null; body_part: string | null; appointment_date: string | null;
     amount_paid: number | null; report_url: string | null; created_at: string;

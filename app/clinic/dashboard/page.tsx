@@ -39,7 +39,7 @@ export default async function ClinicDashboardPage() {
     )
   }
 
-  const clinic = clinicRows[0] as { id: string; name: string; short_name: string | null; city: string; commission_pct: number; is_active: boolean; first_name: string | null }
+  const clinic = clinicRows[0]  as unknown as { id: string; name: string; short_name: string | null; city: string; commission_pct: number; is_active: boolean; first_name: string | null }
   const todayStr = new Date().toISOString().split('T')[0]
 
   const [statsRows, recentRows] = await Promise.all([
@@ -61,12 +61,12 @@ export default async function ClinicDashboardPage() {
     `,
   ])
 
-  const stats = statsRows[0] as { pending_count: string; today_count: string; confirmed_count: string; clinic_earnings: string }
+  const stats = statsRows[0]  as unknown as { pending_count: string; today_count: string; confirmed_count: string; clinic_earnings: string }
   const pendingCount  = Number(stats.pending_count)
   const todayCount    = Number(stats.today_count)
   const clinicEarnings = Number(stats.clinic_earnings)
 
-  const recent = recentRows as { id: string; booking_ref: string; patient_name: string | null; package_name: string | null; body_part: string | null; appointment_date: string | null; status: string; amount_paid: number | null }[]
+  const recent = recentRows  as unknown as { id: string; booking_ref: string; patient_name: string | null; package_name: string | null; body_part: string | null; appointment_date: string | null; status: string; amount_paid: number | null }[]
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'

@@ -11,7 +11,7 @@ export default async function AdminNewClinicPage() {
   if (!user) redirect('/login')
 
   const profileRows = await sql`SELECT role FROM profiles WHERE id = ${user.id} LIMIT 1`
-  const role = (profileRows[0] as { role: string } | undefined)?.role ?? ''
+  const role = (profileRows[0]  as unknown as { role: string } | undefined)?.role ?? ''
   if (!['super_admin', 'admin', 'sales'].includes(role)) redirect('/admin/clinics')
 
   return (

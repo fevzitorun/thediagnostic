@@ -27,7 +27,7 @@ export default async function AdminSettingsPage() {
     WHERE p.role IN ('super_admin','admin','finance','sales','support','marketing')
     ORDER BY p.created_at ASC
   `
-  const admins = rows as { id: string; first_name: string | null; last_name: string | null; role: string; created_at: string; email: string }[]
+  const admins = rows as unknown as { id: string; first_name: string | null; last_name: string | null; role: string; created_at: string; email: string }[]
 
   return (
     <>

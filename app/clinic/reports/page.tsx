@@ -15,7 +15,7 @@ export default async function ClinicReportsPage() {
     WHERE ca.user_id = ${user.id} LIMIT 1
   `
   if (!clinicRows[0]) redirect('/clinic/dashboard')
-  const clinicId = (clinicRows[0] as { id: string }).id
+  const clinicId = (clinicRows[0]  as unknown as { id: string }).id
 
   // Confirmed or completed bookings for this clinic
   const rows = await sql`
@@ -26,7 +26,7 @@ export default async function ClinicReportsPage() {
     ORDER BY appointment_date DESC NULLS LAST
   `
 
-  const bookings = rows as {
+  const bookings = rows  as unknown as {
     id: string; booking_ref: string; patient_name: string | null;
     package_name: string | null; body_part: string | null;
     appointment_date: string | null; report_url: string | null; status: string;

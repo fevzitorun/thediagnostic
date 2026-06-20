@@ -6,11 +6,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { auth } from '@/lib/auth';
 
-async function getClinicId(session: Awaited<ReturnType<typeof auth>>) {
+async function getClinicId(session: { user?: { role?: string; clinicId?: string | null } | null } | null) {
   if (!session?.user) return null;
-  const role = (session.user as Record<string, unknown>).role as string | undefined;
+  const { role, clinicId } = session.user  as unknown as { role?: string; clinicId?: string | null };
   if (role === 'admin' || role === 'super_admin') return null; // admin sees all
-  const clinicId = (session.user as Record<string, unknown>).clinicId as string | undefined;
   return clinicId ?? null;
 }
 
@@ -58,7 +57,7 @@ export async function POST(req: NextRequest) {
   const clinicId = await getClinicId(session);
   if (!clinicId) return NextResponse.json({ error: 'Clinic ID required' }, { status: 400 });
 
-  const body = await req.json() as {
+  const body = await req.json()  as unknown as {
     slots?: Array<{ scan_type_code: string; slot_date: string; slot_time: string; duration_minutes?: number; price_gbp?: number }>;
     // single slot mode
     scan_type_code?: string;
@@ -90,7 +89,7 @@ export async function PATCH(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
 
   const clinicId = await getClinicId(session);
-  const { id, status } = await req.json() as { id: string; status: string };
+  const { id, status } = await req.json()  as unknown as { id: string; status: string };
 
   const allowed = ['available', 'blocked', 'cancelled'];
   if (!allowed.includes(status)) return NextResponse.json({ error: 'Invalid status' }, { status: 400 });

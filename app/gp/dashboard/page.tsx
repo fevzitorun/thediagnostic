@@ -23,11 +23,11 @@ export default async function GPDashboardPage() {
   let gp: GPRow | null = null
   try {
     const gpRows = await sql`SELECT id, name, practice_name, referral_code, commission_rate, total_earned, pending_payout FROM gps WHERE user_id = ${user.id} LIMIT 1`
-    gp = (gpRows[0] as GPRow) ?? null
+    gp = (gpRows[0] as unknown as GPRow) ?? null
   } catch { /* table may not exist */ }
 
   const profileRows = await sql`SELECT first_name, last_name FROM profiles WHERE id = ${user.id} LIMIT 1`
-  const profile = profileRows[0] as { first_name: string | null; last_name: string | null } | undefined
+  const profile = profileRows[0]  as unknown as { first_name: string | null; last_name: string | null } | undefined
 
   if (!gp) {
     return (
@@ -59,10 +59,10 @@ export default async function GPDashboardPage() {
       sql`SELECT COALESCE(SUM(amount_paid),0) AS revenue, COUNT(*) AS cnt FROM bookings WHERE gp_id = ${gp.id} AND status IN ('confirmed','completed') AND created_at >= ${monthStart}`,
       sql`SELECT id, booking_ref, patient_name, clinic_name, package_name, status, amount_paid, created_at FROM bookings WHERE gp_id = ${gp.id} ORDER BY created_at DESC LIMIT 5`,
     ])
-    totalReferrals = Number((totalRows[0] as { cnt: string }).cnt)
-    thisMonthCount = Number((monthRows[0] as { cnt: string }).cnt)
-    thisMonthCommission = Number((monthRows[0] as { revenue: string }).revenue) * commissionRate
-    recent = recentRows as BookingRow[]
+    totalReferrals = Number((totalRows[0]  as unknown as { cnt: string }).cnt)
+    thisMonthCount = Number((monthRows[0]  as unknown as { cnt: string }).cnt)
+    thisMonthCommission = Number((monthRows[0]  as unknown as { revenue: string }).revenue) * commissionRate
+    recent = recentRows as unknown as BookingRow[]
   } catch { /* gp_id column may not exist */ }
 
   const hour = new Date().getHours()

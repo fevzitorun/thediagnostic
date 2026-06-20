@@ -11,9 +11,9 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const clinicId = session.user.clinicId
+  const clinicId = session.user.clinicId ?? null
   const body = await req.json()
-  const { bookingId, reportUrl } = body as { bookingId: string; reportUrl: string }
+  const { bookingId, reportUrl } = body  as unknown as { bookingId: string; reportUrl: string }
 
   if (!bookingId || !reportUrl) {
     return NextResponse.json({ error: 'bookingId and reportUrl are required' }, { status: 400 })
