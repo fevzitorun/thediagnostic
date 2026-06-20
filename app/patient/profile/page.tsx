@@ -1,295 +1,125 @@
-// @ts-nocheck
 'use client'
 
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useEffect, FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
+
+type Profile = {
+  first_name: string; last_name: string; phone: string; nationality: string;
+  passport_number: string; passport_expiry: string; preferred_currency: string;
+  emergency_contact_name: string; emergency_contact_phone: string; medical_notes: string;
+}
+
+const CURRENCIES = ['GBP', 'EUR', 'USD', 'TRY', 'AED']
+
+const field: React.CSSProperties = {
+  width: '100%', padding: '9px 13px', border: '1.5px solid var(--line)',
+  borderRadius: 8, fontSize: 14, color: 'var(--text)', background: '#fafafa',
+  outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
+}
+const lbl: React.CSSProperties = {
+  display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)',
+  textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 5,
+}
 
 export default function ProfilePage() {
-  const supabase = createClient()
-
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    dob: '',
-    marketingConsent: false,
+  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [form, setForm] = useState<Profile>({
+    first_name: '', last_name: '', phone: '', nationality: '',
+    passport_number: '', passport_expiry: '', preferred_currency: 'GBP',
+    emergency_contact_name: '', emergency_contact_phone: '', medical_notes: '',
   })
-
-  const [passwordForm, setPasswordForm] = useState({
-    newPassword: '',
-    confirmPassword: '',
-  })
-  const [passwordSaving, setPasswordSaving] = useState(false)
-  const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-
-  const [email, setEmail] = useState('')
 
   useEffect(() => {
-    async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      setEmail(user.email ?? '')
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, phone, date_of_birth, marketing_consent')
-        .eq('id', user.id)
-        .single()
-
-      if (profile) {
-        setForm({
-          firstName: profile.first_name ?? '',
-          lastName: profile.last_name ?? '',
-          phone: profile.phone ?? '',
-          dob: profile.date_of_birth ?? '',
-          marketingConsent: profile.marketing_consent ?? false,
-        })
-      }
-      setLoading(false)
-    }
-    load()
+    fetch('/api/patient/profile')
+      .then(r => r.json())
+      .then((d: Partial<Profile>) => { setForm(f => ({ ...f, ...d })); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [])
 
-  async function handleSave(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setSaving(true)
-    setMessage(null)
-
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        first_name: form.firstName,
-        last_name: form.lastName,
-        phone: form.phone,
-        date_of_birth: form.dob || null,
-        marketing_consent: form.marketingConsent,
-      })
-      .eq('id', user.id)
-
-    setMessage(error
-      ? { type: 'error', text: error.message }
-      : { type: 'success', text: 'Profile updated successfully.' }
-    )
-    setSaving(false)
-  }
-
-  async function handlePasswordChange(e: React.FormEvent) {
-    e.preventDefault()
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordMessage({ type: 'error', text: 'Passwords do not match.' })
-      return
+    setSaving(true); setMsg(null)
+    try {
+      const res = await fetch('/api/patient/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? 'Could not save.')
+      setMsg({ type: 'success', text: 'Profile saved.' })
+      router.refresh()
+    } catch (err) {
+      setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Error saving profile.' })
+    } finally {
+      setSaving(false)
     }
-    if (passwordForm.newPassword.length < 8) {
-      setPasswordMessage({ type: 'error', text: 'Password must be at least 8 characters.' })
-      return
-    }
-    setPasswordSaving(true)
-    setPasswordMessage(null)
-
-    const { error } = await supabase.auth.updateUser({ password: passwordForm.newPassword })
-    setPasswordMessage(error
-      ? { type: 'error', text: error.message }
-      : { type: 'success', text: 'Password changed successfully.' }
-    )
-    if (!error) setPasswordForm({ newPassword: '', confirmPassword: '' })
-    setPasswordSaving(false)
   }
 
-  if (loading) return <div style={{ color: '#bbb', fontSize: 14 }}>Loading…</div>
+  const set = (k: keyof Profile) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+    setForm(f => ({ ...f, [k]: e.target.value }))
 
-  const input = {
-    width: '100%', padding: '11px 13px',
-    border: '1.5px solid #e8e8e8', borderRadius: 9,
-    fontSize: 14, fontFamily: 'inherit', color: '#111',
-    outline: 'none', background: '#fff', transition: 'border-color .15s',
-  }
-
-  const label = {
-    display: 'block' as const,
-    fontSize: 11, fontWeight: 600 as const,
-    color: '#666', letterSpacing: 0.8,
-    textTransform: 'uppercase' as const, marginBottom: 6,
-  }
+  if (loading) return <div style={{ padding: '80px 0', textAlign: 'center', color: 'var(--text-muted)' }}>Loading profile…</div>
 
   return (
     <>
-      <div style={{ marginBottom: 36 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: '#0F4C81', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>
-          Patient Portal
-        </p>
-        <h1 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 32, color: '#111', letterSpacing: -0.5, marginBottom: 6 }}>
-          My profile
-        </h1>
-        <p style={{ fontSize: 14, color: '#888' }}>Update your personal details and preferences.</p>
+      <div style={{ marginBottom: 32 }}>
+        <p style={{ fontSize: 12, fontWeight: 700, color: '#3AABDB', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>Patient Portal</p>
+        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 32, color: 'var(--primary)', marginBottom: 4 }}>My Profile</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Keep your details up to date. Required for international travel and clinic pre-registration.</p>
       </div>
 
-      <div style={{ display: 'grid', gap: 24, maxWidth: 640 }}>
+      <form onSubmit={handleSubmit} style={{ maxWidth: 680 }}>
 
-        {/* Personal details */}
-        <form onSubmit={handleSave} style={{ background: '#fff', border: '1px solid #ebebeb', borderRadius: 16, padding: '28px 28px' }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#111', marginBottom: 20 }}>Personal details</div>
-
-          {message && (
-            <div style={{
-              background: message.type === 'success' ? '#dcfce7' : '#fef2f2',
-              border: `1px solid ${message.type === 'success' ? '#86efac' : '#fca5a5'}`,
-              borderRadius: 8, padding: '10px 14px', marginBottom: 18,
-              fontSize: 13, color: message.type === 'success' ? '#166534' : '#dc2626',
-            }}>
-              {message.text}
-            </div>
-          )}
-
-          <div style={{ marginBottom: 14 }}>
-            <label style={label}>Email address</label>
-            <input value={email} disabled style={{ ...input, background: '#f8f8f8', color: '#999', cursor: 'not-allowed' }} />
-            <p style={{ fontSize: 11, color: '#bbb', marginTop: 5 }}>Email cannot be changed here. Contact support if needed.</p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+        <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, padding: '24px 28px', marginBottom: 16 }}>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--primary)', marginBottom: 20 }}>Personal Information</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div><label style={lbl}>First name</label><input style={field} value={form.first_name} onChange={set('first_name')} required /></div>
+            <div><label style={lbl}>Last name</label><input style={field} value={form.last_name} onChange={set('last_name')} /></div>
+            <div><label style={lbl}>Phone</label><input style={field} type="tel" value={form.phone} onChange={set('phone')} /></div>
             <div>
-              <label style={label}>First name</label>
-              <input
-                value={form.firstName}
-                onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))}
-                style={input}
-                onFocus={e => (e.currentTarget.style.borderColor = '#0F4C81')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#e8e8e8')}
-              />
-            </div>
-            <div>
-              <label style={label}>Last name</label>
-              <input
-                value={form.lastName}
-                onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))}
-                style={input}
-                onFocus={e => (e.currentTarget.style.borderColor = '#0F4C81')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#e8e8e8')}
-              />
+              <label style={lbl}>Preferred currency</label>
+              <select style={{ ...field }} value={form.preferred_currency} onChange={set('preferred_currency')}>
+                {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
             </div>
           </div>
+        </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
-            <div>
-              <label style={label}>Phone number</label>
-              <input
-                type="tel"
-                value={form.phone}
-                onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                placeholder="07700 900000"
-                style={input}
-                onFocus={e => (e.currentTarget.style.borderColor = '#0F4C81')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#e8e8e8')}
-              />
-            </div>
-            <div>
-              <label style={label}>Date of birth</label>
-              <input
-                type="date"
-                value={form.dob}
-                onChange={e => setForm(f => ({ ...f, dob: e.target.value }))}
-                style={input}
-                onFocus={e => (e.currentTarget.style.borderColor = '#0F4C81')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#e8e8e8')}
-              />
-            </div>
+        <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, padding: '24px 28px', marginBottom: 16 }}>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>Travel &amp; Passport</h2>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>Required for international clinic pre-registration. Data encrypted and GDPR-compliant.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div><label style={lbl}>Nationality</label><input style={field} placeholder="e.g. GB" maxLength={5} value={form.nationality} onChange={set('nationality')} /></div>
+            <div></div>
+            <div><label style={lbl}>Passport number</label><input style={field} value={form.passport_number} onChange={set('passport_number')} /></div>
+            <div><label style={lbl}>Passport expiry</label><input style={field} type="date" value={form.passport_expiry} onChange={set('passport_expiry')} /></div>
           </div>
+        </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 24 }}>
-            <input
-              type="checkbox"
-              id="marketing"
-              checked={form.marketingConsent}
-              onChange={e => setForm(f => ({ ...f, marketingConsent: e.target.checked }))}
-              style={{ marginTop: 2, flexShrink: 0, accentColor: '#0F4C81', width: 16, height: 16, cursor: 'pointer' }}
-            />
-            <label htmlFor="marketing" style={{ fontSize: 13, color: '#666', lineHeight: 1.6, cursor: 'pointer' }}>
-              I&apos;d like to receive health tips and offers from ScanBook. You can unsubscribe at any time.
-            </label>
+        <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, padding: '24px 28px', marginBottom: 16 }}>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>Emergency Contact</h2>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>Required by the clinic before your procedure.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div><label style={lbl}>Full name</label><input style={field} value={form.emergency_contact_name} onChange={set('emergency_contact_name')} /></div>
+            <div><label style={lbl}>Phone number</label><input style={field} type="tel" value={form.emergency_contact_phone} onChange={set('emergency_contact_phone')} /></div>
           </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            style={{
-              padding: '11px 24px', background: saving ? '#e8e8e8' : '#082A4A',
-              color: saving ? '#bbb' : '#fff', border: 'none', borderRadius: 9,
-              fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit', transition: 'background .15s',
-            }}
-          >
-            {saving ? 'Saving…' : 'Save changes'}
-          </button>
-        </form>
+        <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, padding: '24px 28px', marginBottom: 24 }}>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>Medical Notes</h2>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>Allergies, current medications, or anything the clinic should know. Optional.</p>
+          <textarea style={{ ...field, minHeight: 100, resize: 'vertical' }} value={form.medical_notes} onChange={set('medical_notes')} />
+        </div>
 
-        {/* Change password */}
-        <form onSubmit={handlePasswordChange} style={{ background: '#fff', border: '1px solid #ebebeb', borderRadius: 16, padding: '28px 28px' }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#111', marginBottom: 20 }}>Change password</div>
-
-          {passwordMessage && (
-            <div style={{
-              background: passwordMessage.type === 'success' ? '#dcfce7' : '#fef2f2',
-              border: `1px solid ${passwordMessage.type === 'success' ? '#86efac' : '#fca5a5'}`,
-              borderRadius: 8, padding: '10px 14px', marginBottom: 18,
-              fontSize: 13, color: passwordMessage.type === 'success' ? '#166534' : '#dc2626',
-            }}>
-              {passwordMessage.text}
-            </div>
-          )}
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 20 }}>
-            <div>
-              <label style={label}>New password</label>
-              <input
-                type="password"
-                value={passwordForm.newPassword}
-                onChange={e => setPasswordForm(f => ({ ...f, newPassword: e.target.value }))}
-                placeholder="Minimum 8 characters"
-                autoComplete="new-password"
-                style={input}
-                onFocus={e => (e.currentTarget.style.borderColor = '#0F4C81')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#e8e8e8')}
-              />
-            </div>
-            <div>
-              <label style={label}>Confirm new password</label>
-              <input
-                type="password"
-                value={passwordForm.confirmPassword}
-                onChange={e => setPasswordForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                placeholder="Repeat new password"
-                autoComplete="new-password"
-                style={input}
-                onFocus={e => (e.currentTarget.style.borderColor = '#0F4C81')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#e8e8e8')}
-              />
-            </div>
+        {msg && (
+          <div style={{ padding: '12px 16px', borderRadius: 10, marginBottom: 16, background: msg.type === 'success' ? '#D1F2EB' : '#fee2e2', color: msg.type === 'success' ? '#0E6655' : '#991b1b', fontSize: 14, fontWeight: 500 }}>
+            {msg.text}
           </div>
+        )}
 
-          <button
-            type="submit"
-            disabled={passwordSaving || !passwordForm.newPassword}
-            style={{
-              padding: '11px 24px',
-              background: passwordSaving || !passwordForm.newPassword ? '#e8e8e8' : '#111',
-              color: passwordSaving || !passwordForm.newPassword ? '#bbb' : '#fff',
-              border: 'none', borderRadius: 9, fontSize: 14, fontWeight: 600,
-              cursor: passwordSaving || !passwordForm.newPassword ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit', transition: 'background .15s',
-            }}
-          >
-            {passwordSaving ? 'Changing…' : 'Change password'}
-          </button>
-        </form>
-
-      </div>
+        <button type="submit" disabled={saving} style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
+          {saving ? 'Saving…' : 'Save Profile'}
+        </button>
+      </form>
     </>
   )
 }
