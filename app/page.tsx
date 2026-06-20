@@ -102,7 +102,7 @@ const CLINICS = getFeaturedClinics().map((clinic, i) => ({
   rating: clinic.rating,
   priceFrom: clinic.featuredScans.length > 0 ? Math.min(...clinic.featuredScans.map(s => s.priceGbp)) : 0,
   currency: 'GBP',
-  accentColor: i % 2 === 0 ? '#17A589' : '#1B4F72',
+  accentColor: i % 2 === 0 ? '#17A589' : '#082A4A',
 }));
 
 const HOW_IT_WORKS = [

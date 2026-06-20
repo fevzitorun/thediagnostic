@@ -4,18 +4,21 @@
 :root {
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
   --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-  --primary:       #1B4F72;
-  --primary-2:     #154360;
-  --primary-3:     #0E2F48;
-  --primary-05:    #EBF5FB;
+  --primary:       #082A4A;
+  --primary-2:     #0B3565;
+  --primary-3:     #061E32;
+  --primary-05:    #E8F1FA;
   --accent:        #17A589;
   --accent-2:      #0E6655;
   --accent-light:  #D1F2EB;
+  --brand-blue:    #3AABDB;
+  --brand-blue-2:  #1E8AB5;
+  --brand-blue-lt: #D0EBF5;
   --warm:          #E67E22;
   --warm-light:    #FEF9F0;
-  --bg:            #F8FFFE;
-  --bg-2:          #EEF9F7;
-  --line:          #D5E8E4;
+  --bg:            #F6F9FC;
+  --bg-2:          #EBF4FA;
+  --line:          #CDDDE9;
   --text:          #1C2833;
   --text-muted:    #5D6D7E;
   --success:       #27AE60;

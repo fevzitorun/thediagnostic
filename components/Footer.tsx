@@ -1,50 +1,58 @@
 import Link from 'next/link'
-import { ScanBookLogo } from './Navbar'
 
 const COLS = [
   {
     title: 'Scans',
     links: [
-      { label: 'MRI Scan',        href: '/search?type=mri' },
-      { label: 'CT Scan',         href: '/search?type=ct' },
-      { label: 'Ultrasound',      href: '/search?type=ultrasound' },
-      { label: 'X-Ray',           href: '/search?type=xray' },
-      { label: 'Baby Scan',       href: '/search?type=baby-scan' },
-      { label: 'Full Body MRI',   href: '/search?type=mri&pathway=full-body' },
+      { label: 'PET-CT Scan',       href: '/scan/pet-ct' },
+      { label: 'MRI 3T',            href: '/scan/mri-3t' },
+      { label: 'GammaKnife',        href: '/scan/gamma-knife' },
+      { label: 'PET-MRI',           href: '/scan/pet-mri' },
+      { label: 'SPECT-CT',          href: '/scan/spect-ct' },
+      { label: 'Whole Body MRI',    href: '/scan/whole-body-mri' },
     ],
   },
   {
-    title: 'Locations',
+    title: 'Destinations',
     links: [
-      { label: 'London',          href: '/search?location=london' },
-      { label: 'Manchester',      href: '/search?location=manchester' },
-      { label: 'Birmingham',      href: '/search?location=birmingham' },
-      { label: 'Edinburgh',       href: '/search?location=edinburgh' },
-      { label: 'Bristol',         href: '/search?location=bristol' },
-      { label: 'All centres',     href: '/search' },
+      { label: 'Istanbul, Turkey',       href: '/destinations/turkey/istanbul' },
+      { label: 'All Clinics',            href: '/clinics' },
+      { label: 'UK vs Turkey Prices',    href: '/compare/pet-ct-uk-vs-turkey' },
+      { label: 'Medical Tourism Guide',  href: '/blog' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'About us',        href: '/about' },
-      { label: 'For Clinicians',  href: '/partners' },
-      { label: 'For GPs',        href: '/gp-referrals' },
-      { label: 'Blog',            href: '/blog' },
-      { label: 'Careers',        href: '/careers' },
-      { label: 'Contact',        href: '/contact' },
+      { label: 'About Us',          href: '/about' },
+      { label: 'For Clinics',       href: '/partners' },
+      { label: 'Blog',              href: '/blog' },
+      { label: 'Contact',           href: '/contact' },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Privacy policy',  href: '/privacy-policy' },
-      { label: 'Terms',           href: '/terms-and-conditions' },
-      { label: 'Cookie policy',   href: '/cookie-policy' },
-      { label: 'Accessibility',   href: '/accessibility' },
+      { label: 'Privacy Policy',    href: '/privacy-policy' },
+      { label: 'Terms',             href: '/terms-and-conditions' },
+      { label: 'Cookie Policy',     href: '/cookie-policy' },
+      { label: 'Accessibility',     href: '/accessibility' },
     ],
   },
 ]
+
+function DiagnosticLogo() {
+  return (
+    <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/logo-mark.png" alt="" width={34} height={34} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+      <div style={{ lineHeight: 1.1 }}>
+        <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: 400, letterSpacing: '0.12em', textTransform: 'uppercase' }}>The</div>
+        <div style={{ color: '#fff', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em' }}>Diagnostic</div>
+      </div>
+    </Link>
+  )
+}
 
 export default function Footer() {
   return (
@@ -57,13 +65,12 @@ export default function Footer() {
 
           {/* Brand column */}
           <div>
-            <ScanBookLogo light />
+            <DiagnosticLogo />
             <p style={{ fontSize: 13, color: 'rgba(250,250,247,.5)', lineHeight: 1.7, marginTop: 16, maxWidth: 240 }}>
-              Private medical imaging, booked online. Access 200+ CQC-registered centres across the UK.
+              Medical imaging technology broker. 60+ advanced diagnostic technologies at JCI-accredited partner clinics in Istanbul. Reports in English within 24 hours.
             </p>
             <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-              {/* Trust badges */}
-              {['CQC', 'ISO', 'GDPR'].map(b => (
+              {['JCI', 'ISO', 'GDPR'].map(b => (
                 <div key={b} style={{ padding: '4px 10px', border: '1px solid rgba(255,255,255,.15)', borderRadius: 6, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,.4)', letterSpacing: 0.8 }}>
                   {b}
                 </div>
@@ -82,7 +89,7 @@ export default function Footer() {
                   <Link
                     key={l.href}
                     href={l.href}
-                    style={{ fontSize: 13, color: 'rgba(255,255,255,.55)', textDecoration: 'none', transition: 'color .15s' }}
+                    style={{ fontSize: 13, color: 'rgba(255,255,255,.55)', textDecoration: 'none' }}
                   >
                     {l.label}
                   </Link>
@@ -95,10 +102,10 @@ export default function Footer() {
         {/* Bottom bar */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,.3)', margin: 0 }}>
-            © 2026 ScanBook · A trading name of Connective Hub Limited · Company No. 11148446
+            © 2026 thediagnostic.co.uk · A trading name of Connective Hub Limited · Company No. 11148446
           </p>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00C9A7' }} />
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#17A589' }} />
             <span style={{ fontSize: 12, color: 'rgba(255,255,255,.3)' }}>All systems operational</span>
           </div>
         </div>

@@ -42,7 +42,7 @@ sırayla işlenecek. Durum sütunu ilerledikçe güncellenecek.
 
 | # | Modül | Açıklama | Durum |
 |---|---|---|---|
-| 12 | **`/scan/pet-ct`** | PET-CT landing sayfası — fiyat karşılaştırma + FAQ + hazırlık rehberi | ⬜ |
+| 12 | **`/scan/pet-ct`** | PET-CT landing sayfası — fiyat karşılaştırma (UK vs TR tablo) + 8 SSS + 6 adım hazırlık rehberi + partner klinik kartları + SEO metadata. Design system güncellemesi de bu commit'te: `--primary:#082A4A`, `--brand-blue:#3AABDB`, Footer TR odaklı linkler + doğru DiagnosticLogo bileşeni (ScanBookLogo import hatası düzeltildi), Navbar navy güncellendi | ✅ |
 | 13 | **`/scan/gamma-knife`** | GammaKnife landing — vs cerrahi karşılaştırma | ⬜ |
 | 14 | **`/scan/mri-3t`** | MRI 3T landing — 3T vs 1.5T karşılaştırma | ⬜ |
 | 15 | **`/scan/pet-mri`** | PET-MRI landing sayfası | ⬜ |
