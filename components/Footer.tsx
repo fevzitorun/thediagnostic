@@ -10,6 +10,7 @@ const COLS = [
       { label: 'PET-MRI',           href: '/scan/pet-mri' },
       { label: 'SPECT-CT',          href: '/scan/spect-ct' },
       { label: 'Whole Body MRI',    href: '/scan/whole-body-mri' },
+      { label: 'CT Angiography',    href: '/scan/ct-angio' },
     ],
   },
   {
